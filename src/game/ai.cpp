@@ -114,7 +114,7 @@ void AI::speedControl(TrackTile & currentTile, bool isRaceCompleted)
     const float absSpeed = m_car.absSpeed();
 
     // The following speed limits are experimentally defined.
-    float scale = 0.9f;
+    float scale = 0.9f*3.5;
     if (currentTile.computerHint() == TrackTile::CH_BRAKE) {
         if (absSpeed > 14.0f * scale) {
             brake = true;
