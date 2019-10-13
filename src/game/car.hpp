@@ -219,7 +219,7 @@ private:
 
     MCSurface & m_brakeGlow;
 
-    float m_length; // in meters
+    float m_length; // in scene units
 
     int m_speedInKmh;
 
@@ -235,7 +235,7 @@ private:
 
     int m_routeProgression;
 
-    int m_position;
+    int m_position; // car index, between first and last
 
     bool m_isHuman;
 
