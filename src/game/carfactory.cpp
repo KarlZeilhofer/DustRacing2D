@@ -83,6 +83,6 @@ CarPtr CarFactory::buildCar(int index, int numCars, Game & game)
 
 float CarFactory::randomFactor(float from, float to)
 {
-	return (rand()%101)/100.0f*(to-from) + from;
+	return (rand()%1001)/1000.0f*(to-from) + from;
 }
 

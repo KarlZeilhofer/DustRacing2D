@@ -31,6 +31,6 @@ void CarPhysicsComponent::addImpulse(const MCVector3dF & impulse, bool isCollisi
     if (Game::instance().difficultyProfile().hasBodyDamage() && isCollision)
     {
         const float damage = (m_car.isHuman() ? 0.5f : 0.25f) * impulse.lengthFast();
-        m_car.addDamage(damage);
+        m_car.addDamage(damage*0.1);
     }
 }
