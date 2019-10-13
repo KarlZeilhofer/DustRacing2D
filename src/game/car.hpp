@@ -40,6 +40,13 @@ public:
         Left,
         Right
     };
+	
+	// enum, for getters and setters, default is metric
+	enum class Unit{
+		Undefined, 
+		Metric, 
+		Scene
+	};
 
     //! Defines the (default) car properties.
     struct Description
@@ -131,16 +138,16 @@ public:
     int position() const;
 
     //! Get location of the left front tire.
-    MCVector3dF leftFrontTireLocation() const;
+    MCVector3dF leftFrontTireLocation(Unit unit = Unit::Undefined) const;
 
     //! Get location of the right front tire.
-    MCVector3dF rightFrontTireLocation() const;
+    MCVector3dF rightFrontTireLocation(Unit unit = Unit::Undefined) const;
 
     //! Get location of the left rear tire.
-    MCVector3dF leftRearTireLocation() const;
+    MCVector3dF leftRearTireLocation(Unit unit = Unit::Undefined) const;
 
     //! Get location of the right rear tire.
-    MCVector3dF rightRearTireLocation() const;
+    MCVector3dF rightRearTireLocation(Unit unit = Unit::Undefined) const;
 
     bool isHuman() const;
 

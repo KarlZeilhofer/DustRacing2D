@@ -40,7 +40,7 @@ void OffTrackDetector::update()
     assert(m_track);
 
     {
-        const MCVector3dF leftFrontTirePos(m_car.leftFrontTireLocation());
+        const MCVector3dF leftFrontTirePos(m_car.leftFrontTireLocation(Car::Unit::Scene));
         TrackTile & tile = *m_track->trackTileAtLocation(
             leftFrontTirePos.i(), leftFrontTirePos.j());
 
@@ -53,7 +53,7 @@ void OffTrackDetector::update()
     }
 
     {
-        const MCVector3dF rightFrontTirePos(m_car.rightFrontTireLocation());
+        const MCVector3dF rightFrontTirePos(m_car.rightFrontTireLocation(Car::Unit::Scene));
         TrackTile & tile = *m_track->trackTileAtLocation(
             rightFrontTirePos.i(), rightFrontTirePos.j());
 

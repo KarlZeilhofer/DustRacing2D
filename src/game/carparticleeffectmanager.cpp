@@ -51,7 +51,7 @@ float CarParticleEffectManager::calculateSkidAngle(float distance, double dx, do
 
 void CarParticleEffectManager::doLeftSkidMark(ParticleFactory::ParticleType type)
 {
-    const MCVector2dF skidLocation(m_car.leftRearTireLocation());
+    const MCVector2dF skidLocation(m_car.leftRearTireLocation(Car::Unit::Scene));
     const float distance = (m_prevLeftSkidMarkLocation - skidLocation).lengthFast();
     if (distance > SKID_MARK_DENSITY)
     {
@@ -65,7 +65,7 @@ void CarParticleEffectManager::doLeftSkidMark(ParticleFactory::ParticleType type
 
 void CarParticleEffectManager::doRightSkidMark(ParticleFactory::ParticleType type)
 {
-    const MCVector2dF skidLocation(m_car.rightRearTireLocation());
+    const MCVector2dF skidLocation(m_car.rightRearTireLocation(Car::Unit::Scene));
     const float distance = (m_prevRightSkidMarkLocation - skidLocation).lengthFast();
     if (distance > SKID_MARK_DENSITY)
     {
@@ -81,7 +81,7 @@ void CarParticleEffectManager::doDamageSmoke()
 {
     if (m_car.damageLevel() <= 0.3f && MCRandom::getValue() > m_car.damageLevel())
     {
-        MCVector3dF smokeLocation = (m_car.leftFrontTireLocation() + m_car.rightFrontTireLocation()) * 0.5f;
+        MCVector3dF smokeLocation = (m_car.leftFrontTireLocation(Car::Unit::Scene) + m_car.rightFrontTireLocation(Car::Unit::Scene)) * 0.5f;
         ParticleFactory::instance().doParticle(ParticleFactory::DamageSmoke, smokeLocation);
     }
 }
@@ -94,13 +94,13 @@ void CarParticleEffectManager::doOnTrackAnimations()
         if (!m_car.leftSideOffTrack())
         {
             doLeftSkidMark(ParticleFactory::OnTrackSkidMark);
-            ParticleFactory::instance().doParticle(ParticleFactory::SkidSmoke, m_car.leftRearTireLocation(), m_car.physicsComponent().velocity() * 0.25f);
+            ParticleFactory::instance().doParticle(ParticleFactory::SkidSmoke, m_car.leftRearTireLocation(Car::Unit::Scene), m_car.physicsComponent().velocity() * 0.25f); // TODO PHYSICS: mixed units!
         }
 
         if (!m_car.rightSideOffTrack())
         {
             doRightSkidMark(ParticleFactory::OnTrackSkidMark);
-            ParticleFactory::instance().doParticle(ParticleFactory::SkidSmoke, m_car.rightRearTireLocation(), m_car.physicsComponent().velocity() * 0.25f);
+            ParticleFactory::instance().doParticle(ParticleFactory::SkidSmoke, m_car.rightRearTireLocation(Car::Unit::Scene), m_car.physicsComponent().velocity() * 0.25f);// TODO PHYSICS: mixed units!
         }
     }
 }
@@ -120,7 +120,7 @@ void CarParticleEffectManager::doOffTrackAnimations()
             if (++m_mudCounter >= 5)
             {
                 ParticleFactory::instance().doParticle(
-                    ParticleFactory::Mud, m_car.leftRearTireLocation(), m_car.physicsComponent().velocity() * 0.5f);
+                    ParticleFactory::Mud, m_car.leftRearTireLocation(Car::Unit::Scene), m_car.physicsComponent().velocity() * 0.5f); // TODO PHYSICS: mixed units
                 m_mudCounter = 0;
             }
         }
@@ -134,7 +134,7 @@ void CarParticleEffectManager::doOffTrackAnimations()
             if (++m_mudCounter >= 5)
             {
                 ParticleFactory::instance().doParticle(
-                    ParticleFactory::Mud, m_car.rightRearTireLocation(), m_car.physicsComponent().velocity() * 0.5f);
+                    ParticleFactory::Mud, m_car.rightRearTireLocation(Car::Unit::Scene), m_car.physicsComponent().velocity() * 0.5f);// TODO PHYSICS: mixed units
                 m_mudCounter = 0;
             }
         }
@@ -143,7 +143,7 @@ void CarParticleEffectManager::doOffTrackAnimations()
         {
             if (++m_smokeCounter >= 2)
             {
-                MCVector3dF smokeLocation = (m_car.leftRearTireLocation() + m_car.rightRearTireLocation()) * 0.5f;
+                MCVector3dF smokeLocation = (m_car.leftRearTireLocation(Car::Unit::Scene) + m_car.rightRearTireLocation(Car::Unit::Scene)) * 0.5f;
                 ParticleFactory::instance().doParticle(ParticleFactory::OffTrackSmoke, smokeLocation);
             }
         }

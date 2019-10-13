@@ -135,6 +135,7 @@ void Car::setProperties(Description & desc)
 {
     physicsComponent().setMass(desc.mass);
 	
+	// metric dimensions:
 	const float width_m = dynamic_pointer_cast<MCRectShape>(shape())->width() * MCWorld::metersPerUnit();
     const float height_m = dynamic_pointer_cast<MCRectShape>(shape())->height() * MCWorld::metersPerUnit();
 	
@@ -265,25 +266,45 @@ float Car::absSpeed() const
     return m_absSpeed;
 }
 
-// FIXME Physics: why are front tires handled different than rear tires?
-MCVector3dF Car::leftFrontTireLocation() const
+// FIXME Physics: why are front tires handled differently than rear tires?
+MCVector3dF Car::leftFrontTireLocation(Unit unit) const
 {
-    return m_leftFrontTire->location();
+	if(unit == Unit::Scene){
+		return m_leftFrontTire->location();
+	}else if(unit == Unit::Metric){
+		return m_leftFrontTire->location()*MCWorld::metersPerUnit();
+	}
+	assert(false);
 }
 
-MCVector3dF Car::rightFrontTireLocation() const
+MCVector3dF Car::rightFrontTireLocation(Unit unit) const
 {
-    return m_rightFrontTire->location();
+	if(unit == Unit::Scene){
+		return m_rightFrontTire->location();
+	}else if(unit == Unit::Metric){
+		return m_rightFrontTire->location()*MCWorld::metersPerUnit();
+	}
+	assert(false);
 }
 
-MCVector3dF Car::leftRearTireLocation() const
+MCVector3dF Car::leftRearTireLocation(Unit unit) const
 {
-    return MCMathUtil::rotatedVector(m_leftRearTirePos, angle()) + MCVector2dF(location());
+	if(unit == Unit::Scene){
+		return (MCMathUtil::rotatedVector(m_leftRearTirePos, angle()) + MCVector2dF(location()));
+	}else if(unit == Unit::Metric){
+		return (MCMathUtil::rotatedVector(m_leftRearTirePos, angle()) + MCVector2dF(location()))*MCWorld::metersPerUnit();
+	}
+	assert(false);
 }
 
-MCVector3dF Car::rightRearTireLocation() const
+MCVector3dF Car::rightRearTireLocation(Unit unit) const
 {
-    return MCMathUtil::rotatedVector(m_rightRearTirePos, angle()) + MCVector2dF(location());
+	if(unit == Unit::Scene){
+		return (MCMathUtil::rotatedVector(m_rightRearTirePos, angle()) + MCVector2dF(location()));
+	}else if(unit == Unit::Metric){
+		return (MCMathUtil::rotatedVector(m_rightRearTirePos, angle()) + MCVector2dF(location()))*MCWorld::metersPerUnit();
+	}
+	assert(false);
 }
 
 void Car::updateAnimations()
