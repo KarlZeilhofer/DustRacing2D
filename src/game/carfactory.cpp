@@ -56,7 +56,11 @@ CarPtr CarFactory::buildCar(int index, int numCars, Game & game)
     {
         desc.power                = defaultPower;
         desc.dragQuadratic        = defaultDrag;
-        desc.accelerationFriction = 0.60f * Game::instance().difficultyProfile().accelerationFrictionMultiplier(true);
+		
+		// rear wheel drive:
+		//desc.accelerationFriction = 0.60f * Game::instance().difficultyProfile().accelerationFrictionMultiplier(true);
+		// all wheel drive:
+		desc.accelerationFriction = 1.00f * Game::instance().difficultyProfile().accelerationFrictionMultiplier(true);
 
         car.reset(new Car(desc, MCAssetManager::surfaceManager().surface(carImage), index, true));
     }

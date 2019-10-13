@@ -100,7 +100,7 @@ Car::Car(Description & desc, MCSurface & surface, unsigned int index, bool isHum
     numberPlate->shape()->view()->setHasShadow(false);
 
     const float offTrackFrictionFactor = 0.8f;
-    const float frontFriction = 0.85f;
+    const float frontFriction = 1.1f;
     const MCVector3dF tireZ = MCVector3dF(0, 0, 1);
     m_leftFrontTire.reset(new Tire(*this, frontFriction, frontFriction * offTrackFrictionFactor));
     addChildObject(m_leftFrontTire, m_leftFrontTirePos + tireZ, 0);
@@ -108,7 +108,7 @@ Car::Car(Description & desc, MCSurface & surface, unsigned int index, bool isHum
     m_rightFrontTire.reset(new Tire(*this, frontFriction, frontFriction * offTrackFrictionFactor));
     addChildObject(m_rightFrontTire, m_rightFrontTirePos + tireZ, 0);
 
-    const float rearFriction = 0.95f;
+    const float rearFriction = 1.1f;
     m_leftRearTire.reset(new Tire(*this, rearFriction, rearFriction * offTrackFrictionFactor));
     addChildObject(m_leftRearTire, m_leftRearTirePos + tireZ, 0);
 

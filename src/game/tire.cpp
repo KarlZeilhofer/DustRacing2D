@@ -49,7 +49,7 @@ void Tire::onStepTime(int)
     if (physicsComponent().velocity().lengthFast() > 0)
     {
         const float tireNormalAngle = angle() + 90;
-        const MCVector2dF tireAxisUnityVector(
+        const MCVector2dF tireAxisUnityVector( // length 1
             MCTrigonom::cos(tireNormalAngle), MCTrigonom::sin(tireNormalAngle));
         MCVector2dF tireVelocityMaxUnityVector = physicsComponent().velocity();
 		tireVelocityMaxUnityVector.normalize();
@@ -59,17 +59,18 @@ void Tire::onStepTime(int)
 		// There should be a condition, if the tire slipps along the tire-axis. If so, we 
 		// must apply this normalForceVector, but if not, we only have to apply the needed centripedal force
 		// needed for the current steering radius. 
+		float scale = 2.00;
         MCVector2dF normalForceVector =
             MCVector2dF::projection(tireVelocityMaxUnityVector, tireAxisUnityVector) *
                 (m_isOffTrack ? m_offTrackFriction : m_friction) * /* m_spinCoeff * */ // TODO what is this spinCoeff for?
-                    -MCWorld::instance().gravity().k() * parent().physicsComponent().mass()*0.25; // NOTE scale this to 25% load on one wheel
+                    -MCWorld::instance().gravity().k() * parent().physicsComponent().mass()*scale; // TODO scale this to 25% load on one wheel
 		
         MCVector3dF metricLocation = location(); // location() of a tire is in scene units, relative to a global origin. 
 		metricLocation -= parent().location();
 		metricLocation *= MCWorld::metersPerUnit();
 		metricLocation += parent().location() * MCWorld::metersPerUnit();
 		
-        parent().physicsComponent().addForce( -normalForceVector, metricLocation );  
+        parent().physicsComponent().addForce( -normalForceVector, metricLocation);  
 
         if (m_car.isBraking())
         {
@@ -77,7 +78,7 @@ void Tire::onStepTime(int)
             MCVector2dF brakingForceVector =
                 tireVelocityMaxUnityVector * (m_isOffTrack ? m_offTrackFriction : m_friction) *
                     -MCWorld::instance().gravity().k() * parent().physicsComponent().mass() * m_car.tireWearFactor()*0.25; // NOTE scale this to 25% load on one wheel
-            parent().physicsComponent().addForce( -brakingForceVector, metricLocation ); 
+            parent().physicsComponent().addForce( -brakingForceVector, metricLocation); 
         }
     }
 }
