@@ -225,7 +225,7 @@ private:
 
     float m_absSpeed; // in meters/second
 
-    float m_dx, m_dy;
+    float m_dx, m_dy; // in meters
 
     int m_nextTargetNodeIndex;
 

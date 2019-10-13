@@ -49,7 +49,7 @@ public:
     //! Add rotational impulse in rad/s.
     virtual void addAngularImpulse(float impulse, bool isCollision = false);
 
-	const MCVector3dF & physicalLocation();
+	const MCVector3dF & metricLocation();
 
 	void translate(const MCVector3dF & newLocation);
 	
@@ -202,15 +202,15 @@ private:
 
     float m_damping;
 
-    MCVector3dF m_acceleration;
+    MCVector3dF m_acceleration; // m/s²
 
-    MCVector3dF m_velocity;
+    MCVector3dF m_velocity; // m/s
 	
-	MCVector3dF m_physicalLocation;
+	MCVector3dF m_metricLocation;  // m
 
-    float m_maxSpeed;
+    float m_maxSpeed; // m/s
 
-    float m_linearDamping;
+    float m_linearDamping; // N/(m/s)
 
     MCVector3dF m_linearImpulse; // FIXME PHYSICS: has the unit of a velocity, should be renamed or scaled by the mass
 

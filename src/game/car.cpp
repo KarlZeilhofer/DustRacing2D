@@ -148,7 +148,6 @@ void Car::setProperties(Description & desc)
     
 	physicsComponent().setRestitution(desc.restitution);
     setShadowOffset(MCVector3dF(5, -5, 1));
-
 }
 
 void Car::initForceGenerators(Description & desc)
@@ -601,6 +600,6 @@ Car::Description::Description()
 	power = 5000.0f;
 	mass = 1500.0f;
 	restitution = 0.05f;
-	dragLinear = 1.0f;
-	dragQuadratic = 5.0f;
+	dragLinear = 1.0f; // N/(m/s)
+	dragQuadratic = 5.0f; // N/(m/s)²
 }

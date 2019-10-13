@@ -64,12 +64,12 @@ void Tire::onStepTime(int)
                 (m_isOffTrack ? m_offTrackFriction : m_friction) * /* m_spinCoeff * */ // TODO what is this spinCoeff for?
                     -MCWorld::instance().gravity().k() * parent().physicsComponent().mass()*0.25; // NOTE scale this to 25% load on one wheel
 		
-        MCVector3dF physicalLocation = location(); // location() of a tire is in scene units, relative to a global origin. 
-		physicalLocation -= parent().location();
-		physicalLocation *= MCWorld::metersPerUnit();
-		physicalLocation += parent().location() * MCWorld::metersPerUnit();
+        MCVector3dF metricLocation = location(); // location() of a tire is in scene units, relative to a global origin. 
+		metricLocation -= parent().location();
+		metricLocation *= MCWorld::metersPerUnit();
+		metricLocation += parent().location() * MCWorld::metersPerUnit();
 		
-        parent().physicsComponent().addForce( -normalForceVector, physicalLocation );  
+        parent().physicsComponent().addForce( -normalForceVector, metricLocation );  
 
         if (m_car.isBraking())
         {
@@ -77,7 +77,7 @@ void Tire::onStepTime(int)
             MCVector2dF brakingForceVector =
                 tireVelocityMaxUnityVector * (m_isOffTrack ? m_offTrackFriction : m_friction) *
                     -MCWorld::instance().gravity().k() * parent().physicsComponent().mass() * m_car.tireWearFactor()*0.25; // NOTE scale this to 25% load on one wheel
-            parent().physicsComponent().addForce( -brakingForceVector, physicalLocation ); 
+            parent().physicsComponent().addForce( -brakingForceVector, metricLocation ); 
         }
     }
 }
