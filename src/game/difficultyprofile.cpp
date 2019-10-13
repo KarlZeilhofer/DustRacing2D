@@ -69,6 +69,21 @@ float DifficultyProfile::accelerationFrictionMultiplier(bool isHuman) const
     return 1.0f;
 }
 
+float DifficultyProfile::powerMultiplier(bool isHuman) const
+{
+	switch (m_difficulty)
+    {
+    case Difficulty::Easy:
+        return isHuman ? 0.5f : 0.5;
+    case Difficulty::Medium:
+        return isHuman ? 1.0f : 1.0f;
+    case Difficulty::Hard:
+        return isHuman ? 2.5f : 2.5f;
+    }
+
+	return 1.0f;
+}
+
 DifficultyProfile::~DifficultyProfile()
 {
     m_instance = nullptr;

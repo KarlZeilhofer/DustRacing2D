@@ -24,7 +24,9 @@ CarPtr CarFactory::buildCar(int index, int numCars, Game & game)
 	const float airDensity = 1.25; // kg/m³
 	const float cw = 0.25f; // form dependent factor for stream lined drag
 	const float A = 1.8f; // m², cross section area of car
-    const float defaultDrag  = airDensity*cw*A/2.0f; // in N/(m/s)²
+    const float defaultQuadraticDrag  = airDensity*cw*A/2.0f; // in N/(m/s)²
+	
+	const float defaultFriction = 0.60; // rear wheel drive
 
     static const int NUM_CARS = numCars;
     static std::map<int, std::string> carImageMap = {
@@ -54,28 +56,33 @@ CarPtr CarFactory::buildCar(int index, int numCars, Game & game)
     CarPtr car;
     if (index == 0 || (index == 1 && game.hasTwoHumanPlayers()))
     {
-        desc.power                = defaultPower;
-        desc.dragQuadratic        = defaultDrag;
-		
+		desc.power                = defaultPower * Game::instance().difficultyProfile().powerMultiplier(true);
+        desc.dragQuadratic        = defaultQuadraticDrag;
+ 		
 		// rear wheel drive:
-		//desc.accelerationFriction = 0.60f * Game::instance().difficultyProfile().accelerationFrictionMultiplier(true);
+		desc.accelerationFriction = defaultFriction * Game::instance().difficultyProfile().accelerationFrictionMultiplier(true);
 		// all wheel drive:
-		desc.accelerationFriction = 1.00f * Game::instance().difficultyProfile().accelerationFrictionMultiplier(true);
+		//desc.accelerationFriction = 1.00f * Game::instance().difficultyProfile().accelerationFrictionMultiplier(true);
 
         car.reset(new Car(desc, MCAssetManager::surfaceManager().surface(carImage), index, true));
     }
     else if (game.hasComputerPlayers())
     {
-        // Introduce some variance to the power of computer players so that the
+		// Introduce some variance to the power of computer players so that the
         // slowest cars have less power than the human player and the fastest
         // cars have more power than the human player.
-        desc.power                = defaultPower / 2 + (index + 1) * defaultPower / NUM_CARS;
-        desc.accelerationFriction = (0.3f + 0.4f * float(index + 1) / NUM_CARS) *
-            Game::instance().difficultyProfile().accelerationFrictionMultiplier(false);
-        desc.dragQuadratic        = defaultDrag;
+        desc.power                = defaultPower * Game::instance().difficultyProfile().powerMultiplier(true)*randomFactor(0.8f, 1.2f);
+        desc.accelerationFriction = defaultFriction * randomFactor(0.8f, 1.2f) * Game::instance().difficultyProfile().accelerationFrictionMultiplier(false);
+        desc.dragQuadratic        = defaultQuadraticDrag*randomFactor(0.8f, 1.2f);
 
         car.reset(new Car(desc, MCAssetManager::surfaceManager().surface(carImage), index, false));
     }
 
     return car;
 }
+
+float CarFactory::randomFactor(float from, float to)
+{
+	return (rand()%101)/100.0f*(to-from) + from;
+}
+

@@ -56,6 +56,8 @@ public:
 
     float accelerationFrictionMultiplier(bool isHuman) const;
 
+	float powerMultiplier(bool isHuman) const;
+	
 signals:
 
     void difficultyChanged();
