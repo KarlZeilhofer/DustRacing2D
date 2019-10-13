@@ -194,11 +194,11 @@ public:
 
 private:
 
-    void integrate(float step);
+    void integrate(float deltaT);
 
-    void integrateLinear(float step);
+    void integrateLinear(float deltaT);
 
-    float integrateAngular(float step);
+    float integrateAngular(float deltaT);
 
     float m_damping;
 
@@ -216,7 +216,7 @@ private:
 
     MCVector3dF m_forces;
 
-    float m_angularAcceleration; // Radians / s^2
+    float m_angularAcceleration; // Radians / s²
 
     float m_angularVelocity; // Radians / s
 

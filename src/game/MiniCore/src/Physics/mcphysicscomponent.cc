@@ -137,7 +137,7 @@ void MCPhysicsComponent::addForce(const MCVector3dF & force)
 
 void MCPhysicsComponent::addForce(const MCVector3dF & force, const MCVector3dF & pos)
 {
-    addTorque(-(force % (pos - metricLocation())).k());
+    addTorque(-(force % (pos - metricLocation())).k()); 
     m_forces += force;
 
     toggleSleep(false);
@@ -304,9 +304,9 @@ bool MCPhysicsComponent::isStationary() const
 
 /**
  * @brief MCPhysicsComponent::integrate
- * @param step: physical time step in seconds
+ * @param deltaT: physical time step in seconds
  */
-void MCPhysicsComponent::integrate(float step)
+void MCPhysicsComponent::integrate(float deltaT)
 {
     // Integrate, if the object is not sleeping and it doesn't
     // have a parent object.
@@ -314,8 +314,8 @@ void MCPhysicsComponent::integrate(float step)
     {
         m_isIntegrating = true;
 
-        integrateLinear(step);
-        const float angleDiff = integrateAngular(step);
+        integrateLinear(deltaT);
+        const float angleDiff = integrateAngular(deltaT);
         object().checkBoundaries();
 
         const float speed = m_velocity.lengthFast();
@@ -336,7 +336,7 @@ void MCPhysicsComponent::integrate(float step)
             m_angularImpulse = 0.0f;
 
             object().rotate(object().angle() + angleDiff, false);
-            translate(metricLocation() + m_velocity*step); 
+            translate(metricLocation() + m_velocity*deltaT); 
 
             m_sleepCount = 0;
         }
@@ -349,13 +349,13 @@ void MCPhysicsComponent::integrate(float step)
  * @brief MCPhysicsComponent::integrateLinear
  * @param step: physical time step in seconds
  */
-void MCPhysicsComponent::integrateLinear(float step)
+void MCPhysicsComponent::integrateLinear(float deltaT)
 {
     MCVector3dF totAcceleration(m_acceleration);
     totAcceleration += m_forces * m_invMass;
-    m_velocity += totAcceleration * step + 
-			m_linearImpulse * m_invMass - 
-			m_velocity * (m_linearDamping * m_invMass); // NOTE PHYSICS: a damping is speed dependent. 
+    m_velocity += totAcceleration * deltaT;
+	m_velocity += m_linearImpulse * m_invMass;
+	m_velocity -= m_velocity * (m_linearDamping * m_invMass) * deltaT;
 }
 
 /**
@@ -363,19 +363,17 @@ void MCPhysicsComponent::integrateLinear(float step)
  * @param step: physical time step in seconds
  * @return 
  */
-float MCPhysicsComponent::integrateAngular(float step)
+float MCPhysicsComponent::integrateAngular(float deltaT)
 {
     if (object().shape() && m_momentOfInertia > 0.0f)
     {
-        float totAngularAcceleration(m_angularAcceleration);
-        totAngularAcceleration += m_torque * m_invMomentOfInertia;
-        m_angularVelocity += totAngularAcceleration * step + 
-				m_angularImpulse * m_invMomentOfInertia -
-				m_angularVelocity * m_angularDamping * m_invMomentOfInertia;
+        m_angularVelocity += m_torque * m_invMomentOfInertia * deltaT;
+		m_angularVelocity += m_angularImpulse * m_invMomentOfInertia;
+		m_angularVelocity -= m_angularVelocity * m_angularDamping * m_invMomentOfInertia * deltaT;
 
         m_torque = 0.0f;
 
-        return MCTrigonom::radToDeg(m_angularVelocity * step);
+        return MCTrigonom::radToDeg(m_angularVelocity * deltaT);
     }
 
     m_torque = 0.0f;
