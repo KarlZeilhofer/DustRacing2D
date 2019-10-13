@@ -17,18 +17,18 @@
 #include "inputhandler.hpp"
 
 Startlights::Startlights()
-: m_state(Init)
-, m_counter(0)
-, m_stepsPerState(60)
+  : m_state(Init)
+  , m_counter(0)
+  , m_stepsPerState(60)
 {
-    m_stateToFunctionMap[Init]      = std::bind(&Startlights::stateInit,      this);
-    m_stateToFunctionMap[Appear]    = std::bind(&Startlights::stateAppear,    this);
-    m_stateToFunctionMap[FirstRow]  = std::bind(&Startlights::stateFirstRow,  this);
+    m_stateToFunctionMap[Init] = std::bind(&Startlights::stateInit, this);
+    m_stateToFunctionMap[Appear] = std::bind(&Startlights::stateAppear, this);
+    m_stateToFunctionMap[FirstRow] = std::bind(&Startlights::stateFirstRow, this);
     m_stateToFunctionMap[SecondRow] = std::bind(&Startlights::stateSecondRow, this);
-    m_stateToFunctionMap[ThirdRow]  = std::bind(&Startlights::stateThirdRow,  this);
-    m_stateToFunctionMap[Go]        = std::bind(&Startlights::stateGo,        this);
+    m_stateToFunctionMap[ThirdRow] = std::bind(&Startlights::stateThirdRow, this);
+    m_stateToFunctionMap[Go] = std::bind(&Startlights::stateGo, this);
     m_stateToFunctionMap[Disappear] = std::bind(&Startlights::stateDisappear, this);
-    m_stateToFunctionMap[End]       = std::bind(&Startlights::stateEnd,       this);
+    m_stateToFunctionMap[End] = std::bind(&Startlights::stateEnd, this);
 
     connect(&m_timer, &QTimer::timeout, this, &Startlights::updateAnimation);
     m_timer.setInterval(1000 / m_stepsPerState);
@@ -36,8 +36,7 @@ Startlights::Startlights()
 
 bool Startlights::timeElapsed(unsigned int limit)
 {
-    if (++m_counter > limit)
-    {
+    if (++m_counter > limit) {
         m_counter = 0;
         return true;
     }
@@ -57,7 +56,7 @@ void Startlights::beginAnimation()
 
 void Startlights::setDimensions(unsigned int width, unsigned int height)
 {
-    m_width  = width;
+    m_width = width;
     m_height = height;
 }
 
@@ -82,10 +81,10 @@ void Startlights::stateInit()
 
     m_pos = MCVector3dF(m_width / 2, 3 * m_height / 2, 0);
     m_animation.init(
-         m_pos,
-         m_pos,
-         MCVector3dF(m_pos.i(), m_height / 2, 0),
-         second / 3);
+      m_pos,
+      m_pos,
+      MCVector3dF(m_pos.i(), m_height / 2, 0),
+      second / 3);
     m_state = Appear;
     m_glowScale = 1.0;
     InputHandler::setEnabled(false);
@@ -96,8 +95,7 @@ void Startlights::stateAppear()
     const unsigned int second = m_stepsPerState;
 
     m_animation.update();
-    if (timeElapsed(second))
-    {
+    if (timeElapsed(second)) {
         m_state = FirstRow;
         emit messageRequested("3");
     }
@@ -107,8 +105,7 @@ void Startlights::stateFirstRow()
 {
     const unsigned int second = m_stepsPerState;
 
-    if (timeElapsed(second))
-    {
+    if (timeElapsed(second)) {
         m_state = SecondRow;
         emit messageRequested("2");
     }
@@ -118,8 +115,7 @@ void Startlights::stateSecondRow()
 {
     const unsigned int second = m_stepsPerState;
 
-    if (timeElapsed(second))
-    {
+    if (timeElapsed(second)) {
         m_state = ThirdRow;
         emit messageRequested("1");
     }
@@ -129,8 +125,7 @@ void Startlights::stateThirdRow()
 {
     const unsigned int second = m_stepsPerState;
 
-    if (timeElapsed(second))
-    {
+    if (timeElapsed(second)) {
         m_state = Go;
         emit messageRequested(QObject::tr("GO!!!"));
         emit raceStarted();
@@ -142,14 +137,13 @@ void Startlights::stateGo()
 {
     const unsigned int second = m_stepsPerState;
 
-    if (timeElapsed(second))
-    {
+    if (timeElapsed(second)) {
         m_state = Disappear;
         m_animation.init(
-            m_pos,
-            m_pos,
-            MCVector3dF(m_pos.i(), 3 * m_height / 2, 0),
-            second / 3);
+          m_pos,
+          m_pos,
+          MCVector3dF(m_pos.i(), 3 * m_height / 2, 0),
+          second / 3);
     }
 
     m_glowScale *= 0.75;
@@ -157,8 +151,7 @@ void Startlights::stateGo()
 
 void Startlights::stateDisappear()
 {
-    if (m_animation.update())
-    {
+    if (m_animation.update()) {
         m_state = End;
     }
 }

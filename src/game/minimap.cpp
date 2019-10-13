@@ -28,7 +28,7 @@
 #include <memory>
 
 Minimap::Minimap()
-    : m_markerSurface(&GraphicsFactory::generateMinimapMarker())
+  : m_markerSurface(&GraphicsFactory::generateMinimapMarker())
 {
     m_markerSurface->setShaderProgram(Renderer::instance().program("menu"));
     m_markerSurface->material()->setAlphaBlend(true);
@@ -49,24 +49,18 @@ void Minimap::initialize(Car & carToFollow, const MapBase & trackMap, int x, int
     m_tileW = size / trackMap.cols();
     m_tileH = size / trackMap.rows();
 
-    if (m_tileW > m_tileH)
-    {
+    if (m_tileW > m_tileH) {
         m_tileW = m_tileH;
-    }
-    else
-    {
+    } else {
         m_tileH = m_tileW;
     }
 
     float initX, initY;
 
     // Center the map
-    if (trackMap.cols() % 2 == 0)
-    {
+    if (trackMap.cols() % 2 == 0) {
         initX = x - trackMap.cols() * m_tileW / 2 + m_tileW / 4;
-    }
-    else
-    {
+    } else {
         initX = x - trackMap.cols() * m_tileW / 2;
     }
 
@@ -77,15 +71,12 @@ void Minimap::initialize(Car & carToFollow, const MapBase & trackMap, int x, int
     // Loop through the visible tile matrix and store relevant tiles
     float tileX, tileY;
     tileY = initY;
-    for (unsigned int j = 0; j < trackMap.rows(); j++)
-    {
+    for (unsigned int j = 0; j < trackMap.rows(); j++) {
         tileX = initX;
-        for (unsigned int i = 0; i < trackMap.cols(); i++)
-        {
+        for (unsigned int i = 0; i < trackMap.cols(); i++) {
             auto tile = std::static_pointer_cast<TrackTile>(trackMap.getTile(i, j));
             auto surface = tile->previewSurface();
-            if (surface && !tile->excludeFromMinimap())
-            {
+            if (surface && !tile->excludeFromMinimap()) {
                 surface->setShaderProgram(Renderer::instance().program("menu"));
                 surface->setColor(MCGLColor(1.0, 1.0, 1.0));
                 surface->setSize(m_tileH, m_tileW);
@@ -111,15 +102,13 @@ void Minimap::initialize(Car & carToFollow, const MapBase & trackMap, int x, int
 
 void Minimap::renderMap()
 {
-    for (auto && i : m_map)
-    {
+    for (auto && i : m_map) {
         auto surface = i.first;
         surface->bind();
         surface->setColor(MCGLColor(1.0, 1.0, 1.0));
         surface->setSize(m_tileH, m_tileW);
 
-        for (auto && j : i.second)
-        {
+        for (auto && j : i.second) {
             const MinimapTile minimapTile = j;
             surface->render(nullptr, minimapTile.pos, minimapTile.rotation);
         }
@@ -134,25 +123,17 @@ void Minimap::renderMarkers(const Minimap::CarVector & cars, const Race & race)
 
     auto && loser = race.getLoser();
 
-    for (auto && car : cars)
-    {
-        if (car.get() == m_carToFollow)
-        {
+    for (auto && car : cars) {
+        if (car.get() == m_carToFollow) {
             const auto yellow = MCGLColor(0.9f, 0.9f, 0.1f, 0.9f);
             m_markerSurface->setColor(yellow);
-        }
-        else if (car.get() == &leader)
-        {
+        } else if (car.get() == &leader) {
             const auto green = MCGLColor(0.1f, 0.9f, 0.1f, 0.9f);
             m_markerSurface->setColor(green);
-        }
-        else if (car.get() == &loser)
-        {
+        } else if (car.get() == &loser) {
             const auto red = MCGLColor(0.9f, 0.1f, 0.1f, 0.9f);
             m_markerSurface->setColor(red);
-        }
-        else
-        {
+        } else {
             const auto gray = MCGLColor(0.2f, 0.2f, 0.2f, 0.9f);
             m_markerSurface->setColor(gray);
         }

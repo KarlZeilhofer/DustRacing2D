@@ -28,9 +28,9 @@
 #include <cstdio>
 #endif
 
-bool   MCLogger::m_echoMode = false;
-bool   MCLogger::m_dateTime = true;
-FILE * MCLogger::m_file     = nullptr;
+bool MCLogger::m_echoMode = false;
+bool MCLogger::m_dateTime = true;
+FILE * MCLogger::m_file = nullptr;
 
 MCLogger::MCLogger()
 {
@@ -39,19 +39,14 @@ MCLogger::MCLogger()
 bool MCLogger::init(const char * fileName, bool append)
 {
     MCLogger::m_file = nullptr;
-    if (fileName)
-    {
-        if (append)
-        {
+    if (fileName) {
+        if (append) {
             MCLogger::m_file = fopen(fileName, "a+");
-        }
-        else
-        {
+        } else {
             MCLogger::m_file = fopen(fileName, "w+");
         }
 
-        if (!m_file)
-        {
+        if (!m_file) {
 #ifdef Q_OS_ANDROID
             qDebug() << "ERROR!!: Couldn't open '" << fileName << "' for write.";
 #else
@@ -76,8 +71,7 @@ void MCLogger::enableDateTimePrefix(bool enable)
 
 void MCLogger::prefixDateTime()
 {
-    if (MCLogger::m_dateTime)
-    {
+    if (MCLogger::m_dateTime) {
         time_t rawTime;
         time(&rawTime);
         std::string timeStr(ctime(&rawTime));
@@ -116,15 +110,13 @@ std::ostringstream & MCLogger::fatal()
 
 MCLogger::~MCLogger()
 {
-    if (MCLogger::m_file)
-    {
+    if (MCLogger::m_file) {
         fprintf(MCLogger::m_file, "%s", m_oss.str().c_str());
         fprintf(MCLogger::m_file, "\n");
         fflush(MCLogger::m_file);
     }
 
-    if (MCLogger::m_echoMode)
-    {
+    if (MCLogger::m_echoMode) {
 #ifdef Q_OS_ANDROID
         qDebug() << m_oss.str().c_str();
 #else

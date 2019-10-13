@@ -30,8 +30,7 @@ MenuManager::MenuManager()
 
 MenuPtr MenuManager::activeMenu() const
 {
-    if (m_menuStack.size())
-    {
+    if (m_menuStack.size()) {
         return m_menuStack.back();
     }
 
@@ -51,8 +50,7 @@ void MenuManager::addMenu(MenuPtr newMenu)
 
 void MenuManager::enterMenu(MenuPtr newMenu)
 {
-    if (m_menuStack.size())
-    {
+    if (m_menuStack.size()) {
         m_prevMenu = m_menuStack.back();
     }
 
@@ -69,10 +67,8 @@ void MenuManager::enterMenu(std::string menuId)
 
 void MenuManager::pushMenu(MenuPtr newMenu)
 {
-    if (!m_menuStack.size() || m_menuStack.back() != newMenu)
-    {
-        if (m_menuStack.size())
-        {
+    if (!m_menuStack.size() || m_menuStack.back() != newMenu) {
+        if (m_menuStack.size()) {
             m_prevMenu = m_menuStack.back();
             m_prevMenu->pushExit();
         }
@@ -90,14 +86,12 @@ void MenuManager::pushMenu(std::string menuId)
 
 void MenuManager::popMenu()
 {
-    if (m_menuStack.size())
-    {
+    if (m_menuStack.size()) {
         m_prevMenu = m_menuStack.back();
         m_prevMenu->popExit();
         m_menuStack.pop_back();
 
-        if (m_menuStack.size())
-        {
+        if (m_menuStack.size()) {
             m_menuStack.back()->popEnter();
         }
     }
@@ -105,8 +99,7 @@ void MenuManager::popMenu()
 
 void MenuManager::popToMenu(std::string menuId)
 {
-    if (m_menuStack.size())
-    {
+    if (m_menuStack.size()) {
         m_prevMenu = m_menuStack.back();
         m_prevMenu->popExit();
 
@@ -122,8 +115,7 @@ void MenuManager::popToMenu(std::string menuId)
 
 void MenuManager::enterCurrentMenu()
 {
-    if (m_menuStack.size())
-    {
+    if (m_menuStack.size()) {
         m_menuStack.back()->enter();
     }
 }
@@ -141,53 +133,46 @@ MenuManager & MenuManager::instance()
 
 void MenuManager::render()
 {
-    if (m_prevMenu)
-    {
+    if (m_prevMenu) {
         m_prevMenu->render();
     }
 
-    if (m_menuStack.size())
-    {
+    if (m_menuStack.size()) {
         m_menuStack.back()->render();
     }
 }
 
 void MenuManager::up()
 {
-    if (m_menuStack.size())
-    {
+    if (m_menuStack.size()) {
         m_menuStack.back()->up();
     }
 }
 
 void MenuManager::down()
 {
-    if (m_menuStack.size())
-    {
+    if (m_menuStack.size()) {
         m_menuStack.back()->down();
     }
 }
 
 void MenuManager::left()
 {
-    if (m_menuStack.size())
-    {
+    if (m_menuStack.size()) {
         m_menuStack.back()->left();
     }
 }
 
 void MenuManager::right()
 {
-    if (m_menuStack.size())
-    {
+    if (m_menuStack.size()) {
         m_menuStack.back()->right();
     }
 }
 
 bool MenuManager::mousePress(int x, int y, int screenWidth, int screenHeight)
 {
-    if (m_menuStack.size())
-    {
+    if (m_menuStack.size()) {
         return m_menuStack.back()->handleMousePress(x, y, screenWidth, screenHeight);
     }
 
@@ -196,8 +181,7 @@ bool MenuManager::mousePress(int x, int y, int screenWidth, int screenHeight)
 
 bool MenuManager::mouseRelease(int x, int y, int screenWidth, int screenHeight)
 {
-    if (m_menuStack.size())
-    {
+    if (m_menuStack.size()) {
         return m_menuStack.back()->handleMouseRelease(x, y, screenWidth, screenHeight);
     }
 
@@ -206,28 +190,23 @@ bool MenuManager::mouseRelease(int x, int y, int screenWidth, int screenHeight)
 
 void MenuManager::selectCurrentItem()
 {
-    if (m_menuStack.size())
-    {
+    if (m_menuStack.size()) {
         m_menuStack.back()->selectCurrentItem();
     }
 }
 
 bool MenuManager::isDone() const
 {
-    if (!m_menuStack.size())
-    {
+    if (!m_menuStack.size()) {
         return true;
-    }
-    else
-    {
+    } else {
         return m_menuStack.back()->isDone();
     }
 }
 
 void MenuManager::stepTime(int msecs)
 {
-    for (auto && menuIter : m_idToMenuMap)
-    {
+    for (auto && menuIter : m_idToMenuMap) {
         menuIter.second->stepTime(msecs);
     }
 }

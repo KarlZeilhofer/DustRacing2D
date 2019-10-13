@@ -42,8 +42,7 @@ bool Route::push(TargetNodeBasePtr tnode)
 
 bool Route::isClosed() const
 {
-    if (m_route.size() > 1)
-    {
+    if (m_route.size() > 1) {
         const int dx = std::abs(m_route[0]->location().x() - m_route.back()->location().x());
         const int dy = std::abs(m_route[0]->location().y() - m_route.back()->location().y());
 
@@ -60,7 +59,7 @@ unsigned int Route::numNodes() const
 
 TargetNodeBasePtr Route::get(unsigned int index) const
 {
-    assert (index < numNodes());
+    assert(index < numNodes());
     return m_route[index];
 }
 
@@ -74,15 +73,12 @@ void Route::buildFromVector(RouteVector & routeVector)
     clear();
 
     std::sort(routeVector.begin(), routeVector.end(),
-        [] (const TargetNodeBasePtr lhs, const TargetNodeBasePtr rhs)
-        {
-            return lhs->index() < rhs->index();
-        });
+              [](const TargetNodeBasePtr lhs, const TargetNodeBasePtr rhs) {
+                  return lhs->index() < rhs->index();
+              });
 
-    for (TargetNodeBasePtr tnode : routeVector)
-    {
-        if (tnode && tnode->index() >= 0)
-        {
+    for (TargetNodeBasePtr tnode : routeVector) {
+        if (tnode && tnode->index() >= 0) {
             push(tnode);
         }
     }
@@ -92,10 +88,8 @@ unsigned int Route::geometricLength() const
 {
     unsigned int result = 0;
 
-    if (m_route.size() > 1)
-    {
-        for (unsigned int i = 0; i < m_route.size() - 1; i++)
-        {
+    if (m_route.size() > 1) {
+        for (unsigned int i = 0; i < m_route.size() - 1; i++) {
             int dx = m_route[i]->location().x() - m_route[i + 1]->location().x();
             int dy = m_route[i]->location().y() - m_route[i + 1]->location().y();
             result += std::sqrt(dx * dx + dy * dy);

@@ -22,19 +22,19 @@
 namespace MTFH {
 
 Menu::Menu(std::string id, int width, int height, Menu::Style style)
-: m_id(id)
-, m_width(width)
-, m_height(height)
-, m_x(0)
-, m_y(0)
-, m_targetX(0)
-, m_targetY(0)
-, m_currentIndex(-1)
-, m_selectedIndex(-1)
-, m_style(style)
-, m_isDone(false)
-, m_wrapAround(true)
-, m_animationCurve(15, 3)
+  : m_id(id)
+  , m_width(width)
+  , m_height(height)
+  , m_x(0)
+  , m_y(0)
+  , m_targetX(0)
+  , m_targetY(0)
+  , m_currentIndex(-1)
+  , m_selectedIndex(-1)
+  , m_style(style)
+  , m_isDone(false)
+  , m_wrapAround(true)
+  , m_animationCurve(15, 3)
 {
 }
 
@@ -60,8 +60,7 @@ void Menu::reverseItems()
     m_currentIndex = (m_items.size() - 1) - m_currentIndex;
     m_selectedIndex = m_currentIndex;
 
-    for (size_t i = 0; i < m_items.size(); i++)
-    {
+    for (size_t i = 0; i < m_items.size(); i++) {
         m_items.at(i)->setIndex(i);
     }
 }
@@ -76,8 +75,7 @@ void Menu::addMouseItem(Menu::MouseItemType type, MenuItemPtr menuItem)
 
 MenuItemPtr Menu::currentItem() const
 {
-    if (m_items.size())
-    {
+    if (m_items.size()) {
         return m_items.at(m_currentIndex);
     }
 
@@ -86,8 +84,7 @@ MenuItemPtr Menu::currentItem() const
 
 MenuItemPtr Menu::selectedItem() const
 {
-    if (m_items.size())
-    {
+    if (m_items.size()) {
         return m_items.at(m_selectedIndex);
     }
 
@@ -96,8 +93,7 @@ MenuItemPtr Menu::selectedItem() const
 
 MenuItemPtr Menu::item(unsigned int index) const
 {
-    if (index < m_items.size())
-    {
+    if (index < m_items.size()) {
         return m_items.at(index);
     }
 
@@ -117,59 +113,45 @@ void Menu::render()
 
 void Menu::renderItems()
 {
-    if (!m_items.size())
-    {
+    if (!m_items.size()) {
         return;
     }
 
-    if (m_style == Menu::Style::VerticalList)
-    {
+    if (m_style == Menu::Style::VerticalList) {
         // Calculate total height
         int totalHeight = 0;
-        for (auto item : m_items)
-        {
+        for (auto item : m_items) {
             totalHeight += item->height();
         }
 
         // Render centered items
         int startY = y() + m_height / 2 - totalHeight / 2 + totalHeight / m_items.size() / 2;
-        for (auto item : m_items)
-        {
+        for (auto item : m_items) {
             item->setPos(x() + m_width / 2, startY);
             item->render();
             startY += item->height();
         }
-    }
-    else if (m_style == Menu::Style::HorizontalList)
-    {
+    } else if (m_style == Menu::Style::HorizontalList) {
         // Calculate total width
         int totalWidth = 0;
-        for (auto item : m_items)
-        {
+        for (auto item : m_items) {
             totalWidth += item->width();
         }
 
         // Render centered items
         int startX = x() + m_width / 2 - totalWidth / 2 + totalWidth / m_items.size() / 2;
-        for (auto item : m_items)
-        {
+        for (auto item : m_items) {
             item->setPos(startX, y() + m_height / 2);
             item->render();
             startX += item->width();
         }
-    }
-    else if (m_style == Menu::Style::ShowOne)
-    {
+    } else if (m_style == Menu::Style::ShowOne) {
         auto item = m_items.at(m_currentIndex);
         item->setPos(x() + m_width / 2, y() + m_height / 2);
         item->render();
-    }
-    else if (m_style == Menu::Style::ShowMany)
-    {
-        for (auto index: m_itemsToShow)
-        {
-            if (index >= 0 && index < static_cast<int>(m_items.size()))
-            {
+    } else if (m_style == Menu::Style::ShowMany) {
+        for (auto index : m_itemsToShow) {
+            if (index >= 0 && index < static_cast<int>(m_items.size())) {
                 m_items.at(index)->render();
             }
         }
@@ -188,26 +170,22 @@ bool Menu::isPrevAllowed() const
 
 void Menu::renderMouseItems()
 {
-    for (MouseItem item : m_mouseItems)
-    {
-        switch (item.type)
-        {
+    for (MouseItem item : m_mouseItems) {
+        switch (item.type) {
         case Menu::MouseItemType::Quit:
             item.item->setPos(x() + m_width - item.item->width(), y() + m_height - item.item->height());
             item.item->render();
             break;
 
         case Menu::MouseItemType::Prev:
-            if (isPrevAllowed())
-            {
+            if (isPrevAllowed()) {
                 item.item->setPos(x() + item.item->width(), y() + m_height / 2);
                 item.item->render();
             }
             break;
 
         case Menu::MouseItemType::Next:
-            if (isNextAllowed())
-            {
+            if (isNextAllowed()) {
                 item.item->setPos(x() + m_width - item.item->width(), y() + m_height / 2);
                 item.item->render();
             }
@@ -218,12 +196,9 @@ void Menu::renderMouseItems()
 
 void Menu::incrementIndex(int increment)
 {
-    if (m_wrapAround)
-    {
+    if (m_wrapAround) {
         setCurrentIndexWrapAround(m_currentIndex + increment);
-    }
-    else
-    {
+    } else {
         setCurrentIndex(m_currentIndex + increment);
     }
 
@@ -252,10 +227,8 @@ void Menu::right()
 
 void Menu::selectCurrentItem()
 {
-    if (m_items.size())
-    {
-        for (auto item : m_items)
-        {
+    if (m_items.size()) {
+        for (auto item : m_items) {
             item->setSelected(false);
         }
 
@@ -266,13 +239,12 @@ void Menu::selectCurrentItem()
 
 bool Menu::checkIfHit(MenuItemPtr item, int x, int y)
 {
-    const int x1 = item->x() - item->width()  / 2;
-    const int x2 = item->x() + item->width()  / 2;
+    const int x1 = item->x() - item->width() / 2;
+    const int x2 = item->x() + item->width() / 2;
     const int y1 = item->y() - item->height() / 2;
     const int y2 = item->y() + item->height() / 2;
 
-    if (x >= x1 && x <= x2 && y >= y1 && y <= y2)
-    {
+    if (x >= x1 && x <= x2 && y >= y1 && y <= y2) {
         return true;
     }
 
@@ -281,28 +253,23 @@ bool Menu::checkIfHit(MenuItemPtr item, int x, int y)
 
 bool Menu::handleMousePressOnMouseItem(int x, int y)
 {
-    for (MouseItem mouseItem : m_mouseItems)
-    {
+    for (MouseItem mouseItem : m_mouseItems) {
         auto item = mouseItem.item;
-        switch (mouseItem.type)
-        {
+        switch (mouseItem.type) {
         case MouseItemType::Quit:
-            if (checkIfHit(item, x, y))
-            {
+            if (checkIfHit(item, x, y)) {
                 item->setFocused(true);
                 return true;
             }
             break;
         case MouseItemType::Prev:
-            if (isPrevAllowed() && checkIfHit(item, x, y))
-            {
+            if (isPrevAllowed() && checkIfHit(item, x, y)) {
                 item->setFocused(true);
                 return true;
             }
             break;
         case MouseItemType::Next:
-            if (isNextAllowed() && checkIfHit(item, x, y))
-            {
+            if (isNextAllowed() && checkIfHit(item, x, y)) {
                 item->setFocused(true);
                 return true;
             }
@@ -317,23 +284,18 @@ bool Menu::handleMousePressOnMouseItem(int x, int y)
 
 bool Menu::handleMousePressOnItem(int x, int y)
 {
-    for (MouseItem mouseItem : m_mouseItems)
-    {
+    for (MouseItem mouseItem : m_mouseItems) {
         auto item = mouseItem.item;
-        if (checkIfHit(item, x, y))
-        {
+        if (checkIfHit(item, x, y)) {
             item->setFocused(true);
             return true;
         }
     }
 
-    if (m_style != Menu::Style::ShowOne)
-    {
-        for (unsigned int i = 0; i < m_items.size(); i++)
-        {
+    if (m_style != Menu::Style::ShowOne) {
+        for (unsigned int i = 0; i < m_items.size(); i++) {
             auto item = m_items.at(i);
-            if (checkIfHit(item, x, y))
-            {
+            if (checkIfHit(item, x, y)) {
                 setCurrentIndex(i);
                 return true;
             }
@@ -345,11 +307,10 @@ bool Menu::handleMousePressOnItem(int x, int y)
 
 bool Menu::handleMousePress(int x, int y, int screenWidth, int screenHeight)
 {
-    x = x * width()  / screenWidth;
+    x = x * width() / screenWidth;
     y = y * height() / screenHeight;
 
-    if (handleMousePressOnMouseItem(x, y) || handleMousePressOnItem(x, y))
-    {
+    if (handleMousePressOnMouseItem(x, y) || handleMousePressOnItem(x, y)) {
         return true;
     }
 
@@ -358,32 +319,26 @@ bool Menu::handleMousePress(int x, int y, int screenWidth, int screenHeight)
 
 bool Menu::handleMouseReleaseOnMouseItem(int x, int y)
 {
-    for (MouseItem mouseItem : m_mouseItems)
-    {
+    for (MouseItem mouseItem : m_mouseItems) {
         mouseItem.item->setFocused(false);
     }
 
-    for (MouseItem mouseItem : m_mouseItems)
-    {
+    for (MouseItem mouseItem : m_mouseItems) {
         auto item = mouseItem.item;
-        if (checkIfHit(item, x, y))
-        {
-            switch (mouseItem.type)
-            {
+        if (checkIfHit(item, x, y)) {
+            switch (mouseItem.type) {
             case Menu::MouseItemType::Quit:
                 exit();
                 return true;
 
             case Menu::MouseItemType::Prev:
-                if (isPrevAllowed())
-                {
+                if (isPrevAllowed()) {
                     left();
                     return true;
                 }
                 break;
             case Menu::MouseItemType::Next:
-                if (isNextAllowed())
-                {
+                if (isNextAllowed()) {
                     right();
                     return true;
                 }
@@ -397,24 +352,17 @@ bool Menu::handleMouseReleaseOnMouseItem(int x, int y)
 
 bool Menu::handleMouseReleaseOnItem(int x, int y)
 {
-    if (m_style == Menu::Style::ShowOne)
-    {
+    if (m_style == Menu::Style::ShowOne) {
         auto item = currentItem();
-        if (checkIfHit(item, x, y))
-        {
+        if (checkIfHit(item, x, y)) {
             selectCurrentItem();
             return true;
         }
-    }
-    else
-    {
-        for (unsigned int i = 0; i < m_items.size(); i++)
-        {
+    } else {
+        for (unsigned int i = 0; i < m_items.size(); i++) {
             auto item = m_items.at(i);
-            if (checkIfHit(item, x, y))
-            {
-                if (static_cast<int>(i) == m_currentIndex)
-                {
+            if (checkIfHit(item, x, y)) {
+                if (static_cast<int>(i) == m_currentIndex) {
                     selectCurrentItem();
                 }
 
@@ -428,11 +376,10 @@ bool Menu::handleMouseReleaseOnItem(int x, int y)
 
 bool Menu::handleMouseRelease(int x, int y, int screenWidth, int screenHeight)
 {
-    x = x * width()  / screenWidth;
+    x = x * width() / screenWidth;
     y = y * height() / screenHeight;
 
-    if (handleMouseReleaseOnMouseItem(x, y) || handleMouseReleaseOnItem(x, y))
-    {
+    if (handleMouseReleaseOnMouseItem(x, y) || handleMouseReleaseOnItem(x, y)) {
         return true;
     }
 
@@ -441,10 +388,8 @@ bool Menu::handleMouseRelease(int x, int y, int screenWidth, int screenHeight)
 
 void Menu::updateFocus()
 {
-    if (m_items.size())
-    {
-        for (auto item : m_items)
-        {
+    if (m_items.size()) {
+        for (auto item : m_items) {
             item->setFocused(false);
         }
 
@@ -507,14 +452,11 @@ void Menu::setCurrentIndex(int index)
 {
     const int numItems = m_items.size();
 
-    if (!numItems)
-    {
+    if (!numItems) {
         m_currentIndex = -1;
-    }
-    else
-    {
+    } else {
         m_currentIndex = index;
-        m_currentIndex = m_currentIndex < 0         ? 0            : m_currentIndex;
+        m_currentIndex = m_currentIndex < 0 ? 0 : m_currentIndex;
         m_currentIndex = m_currentIndex >= numItems ? numItems - 1 : m_currentIndex;
 
         updateFocus();
@@ -525,15 +467,12 @@ void Menu::setCurrentIndexWrapAround(int index)
 {
     const int numItems = m_items.size();
 
-    if (!numItems)
-    {
+    if (!numItems) {
         m_currentIndex = -1;
-    }
-    else
-    {
+    } else {
         m_currentIndex = index;
-        m_currentIndex = m_currentIndex < 0         ? numItems - 1 : m_currentIndex;
-        m_currentIndex = m_currentIndex >= numItems ? 0            : m_currentIndex;
+        m_currentIndex = m_currentIndex < 0 ? numItems - 1 : m_currentIndex;
+        m_currentIndex = m_currentIndex >= numItems ? 0 : m_currentIndex;
 
         updateFocus();
     }
@@ -603,8 +542,7 @@ void Menu::exit()
 
 void Menu::stepTime(int msecs)
 {
-    for (auto item : m_items)
-    {
+    for (auto item : m_items) {
         item->stepTime(msecs);
     }
 

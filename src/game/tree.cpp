@@ -15,20 +15,20 @@
 
 #include "tree.hpp"
 
-#include <MCSurface>
-#include <MCPhysicsComponent>
 #include <MCCircleShape>
+#include <MCPhysicsComponent>
 #include <MCRandom>
 #include <MCShape>
 #include <MCShapeView>
+#include <MCSurface>
 
 namespace {
 static const float treeBodyRadius = 8;
 static const float treeViewRadius = 48;
-}
+} // namespace
 
 Tree::Tree(MCSurface & surface, float r0, float r1, float treeHeight, int branches)
-    : MCObject(MCShapePtr(new MCCircleShape(nullptr, treeBodyRadius)), "tree")
+  : MCObject(MCShapePtr(new MCCircleShape(nullptr, treeBodyRadius)), "tree")
 {
     physicsComponent().setMass(1, true); // Stationary
     physicsComponent().setRestitution(0.25f);
@@ -38,19 +38,15 @@ Tree::Tree(MCSurface & surface, float r0, float r1, float treeHeight, int branch
     shape()->setRadius(treeBodyRadius);
 
     const float branchHeight = treeHeight / branches;
-    for (int i = 0; i < branches; i++)
-    {
+    for (int i = 0; i < branches; i++) {
         auto branch = new MCObject(surface, i == 0 ? "treeRoot" : "treeBranch");
 
-        if (i == 0)
-        {
+        if (i == 0) {
             branch->shape()->view()->setHasShadow(true);
             branch->shape()->view()->setHandle("branchShadowEnabled"); // Different handle for the only surface with shadow
             branch->setIsPhysicsObject(false);
             addChildObject(MCObjectPtr(branch), MCVector3dF(0, 0, branchHeight) * (i + 1));
-        }
-        else
-        {
+        } else {
             branch->shape()->view()->setHasShadow(false);
             branch->setIsPhysicsObject(false);
             const auto offset = MCRandom::randomVector2d() * 5;

@@ -23,18 +23,15 @@ static const char * INIT_ERROR = "Initializing the game failed!";
 }
 
 Application::Application(int & argc, char ** argv)
-    : QApplication(argc, argv)
+  : QApplication(argc, argv)
 {
 }
 
 bool Application::notify(QObject * receiver, QEvent * event)
 {
-    try
-    {
+    try {
         return QApplication::notify(receiver, event);
-    }
-    catch (std::exception & e)
-    {
+    } catch (std::exception & e) {
         juzzlin::L().fatal() << e.what();
         juzzlin::L().fatal() << INIT_ERROR;
 

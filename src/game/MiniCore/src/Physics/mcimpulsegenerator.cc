@@ -19,23 +19,22 @@
 
 #include "mcimpulsegenerator.hh"
 #include "mccontact.hh"
+#include "mcmathutil.hh"
 #include "mcobject.hh"
 #include "mcphysicscomponent.hh"
-#include "mcmathutil.hh"
 #include "mcshape.hh"
 
 MCImpulseGenerator::MCImpulseGenerator()
-{}
+{
+}
 
 MCContact * MCImpulseGenerator::getDeepestInterpenetration(
-    const std::vector<MCContact *> & contacts)
+  const std::vector<MCContact *> & contacts)
 {
     float maxDepth = 0;
     MCContact * bestContact = nullptr;
-    for (MCContact * contact : contacts)
-    {
-        if (contact->interpenetrationDepth() > maxDepth)
-        {
+    for (MCContact * contact : contacts) {
+        if (contact->interpenetrationDepth() > maxDepth) {
             maxDepth = contact->interpenetrationDepth();
             bestContact = contact;
         }
@@ -44,12 +43,11 @@ MCContact * MCImpulseGenerator::getDeepestInterpenetration(
 }
 
 void MCImpulseGenerator::displace(
-     MCObject & pa, MCObject & pb, const MCVector3dF & displacement)
+  MCObject & pa, MCObject & pb, const MCVector3dF & displacement)
 {
-    if (!pa.physicsComponent().isStationary())
-    {
-        const float invMassA    = pa.physicsComponent().invMass();
-        const float invMassB    = pb.physicsComponent().invMass();
+    if (!pa.physicsComponent().isStationary()) {
+        const float invMassA = pa.physicsComponent().invMass();
+        const float invMassB = pb.physicsComponent().invMass();
         const float massScaling = invMassA / (invMassA + invMassB);
 
         pa.displace(displacement * massScaling);
@@ -57,12 +55,11 @@ void MCImpulseGenerator::displace(
 }
 
 void MCImpulseGenerator::generateImpulsesFromContact(
-    MCObject & pa, MCObject & pb, const MCContact & contact,
-    const MCVector3dF & linearImpulse,
-    float restitution)
+  MCObject & pa, MCObject & pb, const MCContact & contact,
+  const MCVector3dF & linearImpulse,
+  float restitution)
 {
-    if (!pa.physicsComponent().isStationary())
-    {
+    if (!pa.physicsComponent().isStationary()) {
         const float invMassA = pa.physicsComponent().invMass();
         const float invMassB = pb.physicsComponent().invMass();
 
@@ -83,19 +80,16 @@ void MCImpulseGenerator::generateImpulsesFromContact(
 
 void MCImpulseGenerator::resolvePositions(std::vector<MCObject *> & objs, float accuracy)
 {
-    for (MCObject * object : objs)
-    {
+    for (MCObject * object : objs) {
         auto iter(object->contacts().begin());
-        for (; iter != object->contacts().end(); iter++)
-        {
+        for (; iter != object->contacts().end(); iter++) {
             const MCContact * contact = getDeepestInterpenetration(iter->second);
-            if (contact)
-            {
+            if (contact) {
                 MCObject & pa(*object);
                 MCObject & pb(contact->object());
 
                 const MCVector3dF displacement(
-                    contact->contactNormal() * contact->interpenetrationDepth() * accuracy);
+                  contact->contactNormal() * contact->interpenetrationDepth() * accuracy);
 
                 displace(pa, pb, displacement);
                 displace(pb, pa, -displacement);
@@ -111,28 +105,23 @@ void MCImpulseGenerator::resolvePositions(std::vector<MCObject *> & objs, float 
 
 void MCImpulseGenerator::generateImpulsesFromDeepestContacts(std::vector<MCObject *> & objs)
 {
-    for (MCObject * object : objs)
-    {
+    for (MCObject * object : objs) {
         auto iter(object->contacts().begin());
-        for (; iter != object->contacts().end(); iter++)
-        {
+        for (; iter != object->contacts().end(); iter++) {
             const MCContact * contact = getDeepestInterpenetration(iter->second);
-            if (contact)
-            {
+            if (contact) {
                 MCObject & pa(*object);
                 MCObject & pb(contact->object());
 
                 const float restitution(
-                    std::min(pa.physicsComponent().restitution(), pb.physicsComponent().restitution()));
+                  std::min(pa.physicsComponent().restitution(), pb.physicsComponent().restitution()));
 
                 const MCVector2dF velocityDelta(pb.physicsComponent().velocity() - pa.physicsComponent().velocity());
                 const float projection = contact->contactNormal().dot(velocityDelta);
 
-                if (projection > 0)
-                {
+                if (projection > 0) {
                     const MCVector3dF linearImpulse(
-                        contact->contactNormal() *
-                        contact->contactNormal().dot(velocityDelta));
+                      contact->contactNormal() * contact->contactNormal().dot(velocityDelta));
 
                     generateImpulsesFromContact(pa, pb, *contact, linearImpulse, restitution);
                     generateImpulsesFromContact(pb, pa, *contact, -linearImpulse, restitution);

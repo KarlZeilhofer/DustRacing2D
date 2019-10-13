@@ -18,28 +18,28 @@
 #include "settings.hpp"
 #include "statemachine.hpp"
 
-#include <MenuManager>
 #include <Menu>
+#include <MenuManager>
 
 #include <cassert>
 
 EventHandler::EventHandler(InputHandler & inputHandler)
-: m_inputHandler(inputHandler)
-, m_captureMode(false)
+  : m_inputHandler(inputHandler)
+  , m_captureMode(false)
 {
     // Default key bindings
     m_keyToActionMap[KeyCodes::LSHIFT] = ActionMapping(1, InputHandler::Action::Up);
     m_keyToActionMap[KeyCodes::RSHIFT] = ActionMapping(0, InputHandler::Action::Up);
-    m_keyToActionMap[KeyCodes::LCTRL]  = ActionMapping(1, InputHandler::Action::Down);
-    m_keyToActionMap[KeyCodes::RCTRL]  = ActionMapping(0, InputHandler::Action::Down);
-    m_keyToActionMap[Qt::Key_Left]     = ActionMapping(0, InputHandler::Action::Left);
-    m_keyToActionMap[Qt::Key_Right]    = ActionMapping(0, InputHandler::Action::Right);
-    m_keyToActionMap[Qt::Key_A]        = ActionMapping(1, InputHandler::Action::Left);
-    m_keyToActionMap[Qt::Key_D]        = ActionMapping(1, InputHandler::Action::Right);
-    m_keyToActionMap[Qt::Key_Up]       = ActionMapping(0, InputHandler::Action::Up);
-    m_keyToActionMap[Qt::Key_Down]     = ActionMapping(0, InputHandler::Action::Down);
-    m_keyToActionMap[Qt::Key_W]        = ActionMapping(1, InputHandler::Action::Up);
-    m_keyToActionMap[Qt::Key_S]        = ActionMapping(1, InputHandler::Action::Down);
+    m_keyToActionMap[KeyCodes::LCTRL] = ActionMapping(1, InputHandler::Action::Down);
+    m_keyToActionMap[KeyCodes::RCTRL] = ActionMapping(0, InputHandler::Action::Down);
+    m_keyToActionMap[Qt::Key_Left] = ActionMapping(0, InputHandler::Action::Left);
+    m_keyToActionMap[Qt::Key_Right] = ActionMapping(0, InputHandler::Action::Right);
+    m_keyToActionMap[Qt::Key_A] = ActionMapping(1, InputHandler::Action::Left);
+    m_keyToActionMap[Qt::Key_D] = ActionMapping(1, InputHandler::Action::Right);
+    m_keyToActionMap[Qt::Key_Up] = ActionMapping(0, InputHandler::Action::Up);
+    m_keyToActionMap[Qt::Key_Down] = ActionMapping(0, InputHandler::Action::Down);
+    m_keyToActionMap[Qt::Key_W] = ActionMapping(1, InputHandler::Action::Up);
+    m_keyToActionMap[Qt::Key_S] = ActionMapping(1, InputHandler::Action::Down);
 
     loadKeyMappings();
 
@@ -50,8 +50,7 @@ EventHandler::EventHandler(InputHandler & inputHandler)
 
 void EventHandler::loadKeyMappings()
 {
-    std::vector<InputHandler::Action> actions =
-    {
+    std::vector<InputHandler::Action> actions = {
         InputHandler::Action::Up,
         InputHandler::Action::Down,
         InputHandler::Action::Left,
@@ -59,14 +58,12 @@ void EventHandler::loadKeyMappings()
     };
 
     const int numPlayers = 2;
-    for (int player = 0; player < numPlayers; player++)
-    {
-        for (InputHandler::Action action : actions)
-        {
+    for (int player = 0; player < numPlayers; player++) {
+        for (InputHandler::Action action : actions) {
             mapKeyToAction(
-                player,
-                action,
-                Settings::instance().loadKeyMapping(player, action));
+              player,
+              action,
+              Settings::instance().loadKeyMapping(player, action));
         }
     }
 }
@@ -75,7 +72,7 @@ void EventHandler::enableCaptureMode(InputHandler::Action action, int player)
 {
     assert(player == 0 || player == 1);
 
-    m_captureMode   = true;
+    m_captureMode = true;
     m_captureAction = action;
     m_capturePlayer = player;
 }
@@ -87,12 +84,9 @@ void EventHandler::disableCaptureMode()
 
 bool EventHandler::handleKeyPressEvent(QKeyEvent * event)
 {
-    if (StateMachine::instance().state() != StateMachine::State::Menu)
-    {
+    if (StateMachine::instance().state() != StateMachine::State::Menu) {
         return handleGameKeyPressEvent(event);
-    }
-    else
-    {
+    } else {
         return handleMenuKeyPressEvent(event);
     }
 
@@ -101,8 +95,7 @@ bool EventHandler::handleKeyPressEvent(QKeyEvent * event)
 
 bool EventHandler::handleKeyReleaseEvent(QKeyEvent * event)
 {
-    if (StateMachine::instance().state() != StateMachine::State::Menu)
-    {
+    if (StateMachine::instance().state() != StateMachine::State::Menu) {
         return handleGameKeyReleaseEvent(event);
     }
 
@@ -111,19 +104,13 @@ bool EventHandler::handleKeyReleaseEvent(QKeyEvent * event)
 
 bool EventHandler::handleMousePressEvent(QMouseEvent * event, int screenWidth, int screenHeight, bool mirrorY)
 {
-    if (StateMachine::instance().state() == StateMachine::State::Menu)
-    {
-        if (mirrorY)
-        {
-            if (MTFH::MenuManager::instance().mousePress(event->x(), screenHeight - event->y(), screenWidth, screenHeight))
-            {
+    if (StateMachine::instance().state() == StateMachine::State::Menu) {
+        if (mirrorY) {
+            if (MTFH::MenuManager::instance().mousePress(event->x(), screenHeight - event->y(), screenWidth, screenHeight)) {
                 emit soundRequested("menuClick");
             }
-        }
-        else
-        {
-            if (MTFH::MenuManager::instance().mousePress(event->x(), event->y(), screenWidth, screenHeight))
-            {
+        } else {
+            if (MTFH::MenuManager::instance().mousePress(event->x(), event->y(), screenWidth, screenHeight)) {
                 emit soundRequested("menuClick");
             }
         }
@@ -134,19 +121,14 @@ bool EventHandler::handleMousePressEvent(QMouseEvent * event, int screenWidth, i
 
 bool EventHandler::handleMouseReleaseEvent(QMouseEvent * event, int screenWidth, int screenHeight, bool mirrorY)
 {
-    if (StateMachine::instance().state() == StateMachine::State::Menu)
-    {
-        if (mirrorY)
-        {
+    if (StateMachine::instance().state() == StateMachine::State::Menu) {
+        if (mirrorY) {
             MTFH::MenuManager::instance().mouseRelease(event->x(), screenHeight - event->y(), screenWidth, screenHeight);
-        }
-        else
-        {
+        } else {
             MTFH::MenuManager::instance().mouseRelease(event->x(), event->y(), screenWidth, screenHeight);
         }
 
-        if (MTFH::MenuManager::instance().isDone())
-        {
+        if (MTFH::MenuManager::instance().isDone()) {
             emit soundRequested("menuBoom");
         }
     }
@@ -164,18 +146,13 @@ bool EventHandler::handleMouseMoveEvent(QMouseEvent * event)
 
 bool EventHandler::handleMenuKeyPressEvent(QKeyEvent * event)
 {
-    if (m_captureMode)
-    {
-        if (mapKeyToAction(m_capturePlayer, m_captureAction, event->nativeScanCode()))
-        {
+    if (m_captureMode) {
+        if (mapKeyToAction(m_capturePlayer, m_captureAction, event->nativeScanCode())) {
             disableCaptureMode();
             MTFH::MenuManager::instance().popMenu();
         }
-    }
-    else
-    {
-        switch (event->key())
-        {
+    } else {
+        switch (event->key()) {
         case Qt::Key_Left:
             emit soundRequested("menuClick");
             MTFH::MenuManager::instance().left();
@@ -195,12 +172,9 @@ bool EventHandler::handleMenuKeyPressEvent(QKeyEvent * event)
         case Qt::Key_Return:
         case Qt::Key_Enter:
             MTFH::MenuManager::instance().selectCurrentItem();
-            if (MTFH::MenuManager::instance().isDone())
-            {
+            if (MTFH::MenuManager::instance().isDone()) {
                 emit soundRequested("menuBoom");
-            }
-            else
-            {
+            } else {
                 emit soundRequested("menuClick");
             }
             break;
@@ -208,8 +182,7 @@ bool EventHandler::handleMenuKeyPressEvent(QKeyEvent * event)
         case Qt::Key_Q:
             emit soundRequested("menuClick");
             MTFH::MenuManager::instance().activeMenu()->exit();
-            if (MTFH::MenuManager::instance().isDone())
-            {
+            if (MTFH::MenuManager::instance().isDone()) {
                 emit gameExited();
             }
             break;
@@ -233,28 +206,23 @@ bool EventHandler::handleGameKeyReleaseEvent(QKeyEvent * event)
 
 bool EventHandler::applyMatchingAction(QKeyEvent * event, bool press)
 {
-    if (!event->isAutoRepeat())
-    {
-        if (m_keyToActionMap.count(event->nativeScanCode()) > 0)
-        {
+    if (!event->isAutoRepeat()) {
+        if (m_keyToActionMap.count(event->nativeScanCode()) > 0) {
             const unsigned int player = m_keyToActionMap[event->nativeScanCode()].player();
             const InputHandler::Action action = m_keyToActionMap[event->nativeScanCode()].action();
             m_inputHandler.setActionState(player, action, press);
             return true;
         }
 
-        if (m_keyToActionMap.count(event->key()) > 0)
-        {
+        if (m_keyToActionMap.count(event->key()) > 0) {
             const unsigned int player = m_keyToActionMap[event->key()].player();
             const InputHandler::Action action = m_keyToActionMap[event->key()].action();
             m_inputHandler.setActionState(player, action, press);
             return true;
         }
 
-        if (press)
-        {
-            switch (event->key())
-            {
+        if (press) {
+            switch (event->key()) {
             case Qt::Key_Escape:
             case Qt::Key_Q:
                 StateMachine::instance().quit();
@@ -273,26 +241,18 @@ bool EventHandler::applyMatchingAction(QKeyEvent * event, bool press)
 
 bool EventHandler::mapKeyToAction(int player, InputHandler::Action action, int key)
 {
-    if (key &&
-        key != Qt::Key_Escape &&
-        key != Qt::Key_Q &&
-        key != Qt::Key_P)
-    {
+    if (key && key != Qt::Key_Escape && key != Qt::Key_Q && key != Qt::Key_P) {
         // Find the matching action and change the key
         auto iter = m_keyToActionMap.begin();
-        while (iter != m_keyToActionMap.end())
-        {
-            if (iter->second.action() == action && iter->second.player() == player)
-            {
+        while (iter != m_keyToActionMap.end()) {
+            if (iter->second.action() == action && iter->second.player() == player) {
                 iter = m_keyToActionMap.erase(iter);
-            }
-            else
-            {
+            } else {
                 iter++;
             }
         }
 
-        m_keyToActionMap[key] = {player, action};
+        m_keyToActionMap[key] = { player, action };
 
         Settings::instance().saveKeyMapping(player, action, key);
 

@@ -23,10 +23,10 @@
 #include <cassert>
 
 OffTrackDetector::OffTrackDetector(Car & car)
-: m_car(car)
-, m_track(nullptr)
-, m_tileWLimit(TrackTile::TILE_W / 2 - TrackTile::TILE_W / 10)
-, m_tileHLimit(TrackTile::TILE_H / 2 - TrackTile::TILE_H / 10)
+  : m_car(car)
+  , m_track(nullptr)
+  , m_tileWLimit(TrackTile::TILE_W / 2 - TrackTile::TILE_W / 10)
+  , m_tileHLimit(TrackTile::TILE_H / 2 - TrackTile::TILE_H / 10)
 {
 }
 
@@ -42,12 +42,11 @@ void OffTrackDetector::update()
     {
         const MCVector3dF leftFrontTirePos(m_car.leftFrontTireLocation());
         TrackTile & tile = *m_track->trackTileAtLocation(
-            leftFrontTirePos.i(), leftFrontTirePos.j());
+          leftFrontTirePos.i(), leftFrontTirePos.j());
 
         m_car.setLeftSideOffTrack(false);
 
-        if (isOffTrack(leftFrontTirePos, tile))
-        {
+        if (isOffTrack(leftFrontTirePos, tile)) {
             m_car.setLeftSideOffTrack(true);
         }
     }
@@ -55,12 +54,11 @@ void OffTrackDetector::update()
     {
         const MCVector3dF rightFrontTirePos(m_car.rightFrontTireLocation());
         TrackTile & tile = *m_track->trackTileAtLocation(
-            rightFrontTirePos.i(), rightFrontTirePos.j());
+          rightFrontTirePos.i(), rightFrontTirePos.j());
 
         m_car.setRightSideOffTrack(false);
 
-        if (isOffTrack(rightFrontTirePos, tile))
-        {
+        if (isOffTrack(rightFrontTirePos, tile)) {
             m_car.setRightSideOffTrack(true);
         }
     }
@@ -68,51 +66,34 @@ void OffTrackDetector::update()
 
 bool OffTrackDetector::isOffTrack(MCVector2dF tire, const TrackTile & tile) const
 {
-    if (!tile.hasAsphalt())
-    {
+    if (!tile.hasAsphalt()) {
         return true;
-    }
-    else if (
-        tile.tileTypeEnum() == TrackTile::TT_STRAIGHT ||
-        tile.tileTypeEnum() == TrackTile::TT_FINISH)
-    {
-        if ((tile.rotation() + 90) % 180 == 0)
-        {
+    } else if (
+      tile.tileTypeEnum() == TrackTile::TT_STRAIGHT || tile.tileTypeEnum() == TrackTile::TT_FINISH) {
+        if ((tile.rotation() + 90) % 180 == 0) {
             const float y = tire.j();
-            if (y > tile.location().y() + m_tileHLimit ||
-                y < tile.location().y() - m_tileHLimit)
-            {
+            if (y > tile.location().y() + m_tileHLimit || y < tile.location().y() - m_tileHLimit) {
                 return true;
             }
-        }
-        else if (tile.rotation() % 180 == 0)
-        {
+        } else if (tile.rotation() % 180 == 0) {
             const float x = tire.i();
-            if (x > tile.location().x() + m_tileWLimit ||
-                x < tile.location().x() - m_tileWLimit)
-            {
+            if (x > tile.location().x() + m_tileWLimit || x < tile.location().x() - m_tileWLimit) {
                 return true;
             }
         }
-    }
-    else if (tile.tileTypeEnum() == TrackTile::TT_STRAIGHT_45_MALE)
-    {
+    } else if (tile.tileTypeEnum() == TrackTile::TT_STRAIGHT_45_MALE) {
         const MCVector2dF diff = tire - MCVector2dF(tile.location().x(), tile.location().y());
         const MCVector2dF rotatedDiff = MCMathUtil::rotatedVector(diff, tile.rotation() - 45);
 
-        if (rotatedDiff.j() > m_tileHLimit || rotatedDiff.j() < -m_tileHLimit)
-        {
+        if (rotatedDiff.j() > m_tileHLimit || rotatedDiff.j() < -m_tileHLimit) {
             return true;
         }
-    }
-    else if (
-        tile.tileTypeEnum() == TrackTile::TT_STRAIGHT_45_FEMALE)
-    {
+    } else if (
+      tile.tileTypeEnum() == TrackTile::TT_STRAIGHT_45_FEMALE) {
         const MCVector2dF diff = tire - MCVector2dF(tile.location().x(), tile.location().y());
         const MCVector2dF rotatedDiff = MCMathUtil::rotatedVector(diff, 360 - tile.rotation() - 45);
 
-        if (rotatedDiff.j() < m_tileHLimit)
-        {
+        if (rotatedDiff.j() < m_tileHLimit) {
             return true;
         }
     }

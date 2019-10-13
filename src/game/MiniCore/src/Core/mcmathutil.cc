@@ -22,18 +22,16 @@
 
 float MCMathUtil::rotatedX(float x0, float y0, float angle)
 {
-    return MCTrigonom::cos(angle) * x0 -
-        MCTrigonom::sin(angle) * y0;
+    return MCTrigonom::cos(angle) * x0 - MCTrigonom::sin(angle) * y0;
 }
 
 float MCMathUtil::rotatedY(float x0, float y0, float angle)
 {
-    return MCTrigonom::sin(angle) * x0 +
-        MCTrigonom::cos(angle) * y0;
+    return MCTrigonom::sin(angle) * x0 + MCTrigonom::cos(angle) * y0;
 }
 
 void MCMathUtil::rotateVector(
-    const MCVector2dF & v0, MCVector2dF & v1, float angle)
+  const MCVector2dF & v0, MCVector2dF & v1, float angle)
 {
     const float sin = MCTrigonom::sin(angle);
     const float cos = MCTrigonom::cos(angle);
@@ -61,14 +59,12 @@ bool MCMathUtil::crosses(const MCSegmentF & a, const MCSegmentF & b)
     const MCVector2dF a0b0(b.vertex0 - a.vertex0);
     const MCVector2dF a0b1(b.vertex1 - a.vertex0);
 
-    if (sign(a0a1 % a0b0) != sign(a0a1 % a0b1))
-    {
+    if (sign(a0a1 % a0b0) != sign(a0a1 % a0b1)) {
         const MCVector2dF b0b1(b.vertex1 - b.vertex0);
         const MCVector2dF b0a0(a.vertex0 - b.vertex0);
         const MCVector2dF b0a1(a.vertex1 - b.vertex0);
 
-        if (sign(b0b1 % b0a0) != sign(b0b1 % b0a1))
-        {
+        if (sign(b0b1 % b0a0) != sign(b0b1 % b0a1)) {
             return true;
         }
     }

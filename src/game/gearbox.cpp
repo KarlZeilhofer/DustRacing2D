@@ -28,33 +28,23 @@ Gearbox::Gear Gearbox::gear() const
 
 void Gearbox::update(int speedInKmh)
 {
-    if (m_accelerator)
-    {
-        if (m_gear == Gear::Neutral || m_gear == Gear::Stop)
-        {
+    if (m_accelerator) {
+        if (m_gear == Gear::Neutral || m_gear == Gear::Stop) {
             m_gear = Gear::Forward;
         }
-    }
-    else if (m_brake)
-    {
-        if (speedInKmh == 0)
-        {
-            if (m_gear != Gear::Stop && m_gear != Gear::Reverse)
-            {
+    } else if (m_brake) {
+        if (speedInKmh == 0) {
+            if (m_gear != Gear::Stop && m_gear != Gear::Reverse) {
                 m_gear = Gear::Stop;
                 m_stopCounter = 0;
-            }
-            else
-            {
+            } else {
                 if (++m_stopCounter > 30) // Wait ~0.5 sec before reverse engages
                 {
                     m_gear = Gear::Reverse;
                 }
             }
         }
-    }
-    else
-    {
+    } else {
         m_gear = Gear::Neutral;
     }
 }

@@ -20,8 +20,8 @@
 #include "object.hpp"
 #include "objectmodelloader.hpp"
 #include "targetnode.hpp"
-#include "tracktile.hpp"
 #include "trackio.hpp"
+#include "tracktile.hpp"
 
 #include <cassert>
 #include <memory>
@@ -29,8 +29,9 @@
 using std::dynamic_pointer_cast;
 
 EditorData::EditorData(Mediator & mediator)
-    : m_mediator(mediator)
-{}
+  : m_mediator(mediator)
+{
+}
 
 void EditorData::clearScene()
 {
@@ -61,8 +62,7 @@ bool EditorData::isUndoable() const
 
 void EditorData::undo()
 {
-    if (m_undoStack.isUndoable())
-    {
+    if (m_undoStack.isUndoable()) {
         m_dadStore.clear();
 
         m_selectedObject = nullptr;
@@ -84,8 +84,7 @@ bool EditorData::isRedoable() const
 
 void EditorData::redo()
 {
-    if (m_undoStack.isRedoable())
-    {
+    if (m_undoStack.isRedoable()) {
         m_dadStore.clear();
 
         m_selectedObject = nullptr;
@@ -123,8 +122,7 @@ void EditorData::saveRedoPoint()
 bool EditorData::saveTrackDataAs(QString fileName)
 {
     assert(m_trackData);
-    if (m_trackIO.save(m_trackData, fileName))
-    {
+    if (m_trackIO.save(m_trackData, fileName)) {
         m_trackData->setFileName(fileName);
         return true;
     }
@@ -159,8 +157,7 @@ void EditorData::addExistingRouteToScene()
     std::vector<TargetNodeBasePtr> temp;
     m_trackData->route().getAll(temp);
     m_trackData->route().clear();
-    for (auto tnode : temp)
-    {
+    for (auto tnode : temp) {
         pushTargetNodeToRoute(tnode);
     }
 }
@@ -177,8 +174,7 @@ void EditorData::pushTargetNodeToRoute(TargetNodeBasePtr tnode)
 {
     Route & route = trackData()->route();
 
-    if (route.numNodes())
-    {
+    if (route.numNodes()) {
         auto prev = route.get(route.numNodes() - 1);
 
         prev->setNext(tnode);
@@ -201,8 +197,7 @@ void EditorData::pushTargetNodeToRoute(TargetNodeBasePtr tnode)
     routeLine->setZValue(routeLineZ);
 
     // Check if we might have a loop => end
-    if (loopClosed)
-    {
+    if (loopClosed) {
         m_mediator.endSetRoute();
 
         auto firstNode = route.get(0);
@@ -215,8 +210,7 @@ void EditorData::pushTargetNodeToRoute(TargetNodeBasePtr tnode)
 
 void EditorData::removeRouteFromScene()
 {
-    for (auto && tnode : m_trackData->route())
-    {
+    for (auto && tnode : m_trackData->route()) {
         auto node = dynamic_pointer_cast<TargetNode>(tnode);
         assert(node);
 
@@ -258,17 +252,14 @@ void EditorData::addTilesToScene()
 {
     assert(m_trackData);
 
-    for (unsigned int i = 0; i < m_trackData->map().cols(); i++)
-    {
-        for (unsigned int j = 0; j < m_trackData->map().rows(); j++)
-        {
+    for (unsigned int i = 0; i < m_trackData->map().cols(); i++) {
+        for (unsigned int j = 0; j < m_trackData->map().rows(); j++) {
             auto tile = dynamic_pointer_cast<TrackTile>(m_trackData->map().getTile(i, j));
             assert(tile);
 
             tile->setPixmap(MainWindow::instance()->objectModelLoader().getPixmapByRole(tile->tileType()));
 
-            if (!tile->added())
-            {
+            if (!tile->added()) {
                 m_mediator.addItem(tile.get()); // The scene wants a raw pointer
 
                 tile->setAdded(true);
@@ -284,8 +275,7 @@ void EditorData::addObjectsToScene()
 {
     assert(m_trackData);
 
-    for (unsigned int i = 0; i < m_trackData->objects().count(); i++)
-    {
+    for (unsigned int i = 0; i < m_trackData->objects().count(); i++) {
         auto object = dynamic_pointer_cast<Object>(m_trackData->objects().object(i));
         assert(object);
 
@@ -307,14 +297,11 @@ void EditorData::removeTileFromScene(TrackTileBasePtr trackTile)
 
 void EditorData::removeTilesFromScene()
 {
-    if (m_trackData)
-    {
+    if (m_trackData) {
         TrackTile::setActiveTile(nullptr);
 
-        for (unsigned int i = 0; i < m_trackData->map().cols(); i++)
-        {
-            for (unsigned int j = 0; j < m_trackData->map().rows(); j++)
-            {
+        for (unsigned int i = 0; i < m_trackData->map().cols(); i++) {
+            for (unsigned int j = 0; j < m_trackData->map().rows(); j++) {
                 auto tile = dynamic_pointer_cast<TrackTile>(m_trackData->map().getTile(i, j));
                 assert(tile);
 
@@ -326,10 +313,8 @@ void EditorData::removeTilesFromScene()
 
 void EditorData::removeObjectsFromScene()
 {
-    if (m_trackData)
-    {
-        for (unsigned int i = 0; i < m_trackData->objects().count(); i++)
-        {
+    if (m_trackData) {
+        for (unsigned int i = 0; i < m_trackData->objects().count(); i++) {
             auto object = dynamic_pointer_cast<Object>(m_trackData->objects().object(i));
             assert(object);
 
@@ -344,10 +329,8 @@ void EditorData::removeObjectsFromScene()
 
 void EditorData::removeTargetNodesFromScene()
 {
-    if (m_trackData)
-    {
-        for (auto tnode : m_trackData->route())
-        {
+    if (m_trackData) {
+        for (auto tnode : m_trackData->route()) {
             auto node = dynamic_pointer_cast<TargetNode>(tnode);
             assert(node);
 

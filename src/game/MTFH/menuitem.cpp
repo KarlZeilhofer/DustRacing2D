@@ -14,34 +14,34 @@
 // along with Dust Racing 2D. If not, see <http://www.gnu.org/licenses/>.
 
 #include "menuitem.hpp"
-#include "menuitemaction.hpp"
 #include "menu.hpp"
+#include "menuitemaction.hpp"
 #include "menumanager.hpp"
 
 namespace MTFH {
 
 MenuItem::MenuItem(float width, float height, std::wstring text, bool selectable)
-: m_menu(nullptr)
-, m_text(text)
-, m_menuOpenActionMenuId("")
-, m_action(nullptr)
-, m_actionFunction(nullptr)
-, m_view(nullptr)
-, m_focused(false)
-, m_selected(false)
-, m_selectable(selectable)
-, m_width(width)
-, m_height(height)
-, m_x(0)
-, m_y(0)
-, m_targetX(0)
-, m_targetY(0)
-, m_lMargin(1)
-, m_rMargin(1)
-, m_tMargin(1)
-, m_bMargin(1)
-, m_index(-1)
-, m_animationCurve(30, 3)
+  : m_menu(nullptr)
+  , m_text(text)
+  , m_menuOpenActionMenuId("")
+  , m_action(nullptr)
+  , m_actionFunction(nullptr)
+  , m_view(nullptr)
+  , m_focused(false)
+  , m_selected(false)
+  , m_selectable(selectable)
+  , m_width(width)
+  , m_height(height)
+  , m_x(0)
+  , m_y(0)
+  , m_targetX(0)
+  , m_targetY(0)
+  , m_lMargin(1)
+  , m_rMargin(1)
+  , m_tMargin(1)
+  , m_bMargin(1)
+  , m_index(-1)
+  , m_animationCurve(30, 3)
 {
 }
 
@@ -145,28 +145,23 @@ void MenuItem::onDown()
 
 void MenuItem::setCurrent()
 {
-    if (m_menu)
-    {
+    if (m_menu) {
         m_menu->setCurrentIndex(index());
     }
 }
 
 void MenuItem::setSelected(bool flag)
 {
-    if (flag)
-    {
-        if (m_action)
-        {
+    if (flag) {
+        if (m_action) {
             m_action->fire();
         }
 
-        if (m_actionFunction)
-        {
+        if (m_actionFunction) {
             m_actionFunction();
         }
 
-        if (!m_menuOpenActionMenuId.empty())
-        {
+        if (!m_menuOpenActionMenuId.empty()) {
             MenuManager::instance().pushMenu(m_menuOpenActionMenuId);
         }
     }
@@ -189,9 +184,9 @@ void MenuItem::setContentsMargins(float left, float right, float top, float bott
 
 void MenuItem::getContentsMargins(float & left, float & right, float & top, float & bottom) const
 {
-    left   = m_lMargin;
-    right  = m_rMargin;
-    top    = m_tMargin;
+    left = m_lMargin;
+    right = m_rMargin;
+    top = m_tMargin;
     bottom = m_bMargin;
 }
 
@@ -232,8 +227,7 @@ bool MenuItem::selectable() const
 
 void MenuItem::render()
 {
-    if (m_view)
-    {
+    if (m_view) {
         m_view->render(m_x, m_y);
     }
 }
@@ -245,8 +239,7 @@ const std::wstring & MenuItem::text() const
 
 void MenuItem::stepTime(int msecs)
 {
-    if (m_view)
-    {
+    if (m_view) {
         m_view->stepTime(msecs);
     }
 
@@ -266,4 +259,3 @@ MenuItem::~MenuItem()
 }
 
 } // namespace MTFH
-

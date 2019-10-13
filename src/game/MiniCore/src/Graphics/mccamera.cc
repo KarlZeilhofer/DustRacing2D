@@ -32,12 +32,12 @@ MCCamera::MCCamera(float w, float h, float x, float y, float maxX, float maxY)
 
 void MCCamera::init(float w, float h, float x, float y, float maxX, float maxY)
 {
-    m_w     = w;
-    m_h     = h;
+    m_w = w;
+    m_h = h;
     m_halfW = w / 2;
     m_halfH = h / 2;
-    m_maxX  = maxX;
-    m_maxY  = maxY;
+    m_maxX = maxX;
+    m_maxY = maxY;
 
     setPos(x, y);
 }
@@ -52,23 +52,17 @@ void MCCamera::setPos(const MCVector2dF & pos)
     float x = pos.i();
     float y = pos.j();
 
-    if (x < m_halfW)
-    {
+    if (x < m_halfW) {
         x = m_halfW;
-    }
-    else if (x > m_maxX - m_halfW)
-    {
+    } else if (x > m_maxX - m_halfW) {
         x = m_maxX - m_halfW;
     }
 
     m_pos.setI(x);
 
-    if (y < m_halfH)
-    {
+    if (y < m_halfH) {
         y = m_halfH;
-    }
-    else if (y > m_maxY - m_halfH)
-    {
+    } else if (y > m_maxY - m_halfH) {
         y = m_maxY - m_halfH;
     }
 
@@ -103,5 +97,5 @@ float MCCamera::height() const
 MCBBox<float> MCCamera::bbox() const
 {
     return MCBBox<float>(
-        m_pos.i() - m_halfW, m_pos.j() - m_halfH, m_pos.i() + m_halfW, m_pos.j() + m_halfH);
+      m_pos.i() - m_halfW, m_pos.j() - m_halfH, m_pos.i() + m_halfW, m_pos.j() + m_halfH);
 }

@@ -34,12 +34,12 @@ const int NUM_VERTICES_PER_SURFACE = 6;
 }
 
 MCSurfaceObjectRendererLegacy::MCSurfaceObjectRendererLegacy(int maxBatchSize)
-    : MCObjectRendererBase(maxBatchSize)
-    , m_vertices(new MCGLVertex[maxBatchSize * NUM_VERTICES_PER_SURFACE])
-    , m_normals(new MCGLVertex[maxBatchSize * NUM_VERTICES_PER_SURFACE])
-    , m_texCoords(new MCGLTexCoord[maxBatchSize * NUM_VERTICES_PER_SURFACE])
-    , m_colors(new MCGLColor[maxBatchSize * NUM_VERTICES_PER_SURFACE])
-    , m_surface(nullptr)
+  : MCObjectRendererBase(maxBatchSize)
+  , m_vertices(new MCGLVertex[maxBatchSize * NUM_VERTICES_PER_SURFACE])
+  , m_normals(new MCGLVertex[maxBatchSize * NUM_VERTICES_PER_SURFACE])
+  , m_texCoords(new MCGLTexCoord[maxBatchSize * NUM_VERTICES_PER_SURFACE])
+  , m_colors(new MCGLColor[maxBatchSize * NUM_VERTICES_PER_SURFACE])
+  , m_surface(nullptr)
 {
 }
 
@@ -50,7 +50,7 @@ void MCSurfaceObjectRendererLegacy::setBatch(MCRenderLayer::ObjectBatch & batch,
     }
 
     setBatchSize(std::min(static_cast<int>(batch.objects.size()), maxBatchSize()));
-    std::sort(batch.objects.begin(), batch.objects.end(), [] (const MCObject * l, const MCObject * r) {
+    std::sort(batch.objects.begin(), batch.objects.end(), [](const MCObject * l, const MCObject * r) {
         return l->location().k() < r->location().k();
     });
 
@@ -68,42 +68,36 @@ void MCSurfaceObjectRendererLegacy::setBatch(MCRenderLayer::ObjectBatch & batch,
     setHasShadow(view->hasShadow());
 
     int vertexIndex = 0;
-    for (int i = 0; i < batchSize(); i++)
-    {
+    for (int i = 0; i < batchSize(); i++) {
         object = batch.objects[i];
         MCSurfaceView * view = static_cast<MCSurfaceView *>(object->shape()->view().get());
         MCVector3dF location(object->shape()->location());
 
         float x, y, z;
-        if (isShadow)
-        {
+        if (isShadow) {
             x = location.i() + object->shape()->shadowOffset().i();
             y = location.j() + object->shape()->shadowOffset().j();
             z = object->shape()->shadowOffset().k();
-        }
-        else
-        {
+        } else {
             x = location.i();
             y = location.j();
             z = location.k();
         }
 
-        if (camera)
-        {
+        if (camera) {
             camera->mapToCamera(x, y);
         }
 
-        for (int j = 0; j < NUM_VERTICES_PER_SURFACE; j++)
-        {
+        for (int j = 0; j < NUM_VERTICES_PER_SURFACE; j++) {
             m_colors[vertexIndex] = static_cast<MCGLObjectBase *>(m_surface)->color(j);
 
             auto vertex = m_surface->vertex(j);
 
             m_vertices[vertexIndex] =
-                    MCGLVertex(
-                        x + MCMathUtil::rotatedX(vertex.x(), vertex.y(), object->angle()) * view->scale().i(),
-                        y + MCMathUtil::rotatedY(vertex.x(), vertex.y(), object->angle()) * view->scale().j(),
-                        !isShadow ? z + vertex.z() : z);
+              MCGLVertex(
+                x + MCMathUtil::rotatedX(vertex.x(), vertex.y(), object->angle()) * view->scale().i(),
+                y + MCMathUtil::rotatedY(vertex.x(), vertex.y(), object->angle()) * view->scale().j(),
+                !isShadow ? z + vertex.z() : z);
 
             m_normals[vertexIndex] = m_surface->normal(j);
 
@@ -117,13 +111,13 @@ void MCSurfaceObjectRendererLegacy::setBatch(MCRenderLayer::ObjectBatch & batch,
 void MCSurfaceObjectRendererLegacy::setAttributePointers()
 {
     glVertexAttribPointer(MCGLShaderProgram::VAL_Vertex, 3, GL_FLOAT, GL_FALSE,
-        sizeof(MCGLVertex), reinterpret_cast<GLvoid *>(m_vertices));
+                          sizeof(MCGLVertex), reinterpret_cast<GLvoid *>(m_vertices));
     glVertexAttribPointer(MCGLShaderProgram::VAL_Normal, 3, GL_FLOAT, GL_FALSE,
-        sizeof(MCGLVertex), reinterpret_cast<GLvoid *>(m_normals));
+                          sizeof(MCGLVertex), reinterpret_cast<GLvoid *>(m_normals));
     glVertexAttribPointer(MCGLShaderProgram::VAL_TexCoords, 2, GL_FLOAT, GL_FALSE,
-        sizeof(MCGLTexCoord), reinterpret_cast<GLvoid *>(m_texCoords));
+                          sizeof(MCGLTexCoord), reinterpret_cast<GLvoid *>(m_texCoords));
     glVertexAttribPointer(MCGLShaderProgram::VAL_Color, 4, GL_FLOAT, GL_FALSE,
-        sizeof(MCGLColor), reinterpret_cast<GLvoid *>(m_colors));
+                          sizeof(MCGLColor), reinterpret_cast<GLvoid *>(m_colors));
 }
 
 void MCSurfaceObjectRendererLegacy::render()
@@ -167,9 +161,8 @@ void MCSurfaceObjectRendererLegacy::renderShadows()
 
 MCSurfaceObjectRendererLegacy::~MCSurfaceObjectRendererLegacy()
 {
-    delete [] m_vertices;
-    delete [] m_normals;
-    delete [] m_texCoords;
-    delete [] m_colors;
+    delete[] m_vertices;
+    delete[] m_normals;
+    delete[] m_texCoords;
+    delete[] m_colors;
 }
-

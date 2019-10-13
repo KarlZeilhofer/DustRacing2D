@@ -31,55 +31,46 @@ bool ObjectModelLoader::load(QString path)
     QDomDocument doc;
 
     QFile file(path);
-    if (!file.open(QIODevice::ReadOnly))
-    {
+    if (!file.open(QIODevice::ReadOnly)) {
         return false;
     }
 
-    if (!doc.setContent(&file))
-    {
+    if (!doc.setContent(&file)) {
         file.close();
         return false;
     }
 
     file.close();
 
-    QDomElement  root    = doc.documentElement();
-    QString      version = root.attribute("version",
-        Config::Editor::EDITOR_VERSION);
+    QDomElement root = doc.documentElement();
+    QString version = root.attribute("version",
+                                     Config::Editor::EDITOR_VERSION);
 
     m_objects.clear();
 
     QDomNode node = root.firstChild();
-    while(!node.isNull())
-    {
+    while (!node.isNull()) {
         QDomElement tag = node.toElement();
-        if(!tag.isNull())
-        {
+        if (!tag.isNull()) {
             // Parse an object tag
-            if (tag.nodeName() == "object")
-            {
+            if (tag.nodeName() == "object") {
                 ObjectModel newData;
 
-                newData.category  = tag.attribute("category",  "undefined");
-                newData.role      = tag.attribute("role",      "undefined");
-                newData.width     = tag.attribute("width",     "0").toUInt();
-                newData.height    = tag.attribute("height",    "0").toUInt();
+                newData.category = tag.attribute("category", "undefined");
+                newData.role = tag.attribute("role", "undefined");
+                newData.width = tag.attribute("width", "0").toUInt();
+                newData.height = tag.attribute("height", "0").toUInt();
                 QString imagePath = tag.attribute("imagePath", "undefined");
 
                 // The corresponding image is loaded
                 // from Config::DATA_PATH/model.imagePath.
                 // Check that it's available and load it.
-                imagePath = QString(Config::Common::dataPath) +
-                    QDir::separator() + imagePath;
+                imagePath = QString(Config::Common::dataPath) + QDir::separator() + imagePath;
 
-                if (QFile::exists(imagePath))
-                {
+                if (QFile::exists(imagePath)) {
                     newData.pixmap = QPixmap(imagePath);
                     m_objects << newData;
-                }
-                else
-                {
+                } else {
                     MainWindow::instance()->console("WARNING!!: " + imagePath + " cannot be read.");
                 }
             }
@@ -92,14 +83,12 @@ bool ObjectModelLoader::load(QString path)
 }
 
 ObjectModelLoader::ObjectDataVector ObjectModelLoader::getObjectModelsByCategory(
-    QString category) const
+  QString category) const
 {
     ObjectDataVector result;
 
-    for (int i = 0; i < m_objects.size(); i++)
-    {
-        if (m_objects[i].category == category)
-        {
+    for (int i = 0; i < m_objects.size(); i++) {
+        if (m_objects[i].category == category) {
             result << m_objects[i];
         }
     }
@@ -109,10 +98,8 @@ ObjectModelLoader::ObjectDataVector ObjectModelLoader::getObjectModelsByCategory
 
 ObjectModel ObjectModelLoader::getObjectModelByRole(QString role) const
 {
-    for (int i = 0; i < m_objects.size(); i++)
-    {
-        if (m_objects[i].role == role)
-        {
+    for (int i = 0; i < m_objects.size(); i++) {
+        if (m_objects[i].role == role) {
             return m_objects[i];
         }
     }
@@ -122,10 +109,8 @@ ObjectModel ObjectModelLoader::getObjectModelByRole(QString role) const
 
 QString ObjectModelLoader::getCategoryByRole(QString role) const
 {
-    for (int i = 0; i < m_objects.size(); i++)
-    {
-        if (m_objects[i].role == role)
-        {
+    for (int i = 0; i < m_objects.size(); i++) {
+        if (m_objects[i].role == role) {
             return m_objects[i].category;
         }
     }
@@ -140,10 +125,8 @@ ObjectModelLoader::ObjectDataVector ObjectModelLoader::objects() const
 
 QPixmap ObjectModelLoader::getPixmapByRole(QString role) const
 {
-    for (int i = 0; i < m_objects.size(); i++)
-    {
-        if (m_objects[i].role == role)
-        {
+    for (int i = 0; i < m_objects.size(); i++) {
+        if (m_objects[i].role == role) {
             return m_objects[i].pixmap;
         }
     }

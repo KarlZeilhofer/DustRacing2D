@@ -24,8 +24,8 @@
 #include "object.hpp"
 #include "objectfactory.hpp"
 #include "trackdata.hpp"
-#include "tracktile.hpp"
 #include "trackpropertiesdialog.hpp"
+#include "tracktile.hpp"
 
 #include <cassert>
 
@@ -36,25 +36,23 @@
 #include <QStatusBar>
 
 Mediator::Mediator(MainWindow & mainWindow)
-    : m_editorData(new EditorData(*this))
-    , m_editorScene(new QGraphicsScene)
-    , m_editorView(new EditorView(*this))
-    , m_mainWindow(mainWindow)
+  : m_editorData(new EditorData(*this))
+  , m_editorScene(new QGraphicsScene)
+  , m_editorView(new EditorView(*this))
+  , m_mainWindow(mainWindow)
 {
     m_editorView->setParent(&mainWindow);
 }
 
 void Mediator::addCurrentToolBarObjectToScene(QPointF clickedScenePos)
 {
-    if (QAction * action = MainWindow::instance()->currentToolBarAction())
-    {
+    if (QAction * action = MainWindow::instance()->currentToolBarAction()) {
         saveUndoPoint();
 
         Object & object = ObjectFactory::createObject(action->data().toString());
         object.setLocation(clickedScenePos);
 
-        if (MainWindow::instance()->randomlyRotateObjects())
-        {
+        if (MainWindow::instance()->randomlyRotateObjects()) {
             object.setRotation(std::rand() % 360);
         }
 
@@ -87,8 +85,7 @@ bool Mediator::beginSetRoute()
 
     m_editorData->saveUndoPoint();
 
-    if (m_editorData->canRouteBeSet())
-    {
+    if (m_editorData->canRouteBeSet()) {
         m_editorData->beginSetRoute();
 
         return true;
@@ -162,8 +159,7 @@ bool Mediator::initializeNewTrack(QString & name, int & cols, int & rows)
 
     // Show a dialog asking some questions about the track
     NewTrackDialog dialog(&m_mainWindow);
-    if (dialog.exec() == QDialog::Accepted)
-    {
+    if (dialog.exec() == QDialog::Accepted) {
         cols = dialog.cols();
         rows = dialog.rows();
         name = dialog.name();
@@ -237,8 +233,7 @@ void Mediator::clearRoute()
 
 int Mediator::cols()
 {
-    if (m_editorData->trackData())
-    {
+    if (m_editorData->trackData()) {
         return m_editorData->trackData()->map().cols();
     }
     return 0;
@@ -248,8 +243,7 @@ bool Mediator::openTrack(QString fileName)
 {
     assert(m_editorData);
 
-    if (m_editorData->loadTrackData(fileName))
-    {
+    if (m_editorData->loadTrackData(fileName)) {
         delete m_editorScene;
         m_editorScene = new QGraphicsScene;
 
@@ -279,31 +273,21 @@ void Mediator::mouseWheelZoom(int delta)
 
     int newScale = currentScale;
 
-    if (delta < 0)
-    {
-        if (currentScale > sensitivity)
-        {
+    if (delta < 0) {
+        if (currentScale > sensitivity) {
             newScale = currentScale - sensitivity;
-        }
-        else
-        {
+        } else {
             newScale = 0;
         }
-    }
-    else if (delta > 0)
-    {
-        if (currentScale + sensitivity < maxScale)
-        {
+    } else if (delta > 0) {
+        if (currentScale + sensitivity < maxScale) {
             newScale = currentScale + sensitivity;
-        }
-        else
-        {
+        } else {
             newScale = maxScale;
         }
     }
 
-    if (newScale != currentScale)
-    {
+    if (newScale != currentScale) {
         setScale(newScale);
         m_mainWindow.updateScaleSlider(newScale);
     }
@@ -391,8 +375,7 @@ EditorMode Mediator::mode() const
 
 int Mediator::rows()
 {
-    if (m_editorData->trackData())
-    {
+    if (m_editorData->trackData()) {
         return m_editorData->trackData()->map().rows();
     }
     return 0;
@@ -404,9 +387,8 @@ bool Mediator::setTrackProperties()
 
     // Show a dialog to set some properties e.g. lap count.
     TrackPropertiesDialog dialog(
-        m_editorData->trackData()->name(), m_editorData->trackData()->index(), m_editorData->trackData()->isUserTrack(), &m_mainWindow);
-    if (dialog.exec() == QDialog::Accepted)
-    {
+      m_editorData->trackData()->name(), m_editorData->trackData()->index(), m_editorData->trackData()->isUserTrack(), &m_mainWindow);
+    if (dialog.exec() == QDialog::Accepted) {
         m_editorData->trackData()->setName(dialog.name());
         m_editorData->trackData()->setIndex(dialog.index());
         m_editorData->trackData()->setUserTrack(dialog.isUserTrack());
@@ -441,8 +423,7 @@ void Mediator::undo()
 
 void Mediator::updateCoordinates(QPointF mappedPos)
 {
-    if (m_editorData->trackData())
-    {
+    if (m_editorData->trackData()) {
         const int maxCols = static_cast<int>(m_editorData->trackData()->map().cols());
         int column = mappedPos.x() / TrackTile::TILE_W;
         column = column >= maxCols ? maxCols - 1 : column;
@@ -472,4 +453,3 @@ Mediator::~Mediator()
 {
     delete m_editorData;
 }
-

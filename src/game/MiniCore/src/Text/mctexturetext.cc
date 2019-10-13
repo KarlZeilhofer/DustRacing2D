@@ -18,11 +18,11 @@
 //
 
 #include "mctexturetext.hh"
+#include "mccamera.hh"
+#include "mcgltexcoord.hh"
+#include "mcsurface.hh"
 #include "mctexturefont.hh"
 #include "mctextureglyph.hh"
-#include "mccamera.hh"
-#include "mcsurface.hh"
-#include "mcgltexcoord.hh"
 
 #include <MCGLEW>
 
@@ -30,12 +30,12 @@
 #include <vector>
 
 MCTextureText::MCTextureText(const std::wstring & text)
-: m_text(text)
-, m_glyphWidth(32)
-, m_glyphHeight(32)
-, m_color(1.0f, 1.0f, 1.0f, 1.0f)
-, m_xOffset(2.0f)
-, m_yOffset(-2.0f)
+  : m_text(text)
+  , m_glyphWidth(32)
+  , m_glyphHeight(32)
+  , m_color(1.0f, 1.0f, 1.0f, 1.0f)
+  , m_xOffset(2.0f)
+  , m_yOffset(-2.0f)
 {
     updateTextDimensions();
 }
@@ -51,18 +51,13 @@ void MCTextureText::updateTextDimensions()
 
     m_textHeight = m_glyphHeight;
 
-    for (unsigned int i = 0; i < m_text.size(); i++)
-    {
-        if (m_text.at(i) == '\n')
-        {
+    for (unsigned int i = 0; i < m_text.size(); i++) {
+        if (m_text.at(i) == '\n') {
             m_textHeight += m_glyphHeight;
             length = 0;
-        }
-        else
-        {
+        } else {
             length += m_glyphWidth;
-            if (length > maxLength)
-            {
+            if (length > maxLength) {
                 maxLength = length;
             }
         }
@@ -139,35 +134,26 @@ void MCTextureText::render(float x, float y, MCCamera * camera, MCTextureFont & 
 
     float glyphYPos = y;
 
-    if (shadow)
-    {
+    if (shadow) {
         font.surface().bindShadow();
 
-        for (int i = 0; i < static_cast<int>(m_text.size()); i++)
-        {
+        for (int i = 0; i < static_cast<int>(m_text.size()); i++) {
             prevGlyph = glyph;
             glyph = m_text[i];
 
-            if (glyph == '\n')
-            {
-                glyphXPos  = x;
+            if (glyph == '\n') {
+                glyphXPos = x;
                 glyphYPos -= font.yDensity() * m_glyphHeight;
-            }
-            else if (glyph == ' ')
-            {
+            } else if (glyph == ' ') {
                 glyphXPos += font.xDensity() * m_glyphWidth;
-            }
-            else
-            {
-                if (glyph != prevGlyph)
-                {
+            } else {
+                if (glyph != prevGlyph) {
                     auto && texGlyph = font.glyph(glyph);
-                    const MCGLTexCoord uv[4] =
-                    {
-                        {texGlyph.uv(3).m_u, texGlyph.uv(3).m_v},
-                        {texGlyph.uv(0).m_u, texGlyph.uv(0).m_v},
-                        {texGlyph.uv(1).m_u, texGlyph.uv(1).m_v},
-                        {texGlyph.uv(2).m_u, texGlyph.uv(2).m_v}
+                    const MCGLTexCoord uv[4] = {
+                        { texGlyph.uv(3).m_u, texGlyph.uv(3).m_v },
+                        { texGlyph.uv(0).m_u, texGlyph.uv(0).m_v },
+                        { texGlyph.uv(1).m_u, texGlyph.uv(1).m_v },
+                        { texGlyph.uv(2).m_u, texGlyph.uv(2).m_v }
                     };
 
                     font.surface().updateTexCoords(uv);
@@ -185,35 +171,27 @@ void MCTextureText::render(float x, float y, MCCamera * camera, MCTextureFont & 
     font.surface().setColor(m_color);
 
     prevGlyph = 0;
-    glyph     = 0;
+    glyph = 0;
     glyphXPos = x;
     glyphYPos = y;
 
-    for (int i = 0; i < static_cast<int>(m_text.size()); i++)
-    {
+    for (int i = 0; i < static_cast<int>(m_text.size()); i++) {
         prevGlyph = glyph;
         glyph = m_text[i];
 
-        if (glyph == '\n')
-        {
-            glyphXPos  = x;
+        if (glyph == '\n') {
+            glyphXPos = x;
             glyphYPos -= font.yDensity() * m_glyphHeight;
-        }
-        else if (glyph == ' ')
-        {
+        } else if (glyph == ' ') {
             glyphXPos += font.xDensity() * m_glyphWidth;
-        }
-        else
-        {
-            if (glyph != prevGlyph)
-            {
+        } else {
+            if (glyph != prevGlyph) {
                 auto && texGlyph = font.glyph(glyph);
-                const MCGLTexCoord uv[4] =
-                {
-                    {texGlyph.uv(3).m_u, texGlyph.uv(3).m_v},
-                    {texGlyph.uv(0).m_u, texGlyph.uv(0).m_v},
-                    {texGlyph.uv(1).m_u, texGlyph.uv(1).m_v},
-                    {texGlyph.uv(2).m_u, texGlyph.uv(2).m_v}
+                const MCGLTexCoord uv[4] = {
+                    { texGlyph.uv(3).m_u, texGlyph.uv(3).m_v },
+                    { texGlyph.uv(0).m_u, texGlyph.uv(0).m_v },
+                    { texGlyph.uv(1).m_u, texGlyph.uv(1).m_v },
+                    { texGlyph.uv(2).m_u, texGlyph.uv(2).m_v }
                 };
 
                 font.surface().updateTexCoords(uv);

@@ -18,48 +18,45 @@
 #include "renderer.hpp"
 #include "textmenuitemview.hpp"
 
+#include <MCAssetManager>
 #include <MCSurface>
 #include <MCTextureFont>
-#include <MCAssetManager>
 
 #include <MenuItem>
 
 #include <cassert>
 
 SurfaceMenu::SurfaceMenu(
-    std::string surfaceId,
-    std::string id,
-    int width,
-    int height,
-    Menu::Style style,
-    bool quitItem,
-    bool prevItem,
-    bool nextItem)
-: Menu(id, width, height, style)
-, m_back(MCAssetManager::surfaceManager().surface(surfaceId))
-, m_font(MCAssetManager::textureFontManager().font(Game::instance().fontName()))
+  std::string surfaceId,
+  std::string id,
+  int width,
+  int height,
+  Menu::Style style,
+  bool quitItem,
+  bool prevItem,
+  bool nextItem)
+  : Menu(id, width, height, style)
+  , m_back(MCAssetManager::surfaceManager().surface(surfaceId))
+  , m_font(MCAssetManager::textureFontManager().font(Game::instance().fontName()))
 {
     m_back.setShaderProgram(Renderer::instance().program("menu"));
     m_back.setColor(MCGLColor(0.5, 0.5, 0.5, 1.0));
 
-    if (quitItem)
-    {
+    if (quitItem) {
         const int textSize = 40;
         MTFH::MenuItem * quit = new MTFH::MenuItem(textSize, textSize, L"X");
         quit->setView(MTFH::MenuItemViewPtr(new TextMenuItemView(textSize, *quit)));
         addMouseItem(MTFH::Menu::MouseItemType::Quit, MTFH::MenuItemPtr(quit));
     }
 
-    if (prevItem)
-    {
+    if (prevItem) {
         const int textSize = 40;
         MTFH::MenuItem * prev = new MTFH::MenuItem(textSize, textSize, L"<");
         prev->setView(MTFH::MenuItemViewPtr(new TextMenuItemView(textSize, *prev)));
         addMouseItem(MTFH::Menu::MouseItemType::Prev, MTFH::MenuItemPtr(prev));
     }
 
-    if (nextItem)
-    {
+    if (nextItem) {
         const int textSize = 40;
         MTFH::MenuItem * next = new MTFH::MenuItem(textSize, textSize, L">");
         next->setView(MTFH::MenuItemViewPtr(new TextMenuItemView(textSize, *next)));

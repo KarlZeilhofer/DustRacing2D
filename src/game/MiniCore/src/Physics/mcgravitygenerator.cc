@@ -22,15 +22,15 @@
 #include "mcphysicscomponent.hh"
 
 MCGravityGenerator::MCGravityGenerator(const MCVector3d<float> & g)
-: m_g(g)
-{}
+  : m_g(g)
+{
+}
 
 void MCGravityGenerator::updateForce(MCObject & object)
 {
     // G = m * g
     MCPhysicsComponent & physicsComponent = object.physicsComponent();
-    if (!physicsComponent.isStationary())
-    {
+    if (!physicsComponent.isStationary()) {
         physicsComponent.addForce(m_g * physicsComponent.mass());
     }
 }

@@ -16,16 +16,16 @@
 #include "tracktile.hpp"
 
 TrackTile::TrackTile(
-    QPointF location,
-    QPoint matrixLocation,
-    const QString & type,
-    TrackTile::TileType typeEnum)
-: TrackTileBase(location, matrixLocation, type)
-, m_rotation(0)
-, m_surface(nullptr)
-, m_previewSurface(nullptr)
-, m_typeEnum(typeEnum)
-, m_hasAsphalt(false)
+  QPointF location,
+  QPoint matrixLocation,
+  const QString & type,
+  TrackTile::TileType typeEnum)
+  : TrackTileBase(location, matrixLocation, type)
+  , m_rotation(0)
+  , m_surface(nullptr)
+  , m_previewSurface(nullptr)
+  , m_typeEnum(typeEnum)
+  , m_hasAsphalt(false)
 {
 }
 
@@ -68,8 +68,7 @@ void TrackTile::setTileTypeEnum(TrackTile::TileType type)
 {
     m_typeEnum = type;
 
-    switch (type)
-    {
+    switch (type) {
     case TT_BRIDGE:
     case TT_CORNER_90:
     case TT_CORNER_45_LEFT:

@@ -21,28 +21,28 @@
 #include "mctrigonom.hh"
 
 MCPhysicsComponent::MCPhysicsComponent()
-    : m_maxSpeed(1000.0f)
-    , m_linearDamping(0.999f)
-    , m_angularAcceleration(0)
-    , m_angularVelocity(0)
-    , m_angularDamping(0.999f)
-    , m_angularImpulse(0)
-    , m_torque(0)
-    , m_invMass(std::numeric_limits<float>::max())
-    , m_mass(0)
-    , m_invMomentOfInertia(std::numeric_limits<float>::max())
-    , m_momentOfInertia(0)
-    , m_restitution(0.5f)
-    , m_xyFriction(0.0f)
-    , m_isSleeping(false)
-    , m_isSleepingPrevented(false)
-    , m_isStationary(false)
-    , m_isIntegrating(false)
-    , m_linearSleepLimit(0.01f)
-    , m_angularSleepLimit(0.01f)
-    , m_sleepCount(0)
-    , m_collisionTag(0)
-    , m_neverCollideWithTag(-1)
+  : m_maxSpeed(1000.0f)
+  , m_linearDamping(0.999f)
+  , m_angularAcceleration(0)
+  , m_angularVelocity(0)
+  , m_angularDamping(0.999f)
+  , m_angularImpulse(0)
+  , m_torque(0)
+  , m_invMass(std::numeric_limits<float>::max())
+  , m_mass(0)
+  , m_invMomentOfInertia(std::numeric_limits<float>::max())
+  , m_momentOfInertia(0)
+  , m_restitution(0.5f)
+  , m_xyFriction(0.0f)
+  , m_isSleeping(false)
+  , m_isSleepingPrevented(false)
+  , m_isStationary(false)
+  , m_isIntegrating(false)
+  , m_linearSleepLimit(0.01f)
+  , m_angularSleepLimit(0.01f)
+  , m_sleepCount(0)
+  , m_collisionTag(0)
+  , m_neverCollideWithTag(-1)
 {
 }
 
@@ -142,14 +142,10 @@ void MCPhysicsComponent::setMass(float newMass, bool stationary)
 {
     m_isStationary = stationary;
 
-    if (!stationary)
-    {
-        if (newMass > 0)
-        {
+    if (!stationary) {
+        if (newMass > 0) {
             m_invMass = 1.0f / newMass;
-        }
-        else
-        {
+        } else {
             m_invMass = std::numeric_limits<float>::max();
         }
 
@@ -157,11 +153,9 @@ void MCPhysicsComponent::setMass(float newMass, bool stationary)
 
         // This is just a default guess. The shape should set the "correct" value.
         setMomentOfInertia(newMass * 10.0f);
-    }
-    else
-    {
-        m_invMass  = 0;
-        m_mass     = std::numeric_limits<float>::max();
+    } else {
+        m_invMass = 0;
+        m_mass = std::numeric_limits<float>::max();
 
         m_isSleeping = true;
 
@@ -181,12 +175,9 @@ float MCPhysicsComponent::mass() const
 
 void MCPhysicsComponent::setMomentOfInertia(float newMomentOfInertia)
 {
-    if (newMomentOfInertia > 0)
-    {
+    if (newMomentOfInertia > 0) {
         m_invMomentOfInertia = 1.0f / newMomentOfInertia;
-    }
-    else
-    {
+    } else {
         m_invMomentOfInertia = std::numeric_limits<float>::max();
     }
 
@@ -243,7 +234,7 @@ void MCPhysicsComponent::resetZ()
 
 void MCPhysicsComponent::setSleepLimits(float linearSleepLimit, float angularSleepLimit)
 {
-    m_linearSleepLimit  = linearSleepLimit;
+    m_linearSleepLimit = linearSleepLimit;
     m_angularSleepLimit = angularSleepLimit;
 }
 
@@ -251,24 +242,18 @@ void MCPhysicsComponent::toggleSleep(bool sleep)
 {
     m_sleepCount = 0;
 
-    if (sleep && m_isSleepingPrevented)
-    {
+    if (sleep && m_isSleepingPrevented) {
         return;
     }
 
-    if (sleep != m_isSleeping)
-    {
+    if (sleep != m_isSleeping) {
         m_isSleeping = sleep;
 
         // Optimization: dynamically remove from the integration vector
-        if (!object().isParticle())
-        {
-            if (sleep)
-            {
+        if (!object().isParticle()) {
+            if (sleep) {
                 MCWorld::instance().removeObjectFromIntegration(object());
-            }
-            else
-            {
+            } else {
                 MCWorld::instance().restoreObjectToIntegration(object());
             }
         }
@@ -278,12 +263,10 @@ void MCPhysicsComponent::toggleSleep(bool sleep)
 void MCPhysicsComponent::preventSleeping(bool flag)
 {
     m_isSleepingPrevented = flag;
-    if (!m_isSleepingPrevented)
-    {
+    if (!m_isSleepingPrevented) {
         toggleSleep(false);
     }
 }
-
 
 bool MCPhysicsComponent::isStationary() const
 {
@@ -294,8 +277,7 @@ void MCPhysicsComponent::integrate(float step)
 {
     // Integrate, if the object is not sleeping and it doesn't
     // have a parent object.
-    if (!m_isSleeping && (&object().parent() == &object()))
-    {
+    if (!m_isSleeping && (&object().parent() == &object())) {
         m_isIntegrating = true;
 
         integrateLinear(step);
@@ -303,16 +285,12 @@ void MCPhysicsComponent::integrate(float step)
         object().checkBoundaries();
 
         const float speed = m_velocity.lengthFast();
-        if (speed < m_linearSleepLimit && m_angularVelocity < m_angularSleepLimit)
-        {
-            if (++m_sleepCount > 1)
-            {
+        if (speed < m_linearSleepLimit && m_angularVelocity < m_angularSleepLimit) {
+            if (++m_sleepCount > 1) {
                 toggleSleep(true);
                 reset();
             }
-        }
-        else
-        {
+        } else {
             m_velocity.clampFast(m_maxSpeed);
 
             m_forces.setZero();
@@ -339,8 +317,7 @@ void MCPhysicsComponent::integrateLinear(float step)
 
 float MCPhysicsComponent::integrateAngular(float step)
 {
-    if (object().shape() && m_momentOfInertia > 0.0f)
-    {
+    if (object().shape() && m_momentOfInertia > 0.0f) {
         float totAngularAcceleration(m_angularAcceleration);
         totAngularAcceleration += m_torque * m_invMomentOfInertia;
         m_angularVelocity += totAngularAcceleration * step + m_angularImpulse;
@@ -375,8 +352,7 @@ void MCPhysicsComponent::reset()
     m_angularVelocity = 0.0f;
     m_angularImpulse = 0.0f;
 
-    for (auto child: object().children())
-    {
+    for (auto child : object().children()) {
         child->physicsComponent().reset();
     }
 }

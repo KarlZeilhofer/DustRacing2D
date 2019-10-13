@@ -18,16 +18,16 @@
 #include <MenuItem>
 
 #include <MCAssetManager>
+#include <MCRandom>
 #include <MCTextureFont>
 #include <MCTextureText>
-#include <MCRandom>
 
 #include <cmath>
 
 TextMenuItemView::TextMenuItemView(float textSize, MTFH::MenuItem & owner)
-: MenuItemView(owner)
-, m_textSize(textSize)
-, m_angle(MCRandom::getValue() * 2.0f * 3.1415f)
+  : MenuItemView(owner)
+  , m_textSize(textSize)
+  , m_angle(MCRandom::getValue() * 2.0f * 3.1415f)
 {
 }
 
@@ -47,30 +47,24 @@ void TextMenuItemView::render(float x, float y)
 
     const float amp = 0.05f;
     float animatedSize = m_textSize + std::sin(m_angle) * m_textSize * amp;
-    if (owner().focused())
-    {
+    if (owner().focused()) {
         animatedSize *= 1.25f;
     }
     text.setGlyphSize(animatedSize, animatedSize);
 
-    if (owner().focused())
-    {
+    if (owner().focused()) {
         const MCGLColor yellow(1.0f, 1.0f, 0.0f, 1.0f);
         text.setColor(yellow);
-    }
-    else if (owner().selected())
-    {
+    } else if (owner().selected()) {
         const MCGLColor red(1.0f, 0.0f, 0.0f, 1.0f);
         text.setColor(red);
-    }
-    else
-    {
+    } else {
         const MCGLColor white(1.0f, 1.0f, 1.0f, 1.0f);
         text.setColor(white);
     }
 
     const float shadowY = -2;
-    const float shadowX =  2;
+    const float shadowX = 2;
     text.setShadowOffset(shadowX, shadowY);
 
     auto && font = MCAssetManager::textureFontManager().font(Game::instance().fontName());

@@ -22,12 +22,12 @@
 #include "mcsurface.hh"
 #include "mcsurfaceconfigloader.hh"
 
+#include <MCGLEW>
 #include <QByteArray>
 #include <QDir>
 #include <QFile>
 #include <QImage>
 #include <QSysInfo>
-#include <MCGLEW>
 
 #include <cassert>
 #include <cmath>
@@ -49,25 +49,25 @@ static inline QRgb qt_gl_convertToGLFormatHelper(QRgb src_pixel, GLenum texture_
 #endif
         if (QSysInfo::ByteOrder == QSysInfo::BigEndian) {
             return ((src_pixel << 24) & 0xff000000)
-                 | ((src_pixel >> 24) & 0x000000ff)
-                 | ((src_pixel << 8)  & 0x00ff0000)
-                 | ((src_pixel >> 8)  & 0x0000ff00);
+              | ((src_pixel >> 24) & 0x000000ff)
+              | ((src_pixel << 8) & 0x00ff0000)
+              | ((src_pixel >> 8) & 0x0000ff00);
         } else {
             return src_pixel;
         }
-    } else {  // GL_RGBA
+    } else { // GL_RGBA
         if (QSysInfo::ByteOrder == QSysInfo::BigEndian) {
             return (src_pixel << 8) | ((src_pixel >> 24) & 0xff);
         } else {
             return ((src_pixel << 16) & 0xff0000)
-                 | ((src_pixel >> 16) & 0xff)
-                 | (src_pixel & 0xff00ff00);
+              | ((src_pixel >> 16) & 0xff)
+              | (src_pixel & 0xff00ff00);
         }
     }
 }
 
 // This function is taken from Qt in order to drop dependency to QGLWidget::convertToGLFormat().
-static void convertToGLFormatHelper(QImage &dst, const QImage &img, GLenum texture_format)
+static void convertToGLFormatHelper(QImage & dst, const QImage & img, GLenum texture_format)
 {
     Q_ASSERT(dst.depth() == 32);
     Q_ASSERT(img.depth() == 32);
@@ -78,8 +78,8 @@ static void convertToGLFormatHelper(QImage &dst, const QImage &img, GLenum textu
         qreal sx = target_width / qreal(img.width());
         qreal sy = target_height / qreal(img.height());
 
-        quint32 *dest = (quint32 *) dst.scanLine(0); // NB! avoid detach here
-        uchar *srcPixels = (uchar *) img.scanLine(img.height() - 1);
+        quint32 * dest = (quint32 *)dst.scanLine(0); // NB! avoid detach here
+        uchar * srcPixels = (uchar *)img.scanLine(img.height() - 1);
         int sbpl = img.bytesPerLine();
         int dbpl = dst.bytesPerLine();
 
@@ -91,20 +91,20 @@ static void convertToGLFormatHelper(QImage &dst, const QImage &img, GLenum textu
 
         // scale, swizzle and mirror in one loop
         while (target_height--) {
-            const uint *src = (const quint32 *) (srcPixels - (srcy >> 16) * sbpl);
+            const uint * src = (const quint32 *)(srcPixels - (srcy >> 16) * sbpl);
             int srcx = basex;
-            for (int x=0; x<target_width; ++x) {
+            for (int x = 0; x < target_width; ++x) {
                 dest[x] = qt_gl_convertToGLFormatHelper(src[srcx >> 16], texture_format);
                 srcx += ix;
             }
-            dest = (quint32 *)(((uchar *) dest) + dbpl);
+            dest = (quint32 *)(((uchar *)dest) + dbpl);
             srcy += iy;
         }
     } else {
         const int width = img.width();
         const int height = img.height();
-        const uint *p = (const uint*) img.scanLine(img.height() - 1);
-        uint *q = (uint*) dst.scanLine(0);
+        const uint * p = (const uint *)img.scanLine(img.height() - 1);
+        uint * q = (uint *)dst.scanLine(0);
 
 #ifdef __MC_GLES__
         if (false) {
@@ -113,13 +113,13 @@ static void convertToGLFormatHelper(QImage &dst, const QImage &img, GLenum textu
 #endif
             if (QSysInfo::ByteOrder == QSysInfo::BigEndian) {
                 // mirror + swizzle
-                for (int i=0; i < height; ++i) {
-                    const uint *end = p + width;
+                for (int i = 0; i < height; ++i) {
+                    const uint * end = p + width;
                     while (p < end) {
                         *q = ((*p << 24) & 0xff000000)
-                           | ((*p >> 24) & 0x000000ff)
-                           | ((*p << 8)  & 0x00ff0000)
-                           | ((*p >> 8)  & 0x0000ff00);
+                          | ((*p >> 24) & 0x000000ff)
+                          | ((*p << 8) & 0x00ff0000)
+                          | ((*p >> 8) & 0x0000ff00);
                         p++;
                         q++;
                     }
@@ -127,7 +127,7 @@ static void convertToGLFormatHelper(QImage &dst, const QImage &img, GLenum textu
                 }
             } else {
                 const uint bytesPerLine = img.bytesPerLine();
-                for (int i=0; i < height; ++i) {
+                for (int i = 0; i < height; ++i) {
                     memcpy(q, p, bytesPerLine);
                     q += width;
                     p -= width;
@@ -135,8 +135,8 @@ static void convertToGLFormatHelper(QImage &dst, const QImage &img, GLenum textu
             }
         } else {
             if (QSysInfo::ByteOrder == QSysInfo::BigEndian) {
-                for (int i=0; i < height; ++i) {
-                    const uint *end = p + width;
+                for (int i = 0; i < height; ++i) {
+                    const uint * end = p + width;
                     while (p < end) {
                         *q = (*p << 8) | ((*p >> 24) & 0xff);
                         p++;
@@ -145,8 +145,8 @@ static void convertToGLFormatHelper(QImage &dst, const QImage &img, GLenum textu
                     p -= 2 * width;
                 }
             } else {
-                for (int i=0; i < height; ++i) {
-                    const uint *end = p + width;
+                for (int i = 0; i < height; ++i) {
+                    const uint * end = p + width;
                     while (p < end) {
                         *q = ((*p << 16) & 0xff0000) | ((*p >> 16) & 0xff) | (*p & 0xff00ff00);
                         p++;
@@ -165,8 +165,7 @@ MCSurfaceManager::MCSurfaceManager()
 
 MCSurface & MCSurfaceManager::createSurfaceFromImage(const MCSurfaceMetaData & data, QImage image)
 {
-    if (data.handle.size() == 0)
-    {
+    if (data.handle.size() == 0) {
         throw std::runtime_error("Cannot create surface with an empty handle!");
     }
 
@@ -174,7 +173,7 @@ MCSurface & MCSurfaceManager::createSurfaceFromImage(const MCSurfaceMetaData & d
 
     // Store original width of the image
     int origH = data.height.second ? data.height.first : image.height();
-    int origW = data.width.second  ? data.width.first  : image.width();
+    int origW = data.width.second ? data.width.first : image.width();
 
     // Create material. Possible secondary textures are taken from surfaces
     // that are initialized before this surface.
@@ -183,14 +182,13 @@ MCSurface & MCSurfaceManager::createSurfaceFromImage(const MCSurfaceMetaData & d
     material->setTexture(data.handle2.length() ? surface(data.handle2).material()->texture(0) : 0, 1);
     material->setTexture(data.handle3.length() ? surface(data.handle3).material()->texture(0) : 0, 2);
 
-    if (data.specularCoeff.second)
-    {
+    if (data.specularCoeff.second) {
         material->setSpecularCoeff(data.specularCoeff.first);
     }
 
     // Create a new MCSurface object
     MCSurface * surface =
-        new MCSurface(data.handle, material, origW, origH, data.z0, data.z1, data.z2, data.z3);
+      new MCSurface(data.handle, material, origW, origH, data.z0, data.z1, data.z2, data.z3);
 
     // Maybe better place for this could be in the material?
     surface->setColor(data.color);
@@ -205,7 +203,7 @@ void MCSurfaceManager::createSurfaceCommon(MCSurface & surface, const MCSurfaceM
 {
     // Enable alpha blend, if set
     surface.material()->setAlphaBlend(
-        data.alphaBlend.second, data.alphaBlend.first.m_src, data.alphaBlend.first.m_dst);
+      data.alphaBlend.second, data.alphaBlend.first.m_src, data.alphaBlend.first.m_dst);
 
     // Store MCSurface to map
     m_surfaceMap[data.handle] = &surface;
@@ -218,7 +216,7 @@ static bool isPowerOfTwo(unsigned int x)
 
 static unsigned int getNearestPowerOfTwo(unsigned int x)
 {
-    const std::vector<unsigned int> powers = {2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048};
+    const std::vector<unsigned int> powers = { 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048 };
     for (auto power : powers) {
         if (power > x) {
             return power;
@@ -232,20 +230,17 @@ static QImage forceToNearestPowerOfTwoImage(const MCSurfaceMetaData & data, cons
     unsigned int width = image.width();
     unsigned int height = image.height();
 
-    if (isPowerOfTwo(width) && isPowerOfTwo(height))
-    {
+    if (isPowerOfTwo(width) && isPowerOfTwo(height)) {
         return image;
     }
 
-    if (!isPowerOfTwo(width))
-    {
+    if (!isPowerOfTwo(width)) {
         MCLogger().warning() << "Width of surface '" + data.handle + "' not power of two: " << width;
         width = getNearestPowerOfTwo(width);
         MCLogger().warning() << "    new value: " << width;
     }
 
-    if (!isPowerOfTwo(height))
-    {
+    if (!isPowerOfTwo(height)) {
         MCLogger().warning() << "Height of surface '" + data.handle + "' not power of two: " << height;
         height = getNearestPowerOfTwo(height);
         MCLogger().warning() << "    new value: " << height;
@@ -255,7 +250,7 @@ static QImage forceToNearestPowerOfTwoImage(const MCSurfaceMetaData & data, cons
 }
 #endif
 GLuint MCSurfaceManager::create2DTextureFromImage(
-    const MCSurfaceMetaData & data, const QImage & image)
+  const MCSurfaceMetaData & data, const QImage & image)
 {
 #ifdef __MC_GLES__
     QImage textureImage = forceToNearestPowerOfTwoImage(data, image);
@@ -266,22 +261,16 @@ GLuint MCSurfaceManager::create2DTextureFromImage(
     // Take the maximum supported texture size into account
     GLint maxTextureSize;
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
-    if (textureImage.width() > maxTextureSize && textureImage.height() > maxTextureSize)
-    {
+    if (textureImage.width() > maxTextureSize && textureImage.height() > maxTextureSize) {
         textureImage = textureImage.scaled(maxTextureSize, maxTextureSize);
-    }
-    else if (textureImage.width() > maxTextureSize)
-    {
+    } else if (textureImage.width() > maxTextureSize) {
         textureImage = textureImage.scaled(maxTextureSize, textureImage.height());
-    }
-    else if (textureImage.height() > maxTextureSize)
-    {
+    } else if (textureImage.height() > maxTextureSize) {
         textureImage = textureImage.scaled(textureImage.width(), maxTextureSize);
     }
 
     // Flip if set active
-    if (data.xAxisMirror || data.yAxisMirror)
-    {
+    if (data.xAxisMirror || data.yAxisMirror) {
         textureImage = textureImage.mirrored(data.xAxisMirror, data.yAxisMirror);
     }
 
@@ -289,14 +278,12 @@ GLuint MCSurfaceManager::create2DTextureFromImage(
     textureImage = textureImage.convertToFormat(QImage::Format_ARGB32);
 
     // Apply alpha clamp if it was set (clear alpha)
-    if (data.alphaClamp.second)
-    {
+    if (data.alphaClamp.second) {
         applyAlphaClamp(textureImage, static_cast<unsigned int>(255.0f * data.alphaClamp.first));
     }
 
     // Apply colorkey if it was set (set or clear alpha)
-    if (data.colorKeySet)
-    {
+    if (data.colorKeySet) {
         applyColorKey(textureImage, data.colorKey.m_r, data.colorKey.m_g, data.colorKey.m_b);
     }
 
@@ -311,65 +298,46 @@ GLuint MCSurfaceManager::create2DTextureFromImage(
     glBindTexture(GL_TEXTURE_2D, textureHandle);
 
     // Set min filter.
-    if (data.minFilter.second)
-    {
+    if (data.minFilter.second) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, data.minFilter.first);
-    }
-    else
-    {
+    } else {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     }
 
     // Set mag filter.
-    if (data.magFilter.second)
-    {
+    if (data.magFilter.second) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, data.magFilter.first);
-    }
-    else
-    {
+    } else {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     }
 
-    if (data.wrapS.second)
-    {
+    if (data.wrapS.second) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, data.wrapS.first);
-    }
-    else
-    {
+    } else {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     }
 
-    if (data.wrapT.second)
-    {
+    if (data.wrapT.second) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, data.wrapT.first);
-    }
-    else
-    {
+    } else {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     }
 
     // Edit image data using the information textureImage gives us
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
-        glFormattedImage.width(), glFormattedImage.height(),
-        0, GL_RGBA, GL_UNSIGNED_BYTE, glFormattedImage.bits());
+                 glFormattedImage.width(), glFormattedImage.height(),
+                 0, GL_RGBA, GL_UNSIGNED_BYTE, glFormattedImage.bits());
 
     return textureHandle;
 }
 
 void MCSurfaceManager::applyColorKey(QImage & textureImage, unsigned int r, unsigned int g, unsigned int b) const
 {
-    for (int i = 0; i < textureImage.width(); i++)
-    {
-        for (int j = 0; j < textureImage.height(); j++)
-        {
-            if (colorMatch( textureImage.pixel(i, j) & 0x000000ff,        b, 2) &&
-                colorMatch((textureImage.pixel(i, j) & 0x0000ff00) >> 8,  g, 2) &&
-                colorMatch((textureImage.pixel(i, j) & 0x00ff0000) >> 16, r, 2))
-            {
+    for (int i = 0; i < textureImage.width(); i++) {
+        for (int j = 0; j < textureImage.height(); j++) {
+            if (colorMatch(textureImage.pixel(i, j) & 0x000000ff, b, 2) && colorMatch((textureImage.pixel(i, j) & 0x0000ff00) >> 8, g, 2) && colorMatch((textureImage.pixel(i, j) & 0x00ff0000) >> 16, r, 2)) {
                 textureImage.setPixel(i, j, 0x00000000);
-            }
-            else
-            {
+            } else {
                 textureImage.setPixel(i, j, textureImage.pixel(i, j) | 0xff000000);
             }
         }
@@ -378,12 +346,9 @@ void MCSurfaceManager::applyColorKey(QImage & textureImage, unsigned int r, unsi
 
 void MCSurfaceManager::applyAlphaClamp(QImage & textureImage, unsigned int a) const
 {
-    for (int i = 0; i < textureImage.width(); i++)
-    {
-        for (int j = 0; j < textureImage.height(); j++)
-        {
-            if (((textureImage.pixel(i, j) >> 24) & 0x000000ff) < a)
-            {
+    for (int i = 0; i < textureImage.width(); i++) {
+        for (int j = 0; j < textureImage.height(); j++) {
+            if (((textureImage.pixel(i, j) >> 24) & 0x000000ff) < a) {
                 textureImage.setPixel(i, j, 0x00000000);
             }
         }
@@ -394,13 +359,10 @@ MCSurfaceManager::~MCSurfaceManager()
 {
     // Delete OpenGL textures and Textures
     auto iter(m_surfaceMap.begin());
-    while (iter != m_surfaceMap.end())
-    {
-        if (iter->second)
-        {
+    while (iter != m_surfaceMap.end()) {
+        if (iter->second) {
             MCSurface * p = iter->second;
-            for (unsigned int i = 0; i < MCGLMaterial::MAX_TEXTURES; i++)
-            {
+            for (unsigned int i = 0; i < MCGLMaterial::MAX_TEXTURES; i++) {
                 GLuint dummyHandle1 = p->material()->texture(i);
                 glDeleteTextures(1, &dummyHandle1);
             }
@@ -411,15 +373,13 @@ MCSurfaceManager::~MCSurfaceManager()
 }
 
 void MCSurfaceManager::load(
-    const std::string & configFilePath, const std::string & baseDataPath)
+  const std::string & configFilePath, const std::string & baseDataPath)
 {
     MCSurfaceConfigLoader loader;
 
     // Parse the texture config file
-    if (loader.load(configFilePath))
-    {
-        for (unsigned int i = 0; i < loader.surfaceCount(); i++)
-        {
+    if (loader.load(configFilePath)) {
+        for (unsigned int i = 0; i < loader.surfaceCount(); i++) {
             const MCSurfaceMetaData & metaData = loader.surface(i);
 
             // Load the image and create a 2D texture. Due to possible Android asset URLs,
@@ -429,8 +389,7 @@ void MCSurfaceManager::load(
             path.replace("//", "/");
 
             QFile imageFile(path);
-            if (!imageFile.open(QIODevice::ReadOnly))
-            {
+            if (!imageFile.open(QIODevice::ReadOnly)) {
                 throw std::runtime_error("Cannot read file '" + path.toStdString() + "'");
             }
             QByteArray blob = imageFile.readAll();
@@ -439,9 +398,7 @@ void MCSurfaceManager::load(
             textureImage.loadFromData(blob);
             createSurfaceFromImage(metaData, textureImage);
         }
-    }
-    else
-    {
+    } else {
         // Throw an exception
         throw std::runtime_error("Parsing '" + configFilePath + "' failed!");
     }
@@ -450,8 +407,7 @@ void MCSurfaceManager::load(
 MCSurface & MCSurfaceManager::surface(const std::string & id) const
 {
     // Try to find existing texture for the surface
-    if (m_surfaceMap.count(id) == 0)
-    {
+    if (m_surfaceMap.count(id) == 0) {
         throw std::runtime_error("Cannot find texture object for handle '" + id + "'");
     }
 

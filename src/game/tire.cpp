@@ -23,12 +23,12 @@
 #include <MCTrigonom>
 
 Tire::Tire(Car & car, float friction, float offTrackFriction)
-    : MCObject(MCAssetManager::surfaceManager().surface("frontTire"), "Tire")
-    , m_isOffTrack(false)
-    , m_friction(friction)
-    , m_offTrackFriction(offTrackFriction)
-    , m_spinCoeff(1.0f)
-    , m_car(car)
+  : MCObject(MCAssetManager::surfaceManager().surface("frontTire"), "Tire")
+  , m_isOffTrack(false)
+  , m_friction(friction)
+  , m_offTrackFriction(offTrackFriction)
+  , m_spinCoeff(1.0f)
+  , m_car(car)
 {
     setBypassCollisions(true);
 }
@@ -45,25 +45,20 @@ void Tire::setSpinCoeff(float spinCoeff)
 
 void Tire::onStepTime(int)
 {
-    if (physicsComponent().velocity().lengthFast() > 0)
-    {
+    if (physicsComponent().velocity().lengthFast() > 0) {
         const float tireNormalAngle = angle() + 90;
         const MCVector2dF tire(
-            MCTrigonom::cos(tireNormalAngle), MCTrigonom::sin(tireNormalAngle));
+          MCTrigonom::cos(tireNormalAngle), MCTrigonom::sin(tireNormalAngle));
         MCVector2dF v = physicsComponent().velocity();
         v.clampFast(0.999f); // Clamp instead of normalizing to avoid artifacts on small values
         MCVector2dF impulse =
-            MCVector2dF::projection(v, tire) *
-                (m_isOffTrack ? m_offTrackFriction : m_friction) * m_spinCoeff *
-                    -MCWorld::instance().gravity().k() * parent().physicsComponent().mass();
+          MCVector2dF::projection(v, tire) * (m_isOffTrack ? m_offTrackFriction : m_friction) * m_spinCoeff * -MCWorld::instance().gravity().k() * parent().physicsComponent().mass();
         impulse.clampFast(parent().physicsComponent().mass() * 7.0f * m_car.tireWearFactor());
         parent().physicsComponent().addForce(-impulse, location());
 
-        if (m_car.isBraking())
-        {
+        if (m_car.isBraking()) {
             MCVector2dF impulse =
-                v * 0.5f * (m_isOffTrack ? m_offTrackFriction : m_friction) *
-                    -MCWorld::instance().gravity().k() * parent().physicsComponent().mass() * m_car.tireWearFactor();
+              v * 0.5f * (m_isOffTrack ? m_offTrackFriction : m_friction) * -MCWorld::instance().gravity().k() * parent().physicsComponent().mass() * m_car.tireWearFactor();
             parent().physicsComponent().addForce(-impulse, location());
         }
     }

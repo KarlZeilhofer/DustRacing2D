@@ -17,11 +17,10 @@
 // MA  02110-1301, USA.
 //
 
-#include "mctexturefontconfigloader.hh"
-#include "mctexturefont.hh"
-#include "mctexturefontdata.hh"
 #include "mctexturefontmanager.hh"
-
+#include "mctexturefont.hh"
+#include "mctexturefontconfigloader.hh"
+#include "mctexturefontdata.hh"
 
 #include "mcsurface.hh"
 #include "mcsurfacemanager.hh"
@@ -30,30 +29,26 @@
 #include <exception>
 
 MCTextureFontManager::MCTextureFontManager(
-    const MCSurfaceManager & surfaceManager)
+  const MCSurfaceManager & surfaceManager)
   : m_fontHash()
   , m_surfaceManager(surfaceManager)
 {
 }
 
 void MCTextureFontManager::load(
-    const std::string & fileName)
+  const std::string & fileName)
 {
     MCTextureFontConfigLoader loader;
     loader.setConfigPath(fileName);
 
     // Parse the texture config file
-    if (loader.loadFonts())
-    {
+    if (loader.loadFonts()) {
         const int numFonts = loader.fonts();
-        for (int i = 0; i < numFonts; i++)
-        {
+        for (int i = 0; i < numFonts; i++) {
             const MCTextureFontData & data = loader.font(i);
             createFontFromData(data);
         }
-    }
-    else
-    {
+    } else {
         // Throw an exception
         throw std::runtime_error("Parsing '" + fileName + "' failed!");
     }
@@ -79,27 +74,25 @@ void MCTextureFontManager::createFontFromData(const MCTextureFontData & data)
 
     // Generate glyph structures from the loaded data.
     // Loop thru glyphs.
-    for (unsigned int j = 0; j < data.glyphs.size(); j++)
-    {
+    for (unsigned int j = 0; j < data.glyphs.size(); j++) {
         // Loop through glyphs in the row.
         const MCTextureFontData::Glyph & glyph = data.glyphs.at(j);
 
         // Calculate the uv-coordinates for the glyph.
         MCTextureGlyph newGlyph(
-            MCTextureGlyph::UV(
-                static_cast<float>(glyph.x0) / surface.width(),
-                static_cast<float>(glyph.y0) / surface.height()),
-            MCTextureGlyph::UV(
-                static_cast<float>(glyph.x1) / surface.width(),
-                static_cast<float>(glyph.y1) / surface.height()));
+          MCTextureGlyph::UV(
+            static_cast<float>(glyph.x0) / surface.width(),
+            static_cast<float>(glyph.y0) / surface.height()),
+          MCTextureGlyph::UV(
+            static_cast<float>(glyph.x1) / surface.width(),
+            static_cast<float>(glyph.y1) / surface.height()));
 
         // Add glyph mapping to the font.
         newFont->addGlyphMapping(glyph.name, newGlyph);
     }
 
     auto i = data.fallback.begin();
-    while (i != data.fallback.end())
-    {
+    while (i != data.fallback.end()) {
         newFont->setGlyphFallback(i->first, i->second);
         i++;
     }
@@ -109,11 +102,10 @@ void MCTextureFontManager::createFontFromData(const MCTextureFontData & data)
 }
 
 MCTextureFont & MCTextureFontManager::font(
-    const std::string & name) const
+  const std::string & name) const
 {
     // Try to find existing texture for the surface
-    if (m_fontHash.count(name) == 0)
-    {
+    if (m_fontHash.count(name) == 0) {
         // No:
         throw std::runtime_error("Cannot find font object called '" + name + "'");
     }
@@ -127,8 +119,7 @@ MCTextureFontManager::~MCTextureFontManager()
 {
     // Delete fonts
     auto iter(m_fontHash.begin());
-    while (iter != m_fontHash.end())
-    {
+    while (iter != m_fontHash.end()) {
         delete iter->second;
         iter++;
     }

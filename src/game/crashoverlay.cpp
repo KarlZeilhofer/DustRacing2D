@@ -21,10 +21,10 @@
 #include <MCSurface>
 
 CrashOverlay::CrashOverlay()
-    : m_surface(MCAssetManager::instance().surfaceManager().surface("crashOverlay"))
-    , m_alpha(1.0f)
-    , m_car(nullptr)
-    , m_isTriggered(false)
+  : m_surface(MCAssetManager::instance().surfaceManager().surface("crashOverlay"))
+  , m_alpha(1.0f)
+  , m_car(nullptr)
+  , m_isTriggered(false)
 {
     m_surface.material()->setAlphaBlend(true);
 }
@@ -41,11 +41,10 @@ void CrashOverlay::setCarToFollow(Car & car)
 
 void CrashOverlay::render()
 {
-    if (m_isTriggered)
-    {
+    if (m_isTriggered) {
         glDisable(GL_DEPTH_TEST);
 
-        const int w2 = width()  / 2;
+        const int w2 = width() / 2;
         const int h2 = height() / 2;
 
         m_surface.setColor(MCGLColor(1.0, 1.0, 1.0, m_alpha));
@@ -56,16 +55,12 @@ void CrashOverlay::render()
 
 bool CrashOverlay::update()
 {
-    if (m_car && m_car->hadHardCrash())
-    {
+    if (m_car && m_car->hadHardCrash()) {
         m_isTriggered = true;
         m_alpha = 0.75f;
-    }
-    else if (m_isTriggered)
-    {
+    } else if (m_isTriggered) {
         m_alpha *= 0.97f;
-        if (m_alpha < 0.01f)
-        {
+        if (m_alpha < 0.01f) {
             m_isTriggered = false;
         }
     }

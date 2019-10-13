@@ -21,39 +21,32 @@
 #include "mcsurface.hh"
 
 MCTextureFont::MCTextureFont(MCSurface & surface)
-: m_default(
-      MCTextureGlyph::UV(0, 0),
-      MCTextureGlyph::UV(1, 1))
-, m_glyphLookUp(256, m_default)
-, m_xDensity(1.0f)
-, m_yDensity(1.0f)
-, m_surface(surface)
+  : m_default(
+    MCTextureGlyph::UV(0, 0),
+    MCTextureGlyph::UV(1, 1))
+  , m_glyphLookUp(256, m_default)
+  , m_xDensity(1.0f)
+  , m_yDensity(1.0f)
+  , m_surface(surface)
 {
 }
 
 void MCTextureFont::addGlyphMapping(wchar_t glyphId, MCTextureGlyph textureGlyph)
 {
-    if (static_cast<unsigned int>(glyphId) < m_glyphLookUp.size())
-    {
+    if (static_cast<unsigned int>(glyphId) < m_glyphLookUp.size()) {
         m_glyphLookUp[glyphId] = textureGlyph;
-    }
-    else
-    {
+    } else {
         m_glyphs.insert(GlyphHash::value_type(glyphId, textureGlyph));
     }
 }
 
 MCTextureGlyph & MCTextureFont::glyph(wchar_t glyphId)
 {
-    if (static_cast<unsigned int>(glyphId) < m_glyphLookUp.size())
-    {
+    if (static_cast<unsigned int>(glyphId) < m_glyphLookUp.size()) {
         return m_glyphLookUp[glyphId];
-    }
-    else
-    {
+    } else {
         auto textureGlyph = m_glyphs.find(glyphId);
-        if (textureGlyph != m_glyphs.end())
-        {
+        if (textureGlyph != m_glyphs.end()) {
             return textureGlyph->second;
         }
     }

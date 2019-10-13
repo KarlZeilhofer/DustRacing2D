@@ -22,23 +22,23 @@
 StateMachine * StateMachine::m_instance = nullptr;
 
 StateMachine::StateMachine(InputHandler & inputHandler)
-: m_state(State::Init)
-, m_oldState(State::Init)
-, m_raceFinished(false)
-, m_inputHandler(inputHandler)
+  : m_state(State::Init)
+  , m_oldState(State::Init)
+  , m_raceFinished(false)
+  , m_inputHandler(inputHandler)
 {
     assert(!StateMachine::m_instance);
     StateMachine::m_instance = this;
 
-    m_stateToFunctionMap[State::Init]              = std::bind(&StateMachine::stateInit,              this);
-    m_stateToFunctionMap[State::DoIntro]           = std::bind(&StateMachine::stateDoIntro,           this);
-    m_stateToFunctionMap[State::Menu]              = std::bind(&StateMachine::stateMenu,              this);
-    m_stateToFunctionMap[State::MenuTransitionIn]  = std::bind(&StateMachine::stateMenuTransitionIn,  this);
+    m_stateToFunctionMap[State::Init] = std::bind(&StateMachine::stateInit, this);
+    m_stateToFunctionMap[State::DoIntro] = std::bind(&StateMachine::stateDoIntro, this);
+    m_stateToFunctionMap[State::Menu] = std::bind(&StateMachine::stateMenu, this);
+    m_stateToFunctionMap[State::MenuTransitionIn] = std::bind(&StateMachine::stateMenuTransitionIn, this);
     m_stateToFunctionMap[State::MenuTransitionOut] = std::bind(&StateMachine::stateMenuTransitionOut, this);
-    m_stateToFunctionMap[State::GameTransitionIn]  = std::bind(&StateMachine::stateGameTransitionIn,  this);
+    m_stateToFunctionMap[State::GameTransitionIn] = std::bind(&StateMachine::stateGameTransitionIn, this);
     m_stateToFunctionMap[State::GameTransitionOut] = std::bind(&StateMachine::stateGameTransitionOut, this);
-    m_stateToFunctionMap[State::DoStartlights]     = std::bind(&StateMachine::stateDoStartlights,     this);
-    m_stateToFunctionMap[State::Play]              = std::bind(&StateMachine::statePlay,              this);
+    m_stateToFunctionMap[State::DoStartlights] = std::bind(&StateMachine::stateDoStartlights, this);
+    m_stateToFunctionMap[State::Play] = std::bind(&StateMachine::statePlay, this);
 }
 
 StateMachine::~StateMachine()
@@ -54,12 +54,9 @@ StateMachine & StateMachine::instance()
 
 void StateMachine::quit()
 {
-    if (m_state == StateMachine::State::Play)
-    {
+    if (m_state == StateMachine::State::Play) {
         m_state = State::GameTransitionOut;
-    }
-    else if (m_state == StateMachine::State::Menu)
-    {
+    } else if (m_state == StateMachine::State::Menu) {
         emit exitGameRequested();
     }
 }
@@ -67,17 +64,14 @@ void StateMachine::quit()
 bool StateMachine::update()
 {
     // Run the state function on transition
-    if (m_state == State::Init || m_oldState != m_state)
-    {
+    if (m_state == State::Init || m_oldState != m_state) {
         m_oldState = m_state;
         m_stateToFunctionMap[m_state]();
     }
 
     // Transition logic that needs to be constantly updated
-    if (m_state == State::Menu)
-    {
-        if (MTFH::MenuManager::instance().isDone())
-        {
+    if (m_state == State::Menu) {
+        if (MTFH::MenuManager::instance().isDone()) {
             m_state = State::MenuTransitionOut;
         }
     }
@@ -87,8 +81,7 @@ bool StateMachine::update()
 
 void StateMachine::endFadeIn()
 {
-    switch (m_state)
-    {
+    switch (m_state) {
     case State::GameTransitionIn:
         m_state = State::DoStartlights;
         break;
@@ -102,8 +95,7 @@ void StateMachine::endFadeIn()
 
 void StateMachine::endFadeOut()
 {
-    switch (m_state)
-    {
+    switch (m_state) {
     case State::MenuTransitionOut:
         m_state = State::GameTransitionIn;
         break;
@@ -127,9 +119,8 @@ void StateMachine::stateInit()
 
 void StateMachine::stateDoIntro()
 {
-    m_timer.singleShot(3000, [&] () {
-        if (m_state == State::DoIntro)
-        {
+    m_timer.singleShot(3000, [&]() {
+        if (m_state == State::DoIntro) {
             m_state = State::Menu;
         }
     });
@@ -163,12 +154,9 @@ void StateMachine::stateGameTransitionIn()
 
 void StateMachine::stateGameTransitionOut()
 {
-    if (m_raceFinished)
-    {
+    if (m_raceFinished) {
         emit fadeOutRequested(10000, 10000, 0);
-    }
-    else
-    {
+    } else {
         emit fadeOutRequested(0, 2000, 0);
     }
 }

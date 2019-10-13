@@ -28,9 +28,10 @@
 static const float ROTATION_DECAY = 0.01f;
 
 MCFrictionGenerator::MCFrictionGenerator(float coeffLin, float coeffRot)
-    : m_coeffLinTot(std::fabs(coeffLin * MCWorld::instance().gravity().k()))
-    , m_coeffRotTot(std::fabs(coeffRot * MCWorld::instance().gravity().k() * ROTATION_DECAY))
-{}
+  : m_coeffLinTot(std::fabs(coeffLin * MCWorld::instance().gravity().k()))
+  , m_coeffRotTot(std::fabs(coeffRot * MCWorld::instance().gravity().k() * ROTATION_DECAY))
+{
+}
 
 void MCFrictionGenerator::updateForce(MCObject & object)
 {
@@ -38,18 +39,14 @@ void MCFrictionGenerator::updateForce(MCObject & object)
     MCPhysicsComponent & physicsComponent = object.physicsComponent();
     const float length = physicsComponent.velocity().lengthFast();
     const MCVector2d<float> v(physicsComponent.velocity().normalizedFast());
-    if (length >= 1.0)
-    {
+    if (length >= 1.0) {
         physicsComponent.addForce(-v * m_coeffLinTot * physicsComponent.mass());
-    }
-    else
-    {
+    } else {
         physicsComponent.addForce(-v * length * m_coeffLinTot * physicsComponent.mass());
     }
 
     // Simulated friction caused by angular torque.
-    if (object.shape())
-    {
+    if (object.shape()) {
         const float a = physicsComponent.angularVelocity();
         physicsComponent.addAngularImpulse(-a * m_coeffRotTot);
     }
@@ -58,4 +55,3 @@ void MCFrictionGenerator::updateForce(MCObject & object)
 MCFrictionGenerator::~MCFrictionGenerator()
 {
 }
-

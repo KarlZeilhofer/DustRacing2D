@@ -17,27 +17,24 @@
 // MA  02110-1301, USA.
 //
 
-#include "mcobject.hh"
 #include "mcforceregistry.hh"
+#include "mcobject.hh"
 
 #include <algorithm>
 
 MCForceRegistry::MCForceRegistry()
-: m_registryHash()
-{}
+  : m_registryHash()
+{
+}
 
 void MCForceRegistry::update()
 {
     auto iter = m_registryHash.begin();
-    while (iter != m_registryHash.end())
-    {
+    while (iter != m_registryHash.end()) {
         Registry & registry = iter->second;
-        for (unsigned int i = 0; i < registry.size(); i++)
-        {
-            if (iter->first->index() != -1)
-            {
-                if (registry[i]->enabled())
-                {
+        for (unsigned int i = 0; i < registry.size(); i++) {
+            if (iter->first->index() != -1) {
+                if (registry[i]->enabled()) {
                     registry[i]->updateForce(*iter->first);
                 }
             }
@@ -50,8 +47,7 @@ void MCForceRegistry::update()
 void MCForceRegistry::addForceGenerator(MCForceGeneratorPtr generator, MCObject & object)
 {
     MCForceRegistry::Registry & registry = m_registryHash[&object];
-    if (std::find(registry.begin(), registry.end(), generator) == registry.end())
-    {
+    if (std::find(registry.begin(), registry.end(), generator) == registry.end()) {
         registry.push_back(generator);
     }
 }
@@ -59,21 +55,17 @@ void MCForceRegistry::addForceGenerator(MCForceGeneratorPtr generator, MCObject 
 void MCForceRegistry::removeForceGenerator(MCForceGeneratorPtr generator, MCObject & object)
 {
     auto iter = m_registryHash.find(&object);
-    if (iter != m_registryHash.end())
-    {
+    if (iter != m_registryHash.end()) {
         Registry & registry = iter->second;
-        for (unsigned int i = 0; i < registry.size(); i++)
-        {
-            if (registry[i] == generator && iter->first == &object)
-            {
+        for (unsigned int i = 0; i < registry.size(); i++) {
+            if (registry[i] == generator && iter->first == &object) {
                 registry[i] = registry.back();
                 registry.pop_back();
                 break;
             }
         }
 
-        if (!registry.size())
-        {
+        if (!registry.size()) {
             m_registryHash.erase(iter);
         }
     }
@@ -82,8 +74,7 @@ void MCForceRegistry::removeForceGenerator(MCForceGeneratorPtr generator, MCObje
 void MCForceRegistry::removeForceGenerators(MCObject & object)
 {
     auto iter = m_registryHash.find(&object);
-    if (iter != m_registryHash.end())
-    {
+    if (iter != m_registryHash.end()) {
         m_registryHash.erase(iter);
     }
 }

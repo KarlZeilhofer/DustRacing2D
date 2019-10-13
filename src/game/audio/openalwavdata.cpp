@@ -22,9 +22,9 @@
 
 #include "openalwavdata.hpp"
 
+#include <AL/alc.h>
 #include <cassert>
 #include <cstdio>
-#include <AL/alc.h>
 
 static bool checkError()
 {
@@ -35,40 +35,43 @@ static bool checkError()
 // WAV load code from http://www.dunsanyinteractive.com/blogs/oliver/?p=72
 // by Oliver Plunkett
 
-struct RIFF_Header {
-  char chunkID[4];
-  int32_t chunkSize;
-  char format[4];
+struct RIFF_Header
+{
+    char chunkID[4];
+    int32_t chunkSize;
+    char format[4];
 };
 
-struct WAVE_Format {
-  char subChunkID[4];
-  int32_t subChunkSize;
-  int16_t audioFormat;
-  int16_t numChannels;
-  int32_t sampleRate;
-  int32_t byteRate;
-  int16_t blockAlign;
-  int16_t bitsPerSample;
+struct WAVE_Format
+{
+    char subChunkID[4];
+    int32_t subChunkSize;
+    int16_t audioFormat;
+    int16_t numChannels;
+    int32_t sampleRate;
+    int32_t byteRate;
+    int16_t blockAlign;
+    int16_t bitsPerSample;
 };
 
-struct WAVE_Data {
-  char subChunkID[4]; // Should contain the word data
-  int32_t subChunk2Size; // Stores the size of the data block
+struct WAVE_Data
+{
+    char subChunkID[4]; // Should contain the word data
+    int32_t subChunk2Size; // Stores the size of the data block
 };
 
 static bool loadWavFile(
-    const std::string& filename,
-    ALuint* buffer,
-    ALsizei* size,
-    ALsizei* frequency,
-    ALenum* format)
+  const std::string & filename,
+  ALuint * buffer,
+  ALsizei * size,
+  ALsizei * frequency,
+  ALenum * format)
 {
-    FILE* soundFile = nullptr;
+    FILE * soundFile = nullptr;
     WAVE_Format wave_format;
     RIFF_Header riff_header;
     WAVE_Data wave_data;
-    unsigned char* data;
+    unsigned char * data;
 
     try {
         soundFile = fopen(filename.c_str(), "rb");
@@ -80,14 +83,7 @@ static bool loadWavFile(
         assert(bytesRead == sizeof(RIFF_Header));
 
         //check for RIFF and WAVE tag in memeory
-        if ((riff_header.chunkID[0] != 'R' ||
-             riff_header.chunkID[1] != 'I' ||
-             riff_header.chunkID[2] != 'F' ||
-             riff_header.chunkID[3] != 'F') ||
-                (riff_header.format[0] != 'W' ||
-                 riff_header.format[1] != 'A' ||
-                 riff_header.format[2] != 'V' ||
-                 riff_header.format[3] != 'E'))
+        if ((riff_header.chunkID[0] != 'R' || riff_header.chunkID[1] != 'I' || riff_header.chunkID[2] != 'F' || riff_header.chunkID[3] != 'F') || (riff_header.format[0] != 'W' || riff_header.format[1] != 'A' || riff_header.format[2] != 'V' || riff_header.format[3] != 'E'))
             throw std::runtime_error("Invalid RIFF or WAVE Header");
 
         //Read in the 2nd chunk for the wave info
@@ -95,10 +91,7 @@ static bool loadWavFile(
         assert(bytesRead == sizeof(WAVE_Format));
 
         //check for fmt tag in memory
-        if (wave_format.subChunkID[0] != 'f' ||
-                wave_format.subChunkID[1] != 'm' ||
-                wave_format.subChunkID[2] != 't' ||
-                wave_format.subChunkID[3] != ' ')
+        if (wave_format.subChunkID[0] != 'f' || wave_format.subChunkID[1] != 'm' || wave_format.subChunkID[2] != 't' || wave_format.subChunkID[3] != ' ')
             throw std::runtime_error("Invalid Wave Format");
 
         //check for extra parameters;
@@ -110,10 +103,7 @@ static bool loadWavFile(
         assert(bytesRead == sizeof(WAVE_Data));
 
         //check for data tag in memory
-        if (wave_data.subChunkID[0] != 'd' ||
-                wave_data.subChunkID[1] != 'a' ||
-                wave_data.subChunkID[2] != 't' ||
-                wave_data.subChunkID[3] != 'a')
+        if (wave_data.subChunkID[0] != 'd' || wave_data.subChunkID[1] != 'a' || wave_data.subChunkID[2] != 't' || wave_data.subChunkID[3] != 'a')
             throw std::runtime_error("Invalid data header");
 
         //Allocate memory for data
@@ -130,12 +120,12 @@ static bool loadWavFile(
         //The format is worked out by looking at the number of
         //channels and the bits per sample.
         if (wave_format.numChannels == 1) {
-            if (wave_format.bitsPerSample == 8 )
+            if (wave_format.bitsPerSample == 8)
                 *format = AL_FORMAT_MONO8;
             else if (wave_format.bitsPerSample == 16)
                 *format = AL_FORMAT_MONO16;
         } else if (wave_format.numChannels == 2) {
-            if (wave_format.bitsPerSample == 8 )
+            if (wave_format.bitsPerSample == 8)
                 *format = AL_FORMAT_STEREO8;
             else if (wave_format.bitsPerSample == 16)
                 *format = AL_FORMAT_STEREO16;
@@ -145,12 +135,12 @@ static bool loadWavFile(
         checkError();
         //now we put our data into the openAL buffer and
         //check for success
-        alBufferData(*buffer, *format, reinterpret_cast<void*>(data), *size, *frequency);
+        alBufferData(*buffer, *format, reinterpret_cast<void *>(data), *size, *frequency);
         checkError();
         //clean up and return true if successful
         fclose(soundFile);
         return true;
-    } catch(std::string error) {
+    } catch (std::string error) {
         //clean up memory if wave loading fails
         std::fclose(soundFile);
         //return false to indicate the failure to load wave
@@ -159,9 +149,9 @@ static bool loadWavFile(
 }
 
 OpenALWavData::OpenALWavData(const std::string & path)
-    : m_size(0)
-    , m_freq(0)
-    , m_buffer(0)
+  : m_size(0)
+  , m_freq(0)
+  , m_buffer(0)
 {
     load(path);
 }
@@ -170,13 +160,11 @@ void OpenALWavData::load(const std::string & path)
 {
     OpenALData::load(path);
 
-    if (!loadWavFile(path, &m_buffer, &m_size, &m_freq, &m_format))
-    {
+    if (!loadWavFile(path, &m_buffer, &m_size, &m_freq, &m_format)) {
         throw std::runtime_error("Failed to load '" + path + "'");
     }
 
-    if (!checkError())
-    {
+    if (!checkError()) {
         throw std::runtime_error("Failed to set buffer data of '" + path + "'");
     }
 }

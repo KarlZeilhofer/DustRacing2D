@@ -18,15 +18,15 @@
 #include "layers.hpp"
 
 #include <MCCollisionEvent>
-#include <MCSeparationEvent>
-#include <MCRectShape>
 #include <MCPhysicsComponent>
+#include <MCRectShape>
+#include <MCSeparationEvent>
 
 static const char * BRIDGE_TRIGGER_ID = "bridgeTrigger";
 
 BridgeTrigger::BridgeTrigger(Bridge & bridge)
-: MCObject(BRIDGE_TRIGGER_ID)
-, m_bridge(bridge)
+  : MCObject(BRIDGE_TRIGGER_ID)
+  , m_bridge(bridge)
 {
     MCRectShape * shape = new MCRectShape(nullptr, 16, 224);
     setShape(MCShapePtr(shape));
@@ -41,8 +41,7 @@ BridgeTrigger::BridgeTrigger(Bridge & bridge)
 
 void BridgeTrigger::collisionEvent(MCCollisionEvent & event)
 {
-    if (!event.collidingObject().physicsComponent().isStationary())
-    {
+    if (!event.collidingObject().physicsComponent().isStationary()) {
         m_bridge.enterObject(event.collidingObject());
     }
 }

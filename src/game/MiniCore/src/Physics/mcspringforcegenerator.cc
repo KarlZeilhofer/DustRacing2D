@@ -22,13 +22,14 @@
 #include "mcphysicscomponent.hh"
 
 MCSpringForceGenerator::MCSpringForceGenerator(
-    MCObject & object2, float coeff, float length, float min, float max)
-: m_p2(&object2)
-, m_coeff(coeff)
-, m_length(length)
-, m_min(min)
-, m_max(max)
-{}
+  MCObject & object2, float coeff, float length, float min, float max)
+  : m_p2(&object2)
+  , m_coeff(coeff)
+  , m_length(length)
+  , m_min(min)
+  , m_max(max)
+{
+}
 
 void MCSpringForceGenerator::updateForce(MCObject & object1)
 {
@@ -47,8 +48,7 @@ void MCSpringForceGenerator::updateForce(MCObject & object1)
     diff *= (m_length - length) * m_coeff;
     object1.physicsComponent().addForce(diff);
 
-    if (m_p2->physicsComponent().isSleeping())
-    {
+    if (m_p2->physicsComponent().isSleeping()) {
         m_p2->physicsComponent().toggleSleep(false);
     }
 }
