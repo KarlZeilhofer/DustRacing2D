@@ -341,7 +341,7 @@ void Scene::updateCameraLocation(MCCamera & camera, float & offset, MCObject & o
     // in the speed won't look bad.
     MCVector2dF loc(object.location());
 
-    const float offsetAmplification = m_game.hasTwoHumanPlayers() ? 9.6f : 13.8f;
+    const float offsetAmplification = m_game.hasTwoHumanPlayers() ? 4.8f : 6.9f;
     const float smooth = 0.2f;
 
     offset += (object.physicsComponent().velocity().lengthFast() - offset) * smooth;
