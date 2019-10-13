@@ -14,11 +14,11 @@
 // along with Dust Racing 2D. If not, see <http://www.gnu.org/licenses/>.
 
 #include <QDir>
+#include <QDomDocument>
+#include <QDomElement>
 #include <QFile>
 #include <QStringList>
 #include <QTextStream>
-#include <QDomDocument>
-#include <QDomElement>
 
 #include "../common/config.hpp"
 #include "layers.hpp"
@@ -47,15 +47,15 @@ static const int UNLOCK_LIMIT = 6; // Position required to unlock a new track
 TrackLoader * TrackLoader::m_instance = nullptr;
 
 TrackLoader::TrackLoader()
-    : m_assetManager(
-        Config::Common::dataPath,
-        (std::string(Config::Common::dataPath) + QDir::separator().toLatin1() + std::string("surfaces.conf")),
-        "",
-        (std::string(Config::Common::dataPath) + QDir::separator().toLatin1() + std::string("meshes.conf")))
-    , m_objectFactory(m_assetManager)
-    , m_trackObjectFactory(m_objectFactory)
-    , m_paths()
-    , m_tracks()
+  : m_assetManager(
+    Config::Common::dataPath,
+    (std::string(Config::Common::dataPath) + QDir::separator().toLatin1() + std::string("surfaces.conf")),
+    "",
+    (std::string(Config::Common::dataPath) + QDir::separator().toLatin1() + std::string("meshes.conf")))
+  , m_objectFactory(m_assetManager)
+  , m_trackObjectFactory(m_objectFactory)
+  , m_paths()
+  , m_tracks()
 {
     assert(!TrackLoader::m_instance);
     TrackLoader::m_instance = this;
@@ -80,35 +80,28 @@ void TrackLoader::loadAssets()
 int TrackLoader::loadTracks(int lapCount, DifficultyProfile::Difficulty difficulty)
 {
     int numLoaded = 0;
-    for (QString path : m_paths)
-    {
+    for (QString path : m_paths) {
         juzzlin::L().info() << "Loading race tracks from '" << path.toStdString() << "'..";
         QStringList trackPaths(QDir(path).entryList(QStringList("*.trk")));
-        for (QString trackPath : trackPaths)
-        {
+        for (QString trackPath : trackPaths) {
             trackPath = path + QDir::separator() + trackPath;
-            if (TrackData * trackData = loadTrack(trackPath))
-            {
+            if (TrackData * trackData = loadTrack(trackPath)) {
                 m_tracks.push_back(new Track(trackData));
                 numLoaded++;
 
                 juzzlin::L().info() << "  Found '" << trackPath.toStdString() << "', index="
-                    << trackData->index();
-            }
-            else
-            {
+                                    << trackData->index();
+            } else {
                 juzzlin::L().error() << "Couldn't load '" << trackPath.toStdString() << "'..";
             }
         }
 
-        if (!trackPaths.size())
-        {
+        if (!trackPaths.size()) {
             juzzlin::L().info() << "  No race tracks found.";
         }
     }
 
-    if (numLoaded)
-    {
+    if (numLoaded) {
         updateLockedTracks(lapCount, difficulty);
     }
 
@@ -122,27 +115,20 @@ void TrackLoader::updateLockedTracks(int lapCount, DifficultyProfile::Difficulty
     Track * firstOfficialTrack = nullptr;
 
     // Check if the tracks are locked/unlocked.
-    for (Track * track : m_tracks)
-    {
-        if (!track->trackData().isUserTrack() &&
-            !Settings::instance().loadTrackUnlockStatus(*track, lapCount, difficulty))
-        {
+    for (Track * track : m_tracks) {
+        if (!track->trackData().isUserTrack() && !Settings::instance().loadTrackUnlockStatus(*track, lapCount, difficulty)) {
 #ifndef UNLOCK_ALL_TRACKS
             track->trackData().setIsLocked(true);
 #else
             track->trackData().setIsLocked(false);
 #endif
-        }
-        else
-        {
+        } else {
             track->trackData().setIsLocked(false);
 
             // This is needed in the case new tracks are added to the game afterwards.
             const int bestPos = Settings::instance().loadBestPos(*track, lapCount, difficulty);
-            if (bestPos >= 1 && bestPos <= UNLOCK_LIMIT)
-            {
-                if (track->next())
-                {
+            if (bestPos >= 1 && bestPos <= UNLOCK_LIMIT) {
+                if (track->next()) {
                     track->next()->trackData().setIsLocked(false);
                     Settings::instance().saveTrackUnlockStatus(*track->next(), lapCount, difficulty);
                 }
@@ -150,8 +136,7 @@ void TrackLoader::updateLockedTracks(int lapCount, DifficultyProfile::Difficulty
         }
 
         // Always unlock the first official track
-        if (!track->trackData().isUserTrack() && !firstOfficialTrack)
-        {
+        if (!track->trackData().isUserTrack() && !firstOfficialTrack) {
             firstOfficialTrack = track;
             firstOfficialTrack->trackData().setIsLocked(false);
         }
@@ -163,15 +148,13 @@ void TrackLoader::sortTracks()
     // Sort tracks with respect to their indices. Move user tracks to the
     // beginning of the track array.
     std::stable_sort(m_tracks.begin(), m_tracks.end(),
-        [](Track * lhs, Track * rhs) -> bool
-        {
-             const int left = lhs->trackData().isUserTrack() ? -1 : lhs->trackData().index();
-             return left < static_cast<int>(rhs->trackData().index());
-        });
+                     [](Track * lhs, Track * rhs) -> bool {
+                         const int left = lhs->trackData().isUserTrack() ? -1 : lhs->trackData().index();
+                         return left < static_cast<int>(rhs->trackData().index());
+                     });
 
     // Cross-link the tracks
-    for (unsigned int i = 0; i + 1 < m_tracks.size(); i++)
-    {
+    for (unsigned int i = 0; i + 1 < m_tracks.size(); i++) {
         m_tracks[i]->setNext(*m_tracks[i + 1]);
         m_tracks[i + 1]->setPrev(*m_tracks[i]);
     }
@@ -182,13 +165,11 @@ TrackData * TrackLoader::loadTrack(QString path)
     QDomDocument doc;
 
     QFile file(path);
-    if (!file.open(QIODevice::ReadOnly))
-    {
+    if (!file.open(QIODevice::ReadOnly)) {
         return nullptr;
     }
 
-    if (!doc.setContent(&file))
-    {
+    if (!doc.setContent(&file)) {
         file.close();
         return nullptr;
     }
@@ -198,20 +179,18 @@ TrackData * TrackLoader::loadTrack(QString path)
     TrackData * newData = nullptr;
 
     QDomElement root = doc.documentElement();
-    if (root.nodeName() == "track")
-    {
+    if (root.nodeName() == "track") {
         const unsigned int cols =
-            root.attribute(TrackDataBase::DataKeywords::Header::cols, "0").toUInt();
+          root.attribute(TrackDataBase::DataKeywords::Header::cols, "0").toUInt();
         const unsigned int rows =
-            root.attribute(TrackDataBase::DataKeywords::Header::rows, "0").toUInt();
+          root.attribute(TrackDataBase::DataKeywords::Header::rows, "0").toUInt();
 
-        if (cols > 0 && rows > 0)
-        {
+        if (cols > 0 && rows > 0) {
             const QString name =
-                root.attribute(TrackDataBase::DataKeywords::Header::name, "undefined");
+              root.attribute(TrackDataBase::DataKeywords::Header::name, "undefined");
 
             const bool isUserTrack =
-                root.attribute(TrackDataBase::DataKeywords::Header::user, "0").toUInt();
+              root.attribute(TrackDataBase::DataKeywords::Header::user, "0").toUInt();
 
             newData = new TrackData(name, isUserTrack, cols, rows);
             newData->setFileName(path);
@@ -222,24 +201,19 @@ TrackData * TrackLoader::loadTrack(QString path)
             std::vector<TargetNodeBasePtr> route;
 
             QDomNode node = root.firstChild();
-            while(!node.isNull())
-            {
+            while (!node.isNull()) {
                 QDomElement element = node.toElement();
-                if(!element.isNull())
-                {
+                if (!element.isNull()) {
                     // Read a tile element
-                    if (element.nodeName() == TrackDataBase::DataKeywords::Track::tile)
-                    {
+                    if (element.nodeName() == TrackDataBase::DataKeywords::Track::tile) {
                         readTile(element, *newData);
                     }
                     // Read an object element
-                    else if (element.nodeName() == TrackDataBase::DataKeywords::Track::object)
-                    {
+                    else if (element.nodeName() == TrackDataBase::DataKeywords::Track::object) {
                         readObject(element, *newData);
                     }
                     // Read a target node element
-                    else if (element.nodeName() == TrackDataBase::DataKeywords::Track::node)
-                    {
+                    else if (element.nodeName() == TrackDataBase::DataKeywords::Track::node) {
                         readTargetNode(element, *newData, route);
                     }
                 }
@@ -255,7 +229,7 @@ TrackData * TrackLoader::loadTrack(QString path)
 }
 
 void TrackLoader::readTile(
-    QDomElement & element, TrackData & newData)
+  QDomElement & element, TrackData & newData)
 {
     // X-coordinate in the tile matrix
     const unsigned int i = element.attribute(TrackDataBase::DataKeywords::Tile::i, "0").toUInt();
@@ -267,7 +241,7 @@ void TrackLoader::readTile(
     assert(tile);
 
     const std::string type =
-        element.attribute(TrackDataBase::DataKeywords::Tile::type, "clear").toStdString();
+      element.attribute(TrackDataBase::DataKeywords::Tile::type, "clear").toStdString();
     tile->setTileType(type.c_str());
     tile->setTileTypeEnum(tileTypeEnumFromString(type.c_str()));
 
@@ -276,7 +250,7 @@ void TrackLoader::readTile(
     tile->setRotation(o);
 
     tile->setComputerHint(
-        static_cast<TrackTileBase::ComputerHint>(element.attribute(TrackDataBase::DataKeywords::Tile::computerHint, "0").toUInt()));
+      static_cast<TrackTileBase::ComputerHint>(element.attribute(TrackDataBase::DataKeywords::Tile::computerHint, "0").toUInt()));
 
     tile->setExcludeFromMinimap(element.attribute(TrackDataBase::DataKeywords::Tile::excludeFromMinimap, "0").toInt());
 
@@ -286,12 +260,9 @@ void TrackLoader::readTile(
     tile->setSurface(&MCAssetManager::surfaceManager().surface(type));
 
     // Set preview surface, if found.
-    try
-    {
+    try {
         tile->setPreviewSurface(&MCAssetManager::surfaceManager().surface(type + "Preview"));
-    }
-    catch (...)
-    {
+    } catch (...) {
         // Don't care
     }
 }
@@ -299,20 +270,20 @@ void TrackLoader::readTile(
 TrackTile::TileType TrackLoader::tileTypeEnumFromString(std::string str)
 {
     static std::map<string, TrackTile::TileType> mappings = {
-        {"bridge", TrackTile::TT_BRIDGE},
-        {"corner90", TrackTile::TT_CORNER_90},
-        {"corner45Left", TrackTile::TT_CORNER_45_LEFT},
-        {"corner45Right", TrackTile::TT_CORNER_45_RIGHT},
-        {"straight", TrackTile::TT_STRAIGHT},
-        {"straight45Male", TrackTile::TT_STRAIGHT_45_MALE},
-        {"straight45Female", TrackTile::TT_STRAIGHT_45_FEMALE},
-        {"grass", TrackTile::TT_GRASS},
-        {"sand", TrackTile::TT_SAND},
-        {"sandGrassStraight", TrackTile::TT_SAND_GRASS_STRAIGHT},
-        {"sandGrassCorner", TrackTile::TT_SAND_GRASS_CORNER},
-        {"sandGrassCorner2", TrackTile::TT_SAND_GRASS_CORNER_2},
-        {"finish", TrackTile::TT_FINISH},
-        {"clear", TrackTile::TT_NONE}
+        { "bridge", TrackTile::TT_BRIDGE },
+        { "corner90", TrackTile::TT_CORNER_90 },
+        { "corner45Left", TrackTile::TT_CORNER_45_LEFT },
+        { "corner45Right", TrackTile::TT_CORNER_45_RIGHT },
+        { "straight", TrackTile::TT_STRAIGHT },
+        { "straight45Male", TrackTile::TT_STRAIGHT_45_MALE },
+        { "straight45Female", TrackTile::TT_STRAIGHT_45_FEMALE },
+        { "grass", TrackTile::TT_GRASS },
+        { "sand", TrackTile::TT_SAND },
+        { "sandGrassStraight", TrackTile::TT_SAND_GRASS_STRAIGHT },
+        { "sandGrassCorner", TrackTile::TT_SAND_GRASS_CORNER },
+        { "sandGrassCorner2", TrackTile::TT_SAND_GRASS_CORNER_2 },
+        { "finish", TrackTile::TT_FINISH },
+        { "clear", TrackTile::TT_NONE }
     };
 
     if (!mappings.count(str)) {
@@ -347,8 +318,7 @@ void TrackLoader::readObject(QDomElement & element, TrackData & newData)
 
     const bool forceStationary = element.attribute(TrackDataBase::DataKeywords::Object::forceStationary, "0").toUInt();
 
-    if (TrackObject * object = m_trackObjectFactory.build(category, role, location, angle, forceStationary))
-    {
+    if (TrackObject * object = m_trackObjectFactory.build(category, role, location, angle, forceStationary)) {
         newData.objects().add(std::shared_ptr<TrackObject>(object));
     }
 }
@@ -370,8 +340,7 @@ void TrackLoader::readTargetNode(QDomElement & element, TrackData & newData, std
     const int w = element.attribute(TrackDataBase::DataKeywords::Node::width, "0").toInt();
     const int h = element.attribute(TrackDataBase::DataKeywords::Node::height, "0").toInt();
 
-    if (w > 0 && h > 0)
-    {
+    if (w > 0 && h > 0) {
         tnode->setSize(QSizeF(w, h));
     }
 
@@ -385,8 +354,7 @@ unsigned int TrackLoader::tracks() const
 
 Track * TrackLoader::track(unsigned int index) const
 {
-    if (index < tracks())
-    {
+    if (index < tracks()) {
         return m_tracks.at(index);
     }
 
@@ -395,8 +363,7 @@ Track * TrackLoader::track(unsigned int index) const
 
 TrackLoader::~TrackLoader()
 {
-    for (Track * track : m_tracks)
-    {
+    for (Track * track : m_tracks) {
         delete track;
     }
 

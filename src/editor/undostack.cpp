@@ -16,7 +16,7 @@
 #include "undostack.hpp"
 
 UndoStack::UndoStack(unsigned int maxHistorySize)
-    : m_maxHistorySize(maxHistorySize)
+  : m_maxHistorySize(maxHistorySize)
 {
 }
 
@@ -25,8 +25,7 @@ void UndoStack::pushUndoPoint(TrackDataPtr trackData)
     auto copyData = new TrackData(*trackData.get());
     m_undoStack.push_back(TrackDataPtr(copyData));
 
-    if (m_undoStack.size() > m_maxHistorySize)
-    {
+    if (m_undoStack.size() > m_maxHistorySize) {
         m_undoStack.pop_front();
     }
 }
@@ -36,8 +35,7 @@ void UndoStack::pushRedoPoint(TrackDataPtr trackData)
     auto copyData = new TrackData(*trackData.get());
     m_redoStack.push_back(TrackDataPtr(copyData));
 
-    if (m_redoStack.size() > m_maxHistorySize)
-    {
+    if (m_redoStack.size() > m_maxHistorySize) {
         m_redoStack.pop_front();
     }
 }
@@ -55,8 +53,7 @@ bool UndoStack::isUndoable() const
 
 TrackDataPtr UndoStack::undo()
 {
-    if (isUndoable())
-    {
+    if (isUndoable()) {
         auto head = m_undoStack.back();
         m_undoStack.pop_back();
         return head;
@@ -72,8 +69,7 @@ bool UndoStack::isRedoable() const
 
 TrackDataPtr UndoStack::redo()
 {
-    if (isRedoable())
-    {
+    if (isRedoable()) {
         auto head = m_redoStack.back();
         m_redoStack.pop_back();
         return head;

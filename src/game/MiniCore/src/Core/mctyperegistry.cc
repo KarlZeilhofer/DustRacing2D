@@ -20,21 +20,18 @@
 #include "mctyperegistry.hh"
 
 MCTypeRegistry::MCTypeRegistry()
-    : m_typeIdCount(1)
+  : m_typeIdCount(1)
 {
 }
 
 unsigned int MCTypeRegistry::registerType(const std::string & typeName)
 {
     auto i(m_typeHash.find(typeName));
-    if (i == m_typeHash.end())
-    {
+    if (i == m_typeHash.end()) {
         m_typeIdCount++;
         m_typeHash[typeName] = m_typeIdCount;
         return m_typeIdCount;
-    }
-    else
-    {
+    } else {
         return i->second;
     }
 }

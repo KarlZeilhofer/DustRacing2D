@@ -26,17 +26,16 @@
 
 MCMeshLoader::MCMeshLoader()
 {
-    m_keyToFunctionMap["v"]  = std::bind(&MCMeshLoader::parseV,  this, std::placeholders::_1);
+    m_keyToFunctionMap["v"] = std::bind(&MCMeshLoader::parseV, this, std::placeholders::_1);
     m_keyToFunctionMap["vt"] = std::bind(&MCMeshLoader::parseVT, this, std::placeholders::_1);
     m_keyToFunctionMap["vn"] = std::bind(&MCMeshLoader::parseVN, this, std::placeholders::_1);
-    m_keyToFunctionMap["f"]  = std::bind(&MCMeshLoader::parseF,  this, std::placeholders::_1);
+    m_keyToFunctionMap["f"] = std::bind(&MCMeshLoader::parseF, this, std::placeholders::_1);
 }
 
 bool MCMeshLoader::load(QString filePath)
 {
     QFile file(filePath);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         return false;
     }
 
@@ -55,8 +54,7 @@ bool MCMeshLoader::readStream(QTextStream & stream)
     m_faces.clear();
 
     QString line = stream.readLine();
-    while (!line.isNull())
-    {
+    while (!line.isNull()) {
         processLine(line);
         line = stream.readLine();
     }
@@ -67,16 +65,12 @@ bool MCMeshLoader::readStream(QTextStream & stream)
 void MCMeshLoader::processLine(QString line)
 {
     line.remove(QRegExp("^\\s+"));
-    if (!line.startsWith('#') &&
-        !line.startsWith('s') &&
-        !line.startsWith('o') &&
-        !line.startsWith('m') && // mtllib
-        !line.startsWith('u'))   // usemtl
+    if (!line.startsWith('#') && !line.startsWith('s') && !line.startsWith('o') && !line.startsWith('m') && // mtllib
+        !line.startsWith('u')) // usemtl
     {
         const QString key = line.split(QRegExp("\\s+")).at(0);
         auto iter = m_keyToFunctionMap.find(key);
-        if (iter != m_keyToFunctionMap.end())
-        {
+        if (iter != m_keyToFunctionMap.end()) {
             iter->second(line);
         }
     }
@@ -108,8 +102,7 @@ void MCMeshLoader::parseF(QString line)
     MCMesh::Face face;
     QStringList vertices = line.split(QRegExp("\\s+"));
     vertices.removeFirst();
-    for (QString vertex : vertices)
-    {
+    for (QString vertex : vertices) {
         const QStringList indices = vertex.split('/');
         assert(indices.size() == 3);
 
@@ -122,8 +115,7 @@ void MCMeshLoader::parseF(QString line)
         faceVertex.z = m_v.at(vIndex).z;
 
         // Texture coordinate
-        if (m_vt.size())
-        {
+        if (m_vt.size()) {
             const unsigned int vtIndex = indices.at(1).toInt() - 1;
             assert(vtIndex < m_vt.size());
             faceVertex.u = m_vt.at(vtIndex).u;
@@ -131,8 +123,7 @@ void MCMeshLoader::parseF(QString line)
         }
 
         // Normal
-        if (m_vn.size())
-        {
+        if (m_vn.size()) {
             const unsigned int vnIndex = indices.at(2).toInt() - 1;
             assert(vnIndex < m_vn.size());
             faceVertex.i = m_vn.at(vnIndex).x;

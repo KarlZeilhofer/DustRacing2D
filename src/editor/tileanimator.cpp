@@ -21,8 +21,8 @@
 const int FRAMES = 30;
 
 TileAnimator::TileAnimator(TrackTile * tile)
-: QTimeLine(250)
-, m_tile(tile)
+  : QTimeLine(250)
+  , m_tile(tile)
 {
     setFrameRange(0, FRAMES);
 
@@ -31,8 +31,7 @@ TileAnimator::TileAnimator(TrackTile * tile)
 
 bool TileAnimator::rotate90CW()
 {
-    if (state() == QTimeLine::NotRunning)
-    {
+    if (state() == QTimeLine::NotRunning) {
         m_a0 = m_tile->rotation();
         m_a1 = m_tile->rotation() + 90;
 
@@ -46,8 +45,7 @@ bool TileAnimator::rotate90CW()
 
 bool TileAnimator::rotate90CCW()
 {
-    if (state() == QTimeLine::NotRunning)
-    {
+    if (state() == QTimeLine::NotRunning) {
         m_a0 = m_tile->rotation();
         m_a1 = m_tile->rotation() - 90;
 

@@ -30,26 +30,25 @@ CarPtr CarFactory::buildCar(int index, int numCars, Game & game)
 
     static const int NUM_CARS = numCars;
     static std::map<int, std::string> carImageMap = {
-        {NUM_CARS - 1, "carBlack"    },
-        {NUM_CARS - 2, "carOrange"   },
-        {NUM_CARS - 3, "carRed"      },
-        {NUM_CARS - 4, "carBlue"     },
-        {NUM_CARS - 5, "carDarkGreen"},
-        {NUM_CARS - 6, "carBrown"    },
-        {NUM_CARS - 7, "carCyan"     },
-        {NUM_CARS - 8, "carViolet"   },
-        {NUM_CARS - 9, "carGreen"    },
-        {NUM_CARS - 10,"carDarkRed"  },
-        {1,            "carGrey"     },
-        {0,            "carPink"     }
+        { NUM_CARS - 1, "carBlack" },
+        { NUM_CARS - 2, "carOrange" },
+        { NUM_CARS - 3, "carRed" },
+        { NUM_CARS - 4, "carBlue" },
+        { NUM_CARS - 5, "carDarkGreen" },
+        { NUM_CARS - 6, "carBrown" },
+        { NUM_CARS - 7, "carCyan" },
+        { NUM_CARS - 8, "carViolet" },
+        { NUM_CARS - 9, "carGreen" },
+        { NUM_CARS - 10, "carDarkRed" },
+        { 1, "carGrey" },
+        { 0, "carPink" }
     };
 
     Car::Description desc;
 
     // Select car image
     std::string carImage("carYellow");
-    if (carImageMap.count(index))
-    {
+    if (carImageMap.count(index)) {
         carImage = carImageMap[index];
     }
 

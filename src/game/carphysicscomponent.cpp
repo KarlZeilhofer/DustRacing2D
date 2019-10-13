@@ -20,7 +20,7 @@
 #include "game.hpp"
 
 CarPhysicsComponent::CarPhysicsComponent(Car & car)
-    : m_car(car)
+  : m_car(car)
 {
 }
 
@@ -28,8 +28,7 @@ void CarPhysicsComponent::addImpulse(const MCVector3dF & impulse, bool isCollisi
 {
     MCPhysicsComponent::addImpulse(impulse, isCollision);
 
-    if (Game::instance().difficultyProfile().hasBodyDamage() && isCollision)
-    {
+    if (Game::instance().difficultyProfile().hasBodyDamage() && isCollision) {
         const float damage = (m_car.isHuman() ? 0.5f : 0.25f) * impulse.lengthFast();
         m_car.addDamage(damage*0.1);
     }

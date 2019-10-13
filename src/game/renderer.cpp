@@ -28,16 +28,16 @@
 
 #include "../common/config.hpp"
 
-#include <MCGLScene>
 #include <MCAssetManager>
+#include <MCGLScene>
 #include <MCSurface>
 #include <MCSurfaceManager>
 #include <MCTrigonom>
 
 #include "simple_logger.hpp"
 
-#include <cmath>
 #include <cassert>
+#include <cmath>
 
 #include <QDir>
 #include <QFontDatabase>
@@ -49,22 +49,22 @@
 Renderer * Renderer::m_instance = nullptr;
 
 Renderer::Renderer(int hRes, int vRes, bool fullScreen, MCGLScene & glScene)
-: m_context(nullptr)
-, m_scene(nullptr)
-, m_eventHandler(nullptr)
-, m_viewAngle(22.5f)
-, m_zNear(10.0f)
-, m_zFar(10000.0f) // See: https://github.com/juzzlin/DustRacing2D/issues/30
-, m_fadeValue(1.0f)
-, m_enabled(false)
-, m_hRes(hRes)
-, m_vRes(vRes)
-, m_fullHRes(Game::instance().screen()->geometry().width())
-, m_fullVRes(Game::instance().screen()->geometry().height())
-, m_frameCounter(0)
-, m_fullScreen(fullScreen)
-, m_updatePending(false)
-, m_glScene(glScene)
+  : m_context(nullptr)
+  , m_scene(nullptr)
+  , m_eventHandler(nullptr)
+  , m_viewAngle(22.5f)
+  , m_zNear(10.0f)
+  , m_zFar(10000.0f) // See: https://github.com/juzzlin/DustRacing2D/issues/30
+  , m_fadeValue(1.0f)
+  , m_enabled(false)
+  , m_hRes(hRes)
+  , m_vRes(vRes)
+  , m_fullHRes(Game::instance().screen()->geometry().width())
+  , m_fullVRes(Game::instance().screen()->geometry().height())
+  , m_frameCounter(0)
+  , m_fullScreen(fullScreen)
+  , m_updatePending(false)
+  , m_glScene(glScene)
 {
     assert(!Renderer::m_instance);
     Renderer::m_instance = this;
@@ -85,8 +85,7 @@ void Renderer::initialize()
 {
     juzzlin::L().info() << "OpenGL Version: " << glGetString(GL_VERSION);
 
-    if (!m_fullScreen)
-    {
+    if (!m_fullScreen) {
         // Set window size & disable resize
         resize(m_hRes, m_vRes);
         setMinimumSize(QSize(m_hRes, m_vRes));
@@ -107,7 +106,7 @@ void Renderer::initialize()
 void Renderer::resizeGL(int viewWidth, int viewHeight)
 {
     m_glScene.resize(
-        viewWidth, viewHeight, Scene::width(), Scene::height(), m_viewAngle, m_zNear, m_zFar);
+      viewWidth, viewHeight, Scene::width(), Scene::height(), m_viewAngle, m_zNear, m_zFar);
 }
 
 void Renderer::createProgramFromSource(std::string handle, std::string vshSource, std::string fshSource)
@@ -146,20 +145,16 @@ void Renderer::loadShaders()
 
 void Renderer::loadFonts()
 {
-    QStringList fonts = {"DejaVuSans-Bold.ttf"};
-    for (auto font : fonts)
-    {
+    QStringList fonts = { "DejaVuSans-Bold.ttf" };
+    for (auto font : fonts) {
         const QString path = QString(Config::Common::dataPath) + QDir::separator() + "fonts" + QDir::separator() + font;
         juzzlin::L().info() << "Loading font " << path.toStdString() << "..";
         QFile fontFile(path);
         fontFile.open(QFile::ReadOnly);
         const int appFontId = QFontDatabase::addApplicationFontFromData(fontFile.readAll());
-        if (appFontId < 0)
-        {
+        if (appFontId < 0) {
             juzzlin::L().warning() << "Failed to load font " << path.toStdString() << "..";
-        }
-        else
-        {
+        } else {
             juzzlin::L().info() << "Loaded font " << QFontDatabase::applicationFontFamilies(appFontId).at(0).toStdString();
         }
     }
@@ -175,8 +170,7 @@ void Renderer::setEnabled(bool enable)
 MCGLShaderProgramPtr Renderer::program(const std::string & id)
 {
     MCGLShaderProgramPtr program(m_shaderHash[id]);
-    if (!program)
-    {
+    if (!program) {
         throw std::runtime_error("Cannot find shader program '" + id + "'");
     }
     return program;
@@ -204,21 +198,18 @@ float Renderer::fadeValue() const
 
 void Renderer::render()
 {
-    if (!m_scene)
-    {
+    if (!m_scene) {
         return;
     }
 
     resizeGL(m_hRes, m_vRes);
 
-    if (!m_fbo)
-    {
+    if (!m_fbo) {
         m_fbo.reset(new QOpenGLFramebufferObject(m_hRes, m_vRes));
         m_fbo->setAttachment(QOpenGLFramebufferObject::Depth);
     }
 
-    if (!m_shadowFbo)
-    {
+    if (!m_shadowFbo) {
         m_shadowFbo.reset(new QOpenGLFramebufferObject(m_hRes, m_vRes));
         m_shadowFbo->setAttachment(QOpenGLFramebufferObject::Depth);
     }
@@ -251,12 +242,9 @@ void Renderer::render()
     m_scene->renderCommonHUD();
     m_fbo->release();
 
-    if (m_fullScreen)
-    {
+    if (m_fullScreen) {
         resizeGL(m_fullHRes, m_fullVRes);
-    }
-    else
-    {
+    } else {
         resizeGL(m_hRes, m_vRes);
     }
 
@@ -270,17 +258,15 @@ void Renderer::render()
 
 void Renderer::renderLater()
 {
-    if (!m_updatePending)
-    {
+    if (!m_updatePending) {
         m_updatePending = true;
         QCoreApplication::postEvent(this, new QEvent(QEvent::UpdateRequest));
     }
 }
 
-bool Renderer::event(QEvent *event)
+bool Renderer::event(QEvent * event)
 {
-    switch (event->type())
-    {
+    switch (event->type()) {
     case QEvent::UpdateRequest:
         m_updatePending = false;
         renderNow();
@@ -292,32 +278,27 @@ bool Renderer::event(QEvent *event)
 
 void Renderer::exposeEvent(QExposeEvent *)
 {
-    if (isExposed())
-    {
+    if (isExposed()) {
         renderNow();
     }
 }
 
 void Renderer::renderNow()
 {
-    if (!isExposed())
-    {
+    if (!isExposed()) {
         return;
     }
 
     bool needsInitialize = false;
 
-    if (!m_context)
-    {
+    if (!m_context) {
         m_context = new QOpenGLContext(this);
         m_context->setFormat(requestedFormat());
         m_context->create();
 
-        if (!m_context->isValid())
-        {
+        if (!m_context->isValid()) {
             std::stringstream ss;
-            ss << "Cannot create context for OpenGL version " <<
-                  requestedFormat().majorVersion() << "." << requestedFormat().minorVersion();
+            ss << "Cannot create context for OpenGL version " << requestedFormat().majorVersion() << "." << requestedFormat().minorVersion();
             throw std::runtime_error(ss.str());
         }
 
@@ -326,16 +307,13 @@ void Renderer::renderNow()
 
     m_context->makeCurrent(this);
 
-    if (needsInitialize)
-    {
+    if (needsInitialize) {
         initializeOpenGLFunctions();
         initialize();
     }
 
     m_frameCounter++;
-    if (Game::instance().fps() == Game::Fps::Fps60 ||
-        (Game::instance().fps() == Game::Fps::Fps30 && m_frameCounter & 0x01))
-    {
+    if (Game::instance().fps() == Game::Fps::Fps60 || (Game::instance().fps() == Game::Fps::Fps30 && m_frameCounter & 0x01)) {
         render();
 
         m_context->swapBuffers(this);
@@ -350,8 +328,7 @@ void Renderer::resizeEvent(QResizeEvent * event)
 void Renderer::keyPressEvent(QKeyEvent * event)
 {
     assert(m_eventHandler);
-    if (!m_eventHandler->handleKeyPressEvent(event))
-    {
+    if (!m_eventHandler->handleKeyPressEvent(event)) {
         QWindow::keyPressEvent(event);
     }
 }
@@ -359,8 +336,7 @@ void Renderer::keyPressEvent(QKeyEvent * event)
 void Renderer::keyReleaseEvent(QKeyEvent * event)
 {
     assert(m_eventHandler);
-    if (!m_eventHandler->handleKeyReleaseEvent(event))
-    {
+    if (!m_eventHandler->handleKeyReleaseEvent(event)) {
         QWindow::keyReleaseEvent(event);
     }
 }

@@ -20,7 +20,7 @@
 DifficultyProfile * DifficultyProfile::m_instance = nullptr;
 
 DifficultyProfile::DifficultyProfile(Difficulty difficulty)
-    : m_difficulty(difficulty)
+  : m_difficulty(difficulty)
 {
     assert(!m_instance);
     m_instance = this;
@@ -56,8 +56,7 @@ bool DifficultyProfile::hasBodyDamage() const
 
 float DifficultyProfile::accelerationFrictionMultiplier(bool isHuman) const
 {
-    switch (m_difficulty)
-    {
+    switch (m_difficulty) {
     case Difficulty::Easy:
         return isHuman ? 0.70f : 0.70f * 0.85f;
     case Difficulty::Medium:

@@ -17,24 +17,22 @@
 
 #include "simple_logger.hpp"
 OpenALDevice::OpenALDevice()
-    : m_device(nullptr)
-    , m_context(nullptr)
+  : m_device(nullptr)
+  , m_context(nullptr)
 {
 }
 
 void OpenALDevice::initialize()
 {
     m_device = alcOpenDevice(alcGetString(nullptr, ALC_DEFAULT_DEVICE_SPECIFIER));
-    if (!m_device)
-    {
+    if (!m_device) {
         throw std::runtime_error("Failed to open default sound device");
     }
 
     juzzlin::L().info() << "Sound device: " << alcGetString(m_device, ALC_DEVICE_SPECIFIER);
 
     m_context = alcCreateContext(m_device, nullptr);
-    if (!alcMakeContextCurrent(m_context))
-    {
+    if (!alcMakeContextCurrent(m_context)) {
         throw std::runtime_error("Failed to create default sound context");
     }
 }

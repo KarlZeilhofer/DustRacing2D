@@ -17,17 +17,16 @@
 // MA  02110-1301, USA.
 //
 
-#include "mcglshaderprogram.hh"
 #include "mcsurfaceview.hh"
 #include "mccamera.hh"
+#include "mcglshaderprogram.hh"
 #include "mcsurface.hh"
 
 MCSurfaceView::MCSurfaceView(const std::string & viewId, MCSurface * surface)
-    : MCShapeView(viewId)
-    , m_surface(surface)
+  : MCShapeView(viewId)
+  , m_surface(surface)
 {
-    if (surface)
-    {
+    if (surface) {
         m_surface->setShaderProgram(shaderProgram());
         m_surface->setShadowShaderProgram(shadowShaderProgram());
 
@@ -36,7 +35,8 @@ MCSurfaceView::MCSurfaceView(const std::string & viewId, MCSurface * surface)
 }
 
 MCSurfaceView::~MCSurfaceView()
-{}
+{
+}
 
 void MCSurfaceView::updateBBox()
 {
@@ -121,7 +121,7 @@ void MCSurfaceView::setColor(const MCGLColor & color)
     m_surface->setColor(color);
 }
 
-void MCSurfaceView::setScale(const MCVector3dF &scale)
+void MCSurfaceView::setScale(const MCVector3dF & scale)
 {
     MCShapeView::setScale(scale);
     updateBBox();

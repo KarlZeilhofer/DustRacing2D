@@ -25,17 +25,17 @@
 MCAssetManager * MCAssetManager::m_instance = nullptr;
 
 MCAssetManager::MCAssetManager(
-    const std::string & baseDataPath,
-    const std::string & surfaceConfigPath,
-    const std::string & fontConfigPath,
-    const std::string & meshConfigPath)
-: m_surfaceManager(new MCSurfaceManager)
-, m_textureFontManager(new MCTextureFontManager(*m_surfaceManager))
-, m_meshManager(new MCMeshManager)
-, m_baseDataPath(baseDataPath)
-, m_surfaceConfigPath(surfaceConfigPath)
-, m_fontConfigPath(fontConfigPath)
-, m_meshConfigPath(meshConfigPath)
+  const std::string & baseDataPath,
+  const std::string & surfaceConfigPath,
+  const std::string & fontConfigPath,
+  const std::string & meshConfigPath)
+  : m_surfaceManager(new MCSurfaceManager)
+  , m_textureFontManager(new MCTextureFontManager(*m_surfaceManager))
+  , m_meshManager(new MCMeshManager)
+  , m_baseDataPath(baseDataPath)
+  , m_surfaceConfigPath(surfaceConfigPath)
+  , m_fontConfigPath(fontConfigPath)
+  , m_meshConfigPath(meshConfigPath)
 {
     assert(!MCAssetManager::m_instance);
     MCAssetManager::m_instance = this;
@@ -74,8 +74,7 @@ void MCAssetManager::load()
 
 void MCAssetManager::loadSurfaces()
 {
-    if (m_surfaceConfigPath != "")
-    {
+    if (m_surfaceConfigPath != "") {
         MCLogger().info() << "Loading surface config from '" << m_surfaceConfigPath << "'..";
         m_surfaceManager->load(m_surfaceConfigPath, m_baseDataPath);
     }
@@ -83,8 +82,7 @@ void MCAssetManager::loadSurfaces()
 
 void MCAssetManager::loadFonts()
 {
-    if (m_fontConfigPath != "")
-    {
+    if (m_fontConfigPath != "") {
         MCLogger().info() << "Loading font config from '" << m_fontConfigPath << "'..";
         m_textureFontManager->load(m_fontConfigPath);
     }
@@ -92,8 +90,7 @@ void MCAssetManager::loadFonts()
 
 void MCAssetManager::loadMeshes()
 {
-    if (m_meshConfigPath != "")
-    {
+    if (m_meshConfigPath != "") {
         MCLogger().info() << "Loading mesh config from '" << m_meshConfigPath << "'..";
         m_meshManager->load(m_meshConfigPath, m_baseDataPath);
     }

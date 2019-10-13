@@ -26,9 +26,12 @@
 
 static void printHelp()
 {
-    std::cout << std::endl << "Dust Racing 2D version " << VERSION << std::endl;
-    std::cout << Config::Common::COPYRIGHT << std::endl << std::endl;
-    std::cout << "Usage: dustrac-editor [options] [trackFile]" << std::endl << std::endl;
+    std::cout << std::endl
+              << "Dust Racing 2D version " << VERSION << std::endl;
+    std::cout << Config::Common::COPYRIGHT << std::endl
+              << std::endl;
+    std::cout << "Usage: dustrac-editor [options] [trackFile]" << std::endl
+              << std::endl;
     std::cout << "Options:" << std::endl;
     std::cout << "--help        Show this help." << std::endl;
     std::cout << "--lang [lang] Force language: fi, fr, it, cs, ru." << std::endl;
@@ -37,18 +40,14 @@ static void printHelp()
 
 static void initTranslations(QTranslator & appTranslator, QGuiApplication & app, QString lang = "")
 {
-    if (lang == "")
-    {
+    if (lang == "") {
         lang = QLocale::system().name();
     }
 
-    if (appTranslator.load(QString(DATA_PATH) + "/translations/dustrac-editor_" + lang))
-    {
+    if (appTranslator.load(QString(DATA_PATH) + "/translations/dustrac-editor_" + lang)) {
         app.installTranslator(&appTranslator);
         std::cout << "Loaded translations for " << lang.toStdString() << std::endl;
-    }
-    else
-    {
+    } else {
         std::cerr << "Failed to load translations for " << lang.toStdString() << std::endl;
     }
 }
@@ -58,19 +57,13 @@ void Application::parseArgs(int argc, char ** argv)
     QString lang = "";
 
     const std::vector<QString> args(argv, argv + argc);
-    for (unsigned int i = 1; i < args.size(); i++)
-    {
-        if (args[i] == "-h" || args[i] == "--help")
-        {
+    for (unsigned int i = 1; i < args.size(); i++) {
+        if (args[i] == "-h" || args[i] == "--help") {
             printHelp();
             throw UserException("Exit due to help.");
-        }
-        else if (args[i] == "--lang" && (i + i) < args.size())
-        {
+        } else if (args[i] == "--lang" && (i + i) < args.size()) {
             lang = args[++i];
-        }
-        else
-        {
+        } else {
             m_trackFile = args[i];
         }
     }
@@ -79,7 +72,7 @@ void Application::parseArgs(int argc, char ** argv)
 }
 
 Application::Application(int & argc, char ** argv)
-    : m_app(argc, argv)
+  : m_app(argc, argv)
 {
     parseArgs(argc, argv);
 

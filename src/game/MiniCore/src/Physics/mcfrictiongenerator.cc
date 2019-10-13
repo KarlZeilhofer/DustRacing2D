@@ -48,8 +48,7 @@ void MCFrictionGenerator::updateForce(MCObject & object)
     }
 
     // Simulated friction caused by angular torque.
-    if (object.shape())
-    {
+    if (object.shape()) {
         const float a = physicsComponent.angularVelocity();
 		if(a > 0)
 			physicsComponent.addTorque(- m_coeffRotTot * physicsComponent.mass() * 1.0f); // TODO: replace constant of 1.0m for average radius
@@ -61,4 +60,3 @@ void MCFrictionGenerator::updateForce(MCObject & object)
 MCFrictionGenerator::~MCFrictionGenerator()
 {
 }
-

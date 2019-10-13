@@ -167,20 +167,14 @@ unsigned int Car::index() const
 
 void Car::steer(Steer direction, float control)
 {
-    if (direction == Steer::Neutral)
-    {
+    if (direction == Steer::Neutral) {
         m_tireAngle = 0;
-    }
-    else
-    {
+    } else {
         const float maxAngle = 15.0f * (direction == Steer::Left ? 1 : -1);
 
-        if (!m_isHuman)
-        {
+        if (!m_isHuman) {
             m_tireAngle = static_cast<int>(maxAngle * control);
-        }
-        else
-        {
+        } else {
             m_tireAngle = m_tireAngle + (maxAngle - m_tireAngle) * 0.15f;
         }
     }
@@ -196,7 +190,7 @@ void Car::accelerate(bool deccelerate)
     static_pointer_cast<Tire>(m_rightRearTire)->setSpinCoeff(1.0f);
 
     const float maxForce =
-        physicsComponent().mass() * m_desc.accelerationFriction * std::fabs(MCWorld::instance().gravity().k());
+      physicsComponent().mass() * m_desc.accelerationFriction * std::fabs(MCWorld::instance().gravity().k());
     float currentForce = maxForce;
     const float velocity = physicsComponent().velocity().length(); // in m/s
     if (velocity > 0.001f)
@@ -222,8 +216,7 @@ void Car::accelerate(bool deccelerate)
     }
 
     MCVector2dF direction(m_dx, m_dy);
-    if (deccelerate)
-    {
+    if (deccelerate) {
         direction *= -1;
     }
 
@@ -249,7 +242,7 @@ bool Car::isSliding()
 {
     const float bodyNormalAngle = angle() + 90;
     const MCVector2dF n(
-        MCTrigonom::cos(bodyNormalAngle), MCTrigonom::sin(bodyNormalAngle));
+      MCTrigonom::cos(bodyNormalAngle), MCTrigonom::sin(bodyNormalAngle));
     const MCVector2dF & v = physicsComponent().velocity().normalized();
     const MCVector2dF s = MCVector2dF::projection(v, n);
     return absSpeed() > 7.5 && s.lengthFast() > 0.25;
@@ -310,8 +303,7 @@ void Car::updateAnimations()
 {
     m_particleEffectManager.update();
 
-    if (m_soundEffectManager)
-    {
+    if (m_soundEffectManager) {
         m_soundEffectManager->update();
     }
 
@@ -346,28 +338,22 @@ void Car::updateTireWear(int step)
 
         const float offTrackTireWearFactor = 0.10f;
 
-        if (m_leftSideOffTrack)
-        {
+        if (m_leftSideOffTrack) {
             static_pointer_cast<Tire>(m_leftFrontTire)->setIsOffTrack(true);
             static_pointer_cast<Tire>(m_leftRearTire)->setIsOffTrack(true);
 
             wearOutTires(step, offTrackTireWearFactor);
-        }
-        else
-        {
+        } else {
             static_pointer_cast<Tire>(m_leftFrontTire)->setIsOffTrack(false);
             static_pointer_cast<Tire>(m_leftRearTire)->setIsOffTrack(false);
         }
 
-        if (m_rightSideOffTrack)
-        {
+        if (m_rightSideOffTrack) {
             static_pointer_cast<Tire>(m_rightFrontTire)->setIsOffTrack(true);
             static_pointer_cast<Tire>(m_rightRearTire)->setIsOffTrack(true);
 
             wearOutTires(step, offTrackTireWearFactor);
-        }
-        else
-        {
+        } else {
             static_pointer_cast<Tire>(m_rightFrontTire)->setIsOffTrack(false);
             static_pointer_cast<Tire>(m_rightRearTire)->setIsOffTrack(false);
         }
@@ -376,8 +362,7 @@ void Car::updateTireWear(int step)
 
 void Car::collisionEvent(MCCollisionEvent & event)
 {
-    if (!event.collidingObject().isTriggerObject())
-    {
+    if (!event.collidingObject().isTriggerObject()) {
         m_particleEffectManager.collision(event);
         m_soundEffectManager->collision(event);
     }
@@ -387,33 +372,25 @@ void Car::collisionEvent(MCCollisionEvent & event)
 
 void Car::addDamage(float damage)
 {
-    if (m_damageCapacity > damage)
-    {
+    if (m_damageCapacity > damage) {
         m_damageCapacity -= damage;
-    }
-    else
-    {
+    } else {
         m_damageCapacity = 0;
     }
 
     const float hardCrashDamageLimit = 3.5f;
-    if (damage >= hardCrashDamageLimit)
-    {
+    if (damage >= hardCrashDamageLimit) {
         m_hadHardCrash = true;
     }
 }
 
 void Car::wearOutTires(int step, float factor)
 {
-    if (Game::instance().difficultyProfile().hasTireWearOut())
-    {
+    if (Game::instance().difficultyProfile().hasTireWearOut()) {
         const float wearOut = physicsComponent().velocity().lengthFast() * step * factor / 1000;
-        if (m_tireWearOutCapacity >= wearOut)
-        {
+        if (m_tireWearOutCapacity >= wearOut) {
             m_tireWearOutCapacity -= wearOut;
-        }
-        else
-        {
+        } else {
             m_tireWearOutCapacity = 0;
         }
     }
@@ -469,8 +446,7 @@ float Car::damageLevel() const
 
 bool Car::hadHardCrash()
 {
-    if (m_hadHardCrash)
-    {
+    if (m_hadHardCrash) {
         m_hadHardCrash = false;
         return true;
     }
@@ -485,12 +461,9 @@ void Car::onStepTime(int step)
 
     m_gearbox->update(speedInKmh());
 
-    if (m_gearbox->gear() == Gearbox::Gear::Forward)
-    {
+    if (m_gearbox->gear() == Gearbox::Gear::Forward) {
         accelerate();
-    }
-    else if (m_gearbox->gear() == Gearbox::Gear::Reverse)
-    {
+    } else if (m_gearbox->gear() == Gearbox::Gear::Reverse) {
         accelerate(true);
     }
 }

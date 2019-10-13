@@ -21,9 +21,9 @@
 
 #include "application.hpp"
 
+#include <cstdlib>
 #include <iostream>
 #include <memory>
-#include <cstdlib>
 
 #if QT_VERSION < 0x50600
 extern Q_CORE_EXPORT QBasicAtomicInt qt_qhash_seed;
@@ -45,16 +45,12 @@ int main(int argc, char ** argv)
 
     std::unique_ptr<Application> app;
 
-    try
-    {
+    try {
         app.reset(new Application(argc, argv));
 
         return app->run();
-    }
-    catch (std::exception & e)
-    {
-        if (!dynamic_cast<UserException *>(&e))
-        {
+    } catch (std::exception & e) {
+        if (!dynamic_cast<UserException *>(&e)) {
             std::cerr << e.what() << std::endl;
         }
 

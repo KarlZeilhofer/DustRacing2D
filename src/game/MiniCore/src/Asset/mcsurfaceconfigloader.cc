@@ -22,44 +22,38 @@
 #include <QDomElement>
 #include <QFile>
 
+#include "mclogger.hh"
 #include "mcsurfaceconfigloader.hh"
 #include "mcsurfacemetadata.hh"
-#include "mclogger.hh"
 
 #include <cassert>
 #include <exception>
 
 MCSurfaceConfigLoader::MCSurfaceConfigLoader()
-: m_surfaces()
+  : m_surfaces()
 {
-    m_blendFuncMap["one"]              = GL_ONE;
-    m_blendFuncMap["zero"]             = GL_ZERO;
-    m_blendFuncMap["srcColor"]         = GL_SRC_COLOR;
+    m_blendFuncMap["one"] = GL_ONE;
+    m_blendFuncMap["zero"] = GL_ZERO;
+    m_blendFuncMap["srcColor"] = GL_SRC_COLOR;
     m_blendFuncMap["oneMinusSrcColor"] = GL_ONE_MINUS_SRC_COLOR;
-    m_blendFuncMap["srcAlpha"]         = GL_SRC_ALPHA;
+    m_blendFuncMap["srcAlpha"] = GL_SRC_ALPHA;
     m_blendFuncMap["oneMinusSrcAlpha"] = GL_ONE_MINUS_SRC_ALPHA;
-    m_blendFuncMap["dstColor"]         = GL_DST_COLOR;
+    m_blendFuncMap["dstColor"] = GL_DST_COLOR;
     m_blendFuncMap["oneMinusDstColor"] = GL_ONE_MINUS_DST_COLOR;
 }
 
 void MCSurfaceConfigLoader::parseAttributes(const QDomElement & element, SurfaceDataPtr newData, const std::string & baseImagePath)
 {
-    if (element.hasAttribute("image"))
-    {
+    if (element.hasAttribute("image")) {
         const std::string image = element.attribute("image", "").toStdString();
         newData->imagePath = baseImagePath + QDir::separator().toLatin1() + image;
-    }
-    else
-    {
+    } else {
         throw std::runtime_error("Attribute 'image' is required for a surface!");
     }
 
-    if (element.hasAttribute("handle"))
-    {
+    if (element.hasAttribute("handle")) {
         newData->handle = element.attribute("handle", "").toStdString();
-    }
-    else
-    {
+    } else {
         throw std::runtime_error("Attribute 'handle' is required for a surface!");
     }
 
@@ -75,33 +69,25 @@ void MCSurfaceConfigLoader::parseAttributes(const QDomElement & element, Surface
         newData->z1 = z;
         newData->z2 = z;
         newData->z3 = z;
-    }
-    else if (
-        element.hasAttribute("z0") ||
-        element.hasAttribute("z1") ||
-        element.hasAttribute("z2") ||
-        element.hasAttribute("z3"))
-    {
+    } else if (
+      element.hasAttribute("z0") || element.hasAttribute("z1") || element.hasAttribute("z2") || element.hasAttribute("z3")) {
         newData->z0 = element.attribute("z0", "0").toFloat();
         newData->z1 = element.attribute("z1", "0").toFloat();
         newData->z2 = element.attribute("z2", "0").toFloat();
         newData->z3 = element.attribute("z3", "0").toFloat();
     }
 
-    if (element.hasAttribute("w"))
-    {
+    if (element.hasAttribute("w")) {
         const unsigned int width = element.attribute("w", "0").toUInt();
         newData->width = std::pair<int, bool>(width, width > 0);
     }
 
-    if (element.hasAttribute("h"))
-    {
+    if (element.hasAttribute("h")) {
         const unsigned int height = element.attribute("h", "0").toUInt();
         newData->height = std::pair<int, bool>(height, height > 0);
     }
 
-    if (element.hasAttribute("specularCoeff"))
-    {
+    if (element.hasAttribute("specularCoeff")) {
         const float specularCoeff = element.attribute("specularCoeff", "1").toFloat();
         newData->specularCoeff = std::pair<GLfloat, bool>(specularCoeff, specularCoeff > 1.0f);
     }
@@ -111,131 +97,92 @@ void MCSurfaceConfigLoader::parseChildNodes(const QDomNode & node, SurfaceDataPt
 {
     // Read child nodes of surface node.
     auto && childNode = node.firstChild();
-    while (!childNode.isNull())
-    {
-        if (childNode.nodeName() == "color")
-        {
+    while (!childNode.isNull()) {
+        if (childNode.nodeName() == "color") {
             const auto && element = childNode.toElement();
-            if (!element.isNull())
-            {
+            if (!element.isNull()) {
                 newData->color.setR(element.attribute("r", "1").toFloat());
                 newData->color.setG(element.attribute("g", "1").toFloat());
                 newData->color.setB(element.attribute("b", "1").toFloat());
                 newData->color.setA(element.attribute("a", "1").toFloat());
             }
-        }
-        else if (childNode.nodeName() == "colorKey")
-        {
+        } else if (childNode.nodeName() == "colorKey") {
             const auto && element = childNode.toElement();
-            if (!element.isNull())
-            {
+            if (!element.isNull()) {
                 newData->colorKey.m_r = element.attribute("r", "0").toUInt();
                 newData->colorKey.m_g = element.attribute("g", "0").toUInt();
                 newData->colorKey.m_b = element.attribute("b", "0").toUInt();
-                newData->colorKeySet  = true;
+                newData->colorKeySet = true;
             }
-        }
-        else if (childNode.nodeName() == "alphaBlend")
-        {
+        } else if (childNode.nodeName() == "alphaBlend") {
             const auto && element = childNode.toElement();
-            if (!element.isNull())
-            {
+            if (!element.isNull()) {
                 newData->alphaBlend.first.m_src =
-                    alphaBlendStringToEnum(
-                        element.attribute("src", "srcAlpha").toStdString());
+                  alphaBlendStringToEnum(
+                    element.attribute("src", "srcAlpha").toStdString());
                 newData->alphaBlend.first.m_dst =
-                    alphaBlendStringToEnum(
-                        element.attribute(
-                            "dst", "srcAlphaMinusOne").toStdString());
+                  alphaBlendStringToEnum(
+                    element.attribute(
+                             "dst", "srcAlphaMinusOne")
+                      .toStdString());
                 newData->alphaBlend.second = true;
             }
-        }
-        else if (childNode.nodeName() == "alphaClamp")
-        {
+        } else if (childNode.nodeName() == "alphaClamp") {
             const auto && element = childNode.toElement();
-            if (!element.isNull())
-            {
+            if (!element.isNull()) {
                 newData->alphaClamp.first = element.attribute("val", "0.5").toFloat();
                 newData->alphaClamp.second = true;
             }
-        }
-        else if (childNode.nodeName() == "filter")
-        {
+        } else if (childNode.nodeName() == "filter") {
             const auto && element = childNode.toElement();
-            if (!element.isNull())
-            {
+            if (!element.isNull()) {
                 const std::string min = element.attribute("min", "").toStdString();
                 const std::string mag = element.attribute("mag", "").toStdString();
 
-                if (min == "linear")
-                {
+                if (min == "linear") {
                     newData->minFilter = std::pair<GLint, bool>(GL_LINEAR, true);
-                }
-                else if (min == "nearest")
-                {
+                } else if (min == "nearest") {
                     newData->minFilter = std::pair<GLint, bool>(GL_NEAREST, true);
-                }
-                else
-                {
+                } else {
                     throw std::runtime_error("Unknown min filter '" + min + "'");
                 }
 
-                if (mag == "linear")
-                {
+                if (mag == "linear") {
                     newData->magFilter = std::pair<GLint, bool>(GL_LINEAR, true);
-                }
-                else if (mag == "nearest")
-                {
+                } else if (mag == "nearest") {
                     newData->magFilter = std::pair<GLint, bool>(GL_NEAREST, true);
-                }
-                else
-                {
+                } else {
                     throw std::runtime_error("Unknown mag filter '" + mag + "'");
                 }
             }
-        }
-        else if (childNode.nodeName() == "wrap")
-        {
+        } else if (childNode.nodeName() == "wrap") {
             const auto && element = childNode.toElement();
-            if (!element.isNull())
-            {
+            if (!element.isNull()) {
                 const std::string s = element.attribute("s", "").toStdString();
                 const std::string t = element.attribute("t", "").toStdString();
 
-                // Windows build hack
-                #ifndef GL_CLAMP_TO_EDGE
-                    #define GL_CLAMP_TO_EDGE 0x812F
-                #endif
+// Windows build hack
+#ifndef GL_CLAMP_TO_EDGE
+#define GL_CLAMP_TO_EDGE 0x812F
+#endif
 
-                if (s == "clamp")
-                {
+                if (s == "clamp") {
                     newData->wrapS = std::pair<GLint, bool>(GL_CLAMP_TO_EDGE, true);
-                }
-                else if (s == "repeat")
-                {
+                } else if (s == "repeat") {
                     newData->wrapS = std::pair<GLint, bool>(GL_REPEAT, true);
-                }
-                else
-                {
+                } else {
                     throw std::runtime_error("Unknown s wrap '" + s + "'");
                 }
 
-                if (t == "clamp")
-                {
+                if (t == "clamp") {
                     newData->wrapT = std::pair<GLint, bool>(GL_CLAMP_TO_EDGE, true);
-                }
-                else if (t == "repeat")
-                {
+                } else if (t == "repeat") {
                     newData->wrapT = std::pair<GLint, bool>(GL_REPEAT, true);
-                }
-                else
-                {
+                } else {
                     throw std::runtime_error("Unknown t wrap '" + t + "'");
                 }
             }
-        }
-        else
-        {
+        } else {
             throw std::runtime_error("Unknown element '" + childNode.nodeName().toStdString() + "'");
         }
 
@@ -247,13 +194,11 @@ bool MCSurfaceConfigLoader::load(const std::string & path)
 {
     QDomDocument doc;
     QFile file(path.c_str());
-    if (!file.open(QIODevice::ReadOnly))
-    {
+    if (!file.open(QIODevice::ReadOnly)) {
         return false;
     }
 
-    if (!doc.setContent(&file))
-    {
+    if (!doc.setContent(&file)) {
         file.close();
         return false;
     }
@@ -261,16 +206,13 @@ bool MCSurfaceConfigLoader::load(const std::string & path)
     file.close();
 
     const auto && root = doc.documentElement();
-    if (root.nodeName() == "surfaces")
-    {
+    if (root.nodeName() == "surfaces") {
         const std::string baseImagePath = root.attribute("baseImagePath", "./").toStdString();
         auto && node = root.firstChild();
-        while(!node.isNull() && node.nodeName() == "surface")
-        {
+        while (!node.isNull() && node.nodeName() == "surface") {
             SurfaceDataPtr newData(new MCSurfaceMetaData);
             auto && element = node.toElement();
-            if(!element.isNull())
-            {
+            if (!element.isNull()) {
                 parseAttributes(element, newData, baseImagePath);
                 parseChildNodes(node, newData);
             }
@@ -285,14 +227,11 @@ bool MCSurfaceConfigLoader::load(const std::string & path)
 }
 
 GLenum MCSurfaceConfigLoader::alphaBlendStringToEnum(
-    const std::string & function) const
+  const std::string & function) const
 {
-    try
-    {
+    try {
         return m_blendFuncMap.at(function);
-    }
-    catch (...)
-    {
+    } catch (...) {
         throw std::runtime_error("Unknown alpha blend function '" + function + "'");
     }
 

@@ -29,9 +29,9 @@
 GLuint MCGLObjectBase::m_boundVbo = 0;
 
 MCGLObjectBase::MCGLObjectBase(std::string handle)
-    : m_handle(handle)
-    , m_program(MCGLScene::instance().defaultShaderProgram())
-    , m_shadowProgram(MCGLScene::instance().defaultShadowShaderProgram())
+  : m_handle(handle)
+  , m_program(MCGLScene::instance().defaultShaderProgram())
+  , m_shadowProgram(MCGLScene::instance().defaultShadowShaderProgram())
 {
 #ifdef __MC_QOPENGLFUNCTIONS__
     initializeOpenGLFunctions();
@@ -63,12 +63,9 @@ MCGLShaderProgramPtr MCGLObjectBase::shadowShaderProgram() const
 void MCGLObjectBase::bindVAO()
 {
 #ifdef __MC_QOPENGLFUNCTIONS__
-    if (m_hasVao)
-    {
+    if (m_hasVao) {
         m_vao.bind();
-    }
-    else
-    {
+    } else {
         setAttributePointers();
     }
 #else
@@ -79,8 +76,7 @@ void MCGLObjectBase::bindVAO()
 void MCGLObjectBase::releaseVAO()
 {
 #ifdef __MC_QOPENGLFUNCTIONS__
-    if (m_hasVao)
-    {
+    if (m_hasVao) {
         m_vao.release();
     }
 #else
@@ -94,8 +90,7 @@ bool MCGLObjectBase::createVAO()
     m_hasVao = m_vao.create();
     return m_hasVao;
 #else
-    if (m_vao == 0)
-    {
+    if (m_vao == 0) {
         glGenVertexArrays(1, &m_vao);
     }
     return m_vao;
@@ -116,8 +111,7 @@ void MCGLObjectBase::releaseVBO()
 
 void MCGLObjectBase::createVBO()
 {
-    if (m_vbo == 0)
-    {
+    if (m_vbo == 0) {
         glGenBuffers(1, &m_vbo);
     }
 }
@@ -133,8 +127,7 @@ void MCGLObjectBase::render(MCCamera * camera, MCVector3dFR pos, float angle)
     float y = pos.j();
     float z = pos.k();
 
-    if (camera)
-    {
+    if (camera) {
         camera->mapToCamera(x, y);
     }
 
@@ -154,8 +147,7 @@ void MCGLObjectBase::renderShadow(MCCamera * camera, MCVector3dFR pos, float ang
     float x = pos.i();
     float y = pos.j();
 
-    if (camera)
-    {
+    if (camera) {
         camera->mapToCamera(x, y);
     }
 
@@ -171,16 +163,13 @@ void MCGLObjectBase::renderShadow(MCCamera * camera, MCVector3dFR pos, float ang
 
 void MCGLObjectBase::bind()
 {
-    if (shaderProgram())
-    {
+    if (shaderProgram()) {
         shaderProgram()->bind();
         shaderProgram()->bindMaterial(m_material);
 
         bindVBO();
         bindVAO();
-    }
-    else
-    {
+    } else {
         // Save the user from debugging as to why nothing is being drawn.
         throw std::runtime_error("Trying to bind MCGLObject but shader program for it not set!");
     }
@@ -188,16 +177,13 @@ void MCGLObjectBase::bind()
 
 void MCGLObjectBase::bindShadow()
 {
-    if (shadowShaderProgram())
-    {
+    if (shadowShaderProgram()) {
         shadowShaderProgram()->bind();
         shadowShaderProgram()->bindMaterial(m_material);
 
         bindVBO();
         bindVAO();
-    }
-    else
-    {
+    } else {
         // Save the user from debugging as to why nothing is being drawn.
         throw std::runtime_error("Trying to render shadow for surface, but shader program for it not set!");
     }
@@ -344,13 +330,13 @@ void MCGLObjectBase::initUpdateBufferData()
 }
 
 void MCGLObjectBase::addBufferSubData(
-    MCGLShaderProgram::VertexAttribLocations dataType, int dataSize, const GLfloat * data)
+  MCGLShaderProgram::VertexAttribLocations dataType, int dataSize, const GLfloat * data)
 {
     addBufferSubData(dataType, dataSize, dataSize, data);
 }
 
 void MCGLObjectBase::addBufferSubData(
-    MCGLShaderProgram::VertexAttribLocations dataType, int dataSize, int offsetJump, const GLfloat * data)
+  MCGLShaderProgram::VertexAttribLocations dataType, int dataSize, int offsetJump, const GLfloat * data)
 {
     assert(dataSize <= offsetJump);
 
@@ -391,13 +377,13 @@ void MCGLObjectBase::setAttributePointers()
     glVertexAttribPointer(MCGLShaderProgram::VAL_Vertex, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     glVertexAttribPointer(MCGLShaderProgram::VAL_Normal, 3, GL_FLOAT, GL_FALSE, 0,
-        reinterpret_cast<GLvoid *>(m_vertexDataSize));
+                          reinterpret_cast<GLvoid *>(m_vertexDataSize));
 
     glVertexAttribPointer(MCGLShaderProgram::VAL_TexCoords, 2, GL_FLOAT, GL_FALSE, 0,
-        reinterpret_cast<GLvoid *>(m_vertexDataSize + m_normalDataSize));
+                          reinterpret_cast<GLvoid *>(m_vertexDataSize + m_normalDataSize));
 
     glVertexAttribPointer(MCGLShaderProgram::VAL_Color, 4, GL_FLOAT, GL_FALSE, 0,
-        reinterpret_cast<GLvoid *>(m_vertexDataSize + m_normalDataSize + m_texCoordDataSize));
+                          reinterpret_cast<GLvoid *>(m_vertexDataSize + m_normalDataSize + m_texCoordDataSize));
 }
 
 void MCGLObjectBase::disableAttributePointers()
@@ -489,14 +475,12 @@ int MCGLObjectBase::totalDataSize() const
 
 MCGLObjectBase::~MCGLObjectBase()
 {
-    if (m_vbo != 0)
-    {
+    if (m_vbo != 0) {
         glDeleteBuffers(1, &m_vbo);
         m_vbo = 0;
     }
 #ifndef __MC_QOPENGLFUNCTIONS__
-    if (m_vao != 0)
-    {
+    if (m_vao != 0) {
         glDeleteVertexArrays(1, &m_vao);
         m_vao = 0;
     }

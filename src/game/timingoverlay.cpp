@@ -21,8 +21,8 @@
 #include "scene.hpp"
 #include "timing.hpp"
 
-#include <MCCamera>
 #include <MCAssetManager>
+#include <MCCamera>
 
 #include <cassert>
 #include <sstream>
@@ -30,44 +30,43 @@
 #include <QObject> // For QObject::tr()
 #include <QTimer>
 
-static const int RACE_TIME_POS        = 1;
+static const int RACE_TIME_POS = 1;
 static const int CURRENT_LAP_TIME_POS = 2;
-static const int LAST_LAP_TIME_POS    = 3;
-static const int RECORD_LAP_TIME_POS  = 4;
-static const int GLYPH_W_TIMES        = 15;
-static const int GLYPH_H_TIMES        = 15;
-static const int GLYPH_W_POS          = 20;
-static const int GLYPH_H_POS          = 20;
+static const int LAST_LAP_TIME_POS = 3;
+static const int RECORD_LAP_TIME_POS = 4;
+static const int GLYPH_W_TIMES = 15;
+static const int GLYPH_H_TIMES = 15;
+static const int GLYPH_W_POS = 20;
+static const int GLYPH_H_POS = 20;
 
-static const MCGLColor RED    (1.0, 0.0, 0.0);
-static const MCGLColor GREEN  (0.0, 1.0, 0.0);
-static const MCGLColor YELLOW (1.0, 1.0, 0.0);
-static const MCGLColor WHITE  (1.0, 1.0, 1.0);
+static const MCGLColor RED(1.0, 0.0, 0.0);
+static const MCGLColor GREEN(0.0, 1.0, 0.0);
+static const MCGLColor YELLOW(1.0, 1.0, 0.0);
+static const MCGLColor WHITE(1.0, 1.0, 1.0);
 
 TimingOverlay::TimingOverlay()
-: m_fontManager(MCAssetManager::textureFontManager())
-, m_font(m_fontManager.font(Game::instance().fontName()))
-, m_text(L"")
-, m_car(nullptr)
-, m_timing(nullptr)
-, m_race(nullptr)
-, m_posTexts({
-    QObject::tr("---").toStdWString(),
-    QObject::tr("1st").toStdWString(),
-    QObject::tr("2nd").toStdWString(),
-    QObject::tr("3rd").toStdWString(),
-    QObject::tr("4th").toStdWString(),
-    QObject::tr("5th").toStdWString(),
-    QObject::tr("6th").toStdWString(),
-    QObject::tr("7th").toStdWString(),
-    QObject::tr("8th").toStdWString(),
-    QObject::tr("9th").toStdWString(),
-    QObject::tr("10th").toStdWString(),
-    QObject::tr("11th").toStdWString(),
-    QObject::tr("12th").toStdWString()})
-, m_showLapRecordTime(true)
-, m_showRaceTime(true)
-, m_showCarStatus(true)
+  : m_fontManager(MCAssetManager::textureFontManager())
+  , m_font(m_fontManager.font(Game::instance().fontName()))
+  , m_text(L"")
+  , m_car(nullptr)
+  , m_timing(nullptr)
+  , m_race(nullptr)
+  , m_posTexts({ QObject::tr("---").toStdWString(),
+                 QObject::tr("1st").toStdWString(),
+                 QObject::tr("2nd").toStdWString(),
+                 QObject::tr("3rd").toStdWString(),
+                 QObject::tr("4th").toStdWString(),
+                 QObject::tr("5th").toStdWString(),
+                 QObject::tr("6th").toStdWString(),
+                 QObject::tr("7th").toStdWString(),
+                 QObject::tr("8th").toStdWString(),
+                 QObject::tr("9th").toStdWString(),
+                 QObject::tr("10th").toStdWString(),
+                 QObject::tr("11th").toStdWString(),
+                 QObject::tr("12th").toStdWString() })
+  , m_showLapRecordTime(true)
+  , m_showRaceTime(true)
+  , m_showCarStatus(true)
 {
     assert(Scene::NUM_CARS <= static_cast<int>(m_posTexts.size()) - 1);
     m_text.setShadowOffset(2, -2);
@@ -81,12 +80,12 @@ void TimingOverlay::setCarToFollow(const Car & car)
 
 void TimingOverlay::setRace(Race & race)
 {
-    m_race   = &race;
+    m_race = &race;
     m_timing = &m_race->timing();
 
     connect(m_timing, &Timing::lapRecordAchieved, this, &TimingOverlay::setLapRecord);
     connect(m_timing, &Timing::raceRecordAchieved, this, &TimingOverlay::setRaceRecord);
-    connect(m_race, &Race::tiresChanged, this, static_cast<void(TimingOverlay::*)()>(&TimingOverlay::blinkCarStatus));
+    connect(m_race, &Race::tiresChanged, this, static_cast<void (TimingOverlay::*)()>(&TimingOverlay::blinkCarStatus));
 }
 
 void TimingOverlay::setLapRecord(int)
@@ -102,14 +101,11 @@ void TimingOverlay::setRaceRecord(int)
 void TimingOverlay::blinkLapRecord()
 {
     static int count = 0;
-    if (count < 10)
-    {
+    if (count < 10) {
         QTimer::singleShot(250, this, &TimingOverlay::blinkLapRecord);
         m_showLapRecordTime = !m_showLapRecordTime;
         count++;
-    }
-    else
-    {
+    } else {
         m_showLapRecordTime = true;
         count = 0;
     }
@@ -118,14 +114,11 @@ void TimingOverlay::blinkLapRecord()
 void TimingOverlay::blinkRaceRecord()
 {
     static int count = 0;
-    if (count < 10)
-    {
+    if (count < 10) {
         QTimer::singleShot(250, this, &TimingOverlay::blinkRaceRecord);
         m_showRaceTime = !m_showRaceTime;
         count++;
-    }
-    else
-    {
+    } else {
         m_showRaceTime = true;
         count = 0;
     }
@@ -134,14 +127,11 @@ void TimingOverlay::blinkRaceRecord()
 void TimingOverlay::blinkCarStatus()
 {
     static int count = 0;
-    if (count < 10)
-    {
-        QTimer::singleShot(250, this, static_cast<void(TimingOverlay::*)()>(&TimingOverlay::blinkCarStatus));
+    if (count < 10) {
+        QTimer::singleShot(250, this, static_cast<void (TimingOverlay::*)()>(&TimingOverlay::blinkCarStatus));
         m_showCarStatus = !m_showCarStatus;
         count++;
-    }
-    else
-    {
+    } else {
         m_showCarStatus = true;
         count = 0;
     }
@@ -149,16 +139,14 @@ void TimingOverlay::blinkCarStatus()
 
 void TimingOverlay::blinkCarStatus(const Car & car)
 {
-    if (m_car == &car)
-    {
+    if (m_car == &car) {
         blinkCarStatus();
     }
 }
 
 void TimingOverlay::render()
 {
-    if (m_car && m_timing && m_race)
-    {
+    if (m_car && m_timing && m_race) {
         renderCurrentLap();
 
         renderPosition();
@@ -206,8 +194,7 @@ void TimingOverlay::renderPosition()
     ss << m_posTexts.at(pos);
 
     const int lapDiff = leadersLap - lap;
-    if (lapDiff > 0)
-    {
+    if (lapDiff > 0) {
         ss << "+"
            << lapDiff
            << (lapDiff == 1 ? QObject::tr("LAP").toStdWString() : QObject::tr("LAPS").toStdWString());
@@ -221,23 +208,17 @@ void TimingOverlay::renderPosition()
 void TimingOverlay::renderSpeed()
 {
     // Minimaps replace speedometer in the split modes
-    if (!Game::instance().hasTwoHumanPlayers())
-    {
+    if (!Game::instance().hasTwoHumanPlayers()) {
         int speed = m_car->speedInKmh();
         speed = speed < 0 ? 0 : speed;
 
         std::wstringstream ss;
         ss << " " << speed;
-        if (speed < 100)
-        {
+        if (speed < 100) {
             m_text.setColor(WHITE);
-        }
-        else if (speed < 200)
-        {
+        } else if (speed < 200) {
             m_text.setColor(YELLOW);
-        }
-        else
-        {
+        } else {
             m_text.setColor(RED);
         }
 
@@ -261,29 +242,23 @@ void TimingOverlay::renderCurrentLapTime()
 
     std::wstringstream ss;
     ss << QObject::tr("LAP:").toStdWString();
-    if (m_timing->raceCompleted(m_car->index()))
-    {
+    if (m_timing->raceCompleted(m_car->index())) {
         ss << m_timing->msecsToString(lastLapTime);
 
         m_text.setColor(WHITE);
-    }
-    else
-    {
+    } else {
         ss << m_timing->msecsToString(currentLapTime);
 
         // Set color to WHITE, if lastLapTime is not set.
-        if (lastLapTime == -1 || currentLapTime == lastLapTime)
-        {
+        if (lastLapTime == -1 || currentLapTime == lastLapTime) {
             m_text.setColor(WHITE);
         }
         // Set color to GREEN, if current time is ahead of the last lap time.
-        else if (currentLapTime < lastLapTime)
-        {
+        else if (currentLapTime < lastLapTime) {
             m_text.setColor(GREEN);
         }
         // Set color to RED (current time is slower than the last lap time).
-        else
-        {
+        else {
             m_text.setColor(RED);
         }
     }
@@ -291,10 +266,10 @@ void TimingOverlay::renderCurrentLapTime()
     m_text.setText(ss.str());
     m_text.setGlyphSize(GLYPH_W_TIMES, GLYPH_H_TIMES);
     m_text.render(
-        width() - m_text.width(m_font),
-        height() - m_text.height(m_font) * CURRENT_LAP_TIME_POS,
-        nullptr,
-        m_font);
+      width() - m_text.width(m_font),
+      height() - m_text.height(m_font) * CURRENT_LAP_TIME_POS,
+      nullptr,
+      m_font);
 }
 
 void TimingOverlay::renderLastLapTime()
@@ -308,16 +283,15 @@ void TimingOverlay::renderLastLapTime()
     ss << QObject::tr("L:").toStdWString() << m_timing->msecsToString(lastLapTime);
     m_text.setText(ss.str());
     m_text.render(
-        width() - m_text.width(m_font),
-        height() - m_text.height(m_font) * LAST_LAP_TIME_POS,
-        nullptr,
-        m_font);
+      width() - m_text.width(m_font),
+      height() - m_text.height(m_font) * LAST_LAP_TIME_POS,
+      nullptr,
+      m_font);
 }
 
 void TimingOverlay::renderRecordLapTime()
 {
-    if (m_showLapRecordTime)
-    {
+    if (m_showLapRecordTime) {
         const int recordLapTime = m_timing->lapRecord();
 
         m_text.setGlyphSize(GLYPH_W_TIMES, GLYPH_H_TIMES);
@@ -327,17 +301,16 @@ void TimingOverlay::renderRecordLapTime()
         ss << QObject::tr("R:").toStdWString() << m_timing->msecsToString(recordLapTime);
         m_text.setText(ss.str());
         m_text.render(
-            width() - m_text.width(m_font),
-            height() - m_text.height(m_font) * RECORD_LAP_TIME_POS,
-            nullptr,
-            m_font);
+          width() - m_text.width(m_font),
+          height() - m_text.height(m_font) * RECORD_LAP_TIME_POS,
+          nullptr,
+          m_font);
     }
 }
 
 void TimingOverlay::renderRaceTime()
 {
-    if (m_showRaceTime)
-    {
+    if (m_showRaceTime) {
         const int raceTime = m_timing->raceTime(m_car->index());
 
         m_text.setGlyphSize(GLYPH_W_TIMES, GLYPH_H_TIMES);
@@ -347,17 +320,16 @@ void TimingOverlay::renderRaceTime()
         ss << QObject::tr("TOT:").toStdWString() << m_timing->msecsToString(raceTime);
         m_text.setText(ss.str());
         m_text.render(
-            width() - m_text.width(m_font),
-            height() - m_text.height(m_font) * RACE_TIME_POS,
-            nullptr,
-            m_font);
+          width() - m_text.width(m_font),
+          height() - m_text.height(m_font) * RACE_TIME_POS,
+          nullptr,
+          m_font);
     }
 }
 
 void TimingOverlay::renderCarStatusView()
 {
-    if (m_showCarStatus)
-    {
+    if (m_showCarStatus) {
         m_carStatusView.setPos(width() - m_carStatusView.width(), m_carStatusView.height() + 10);
         m_carStatusView.render();
     }

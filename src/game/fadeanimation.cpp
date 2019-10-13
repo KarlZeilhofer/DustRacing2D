@@ -17,9 +17,9 @@
 #include <cmath>
 
 FadeAnimation::FadeAnimation(int updateFps)
-: m_updateFps(updateFps)
-, m_fadeValue(0.0)
-, m_fadeIn(false)
+  : m_updateFps(updateFps)
+  , m_fadeValue(0.0)
+  , m_fadeIn(false)
 {
     m_timer.setInterval(1000 / updateFps);
     connect(&m_timer, &QTimer::timeout, this, &FadeAnimation::updateAnimation);
@@ -32,11 +32,11 @@ bool FadeAnimation::isFading() const
 
 void FadeAnimation::beginFadeIn(int preDelayMSec, int msec, int postDelayMSec)
 {
-    m_preDelayMSec  = preDelayMSec / m_updateFps;
+    m_preDelayMSec = preDelayMSec / m_updateFps;
     m_postDelayMSec = postDelayMSec / m_updateFps;
-    m_fadeValue     = 0.0;
-    m_step          = 1.0 / (msec / m_updateFps);
-    m_fadeIn        = true;
+    m_fadeValue = 0.0;
+    m_step = 1.0 / (msec / m_updateFps);
+    m_fadeIn = true;
 
     emit fadeValueChanged(m_fadeValue);
 
@@ -45,11 +45,11 @@ void FadeAnimation::beginFadeIn(int preDelayMSec, int msec, int postDelayMSec)
 
 void FadeAnimation::beginFadeOut(int preDelayMSec, int msec, int postDelayMSec)
 {
-    m_preDelayMSec  = preDelayMSec / m_updateFps;
+    m_preDelayMSec = preDelayMSec / m_updateFps;
     m_postDelayMSec = postDelayMSec / m_updateFps;
-    m_fadeValue     = 1.0;
-    m_step          = m_fadeValue / (msec / m_updateFps);
-    m_fadeIn        = false;
+    m_fadeValue = 1.0;
+    m_step = m_fadeValue / (msec / m_updateFps);
+    m_fadeIn = false;
 
     emit fadeValueChanged(m_fadeValue);
 
@@ -58,11 +58,11 @@ void FadeAnimation::beginFadeOut(int preDelayMSec, int msec, int postDelayMSec)
 
 void FadeAnimation::beginFadeOutFlash(int preDelayMSec, int msec, int postDelayMSec)
 {
-    m_preDelayMSec  = preDelayMSec / m_updateFps;
+    m_preDelayMSec = preDelayMSec / m_updateFps;
     m_postDelayMSec = postDelayMSec / m_updateFps;
-    m_fadeValue     = 10.0;
-    m_step          = m_fadeValue / (msec / m_updateFps);
-    m_fadeIn        = false;
+    m_fadeValue = 10.0;
+    m_step = m_fadeValue / (msec / m_updateFps);
+    m_fadeIn = false;
 
     emit fadeValueChanged(m_fadeValue);
 
@@ -71,44 +71,31 @@ void FadeAnimation::beginFadeOutFlash(int preDelayMSec, int msec, int postDelayM
 
 void FadeAnimation::updateAnimation()
 {
-    if (m_preDelayMSec)
-    {
+    if (m_preDelayMSec) {
         m_preDelayMSec--;
-    }
-    else if (m_fadeIn && m_fadeValue < 1.0)
-    {
+    } else if (m_fadeIn && m_fadeValue < 1.0) {
         m_fadeValue += m_step;
 #ifdef Q_OS_ANDROID
         emit fadeValueChanged(fmin(m_fadeValue, 1.0));
 #else
         emit fadeValueChanged(std::fmin(m_fadeValue, 1.0));
 #endif
-    }
-    else if (!m_fadeIn && m_fadeValue > 0.0)
-    {
+    } else if (!m_fadeIn && m_fadeValue > 0.0) {
         m_fadeValue -= m_step;
 #ifdef Q_OS_ANDROID
         emit fadeValueChanged(fmax(m_fadeValue, 0.0));
 #else
         emit fadeValueChanged(std::fmax(m_fadeValue, 0.0));
 #endif
-    }
-    else if (m_postDelayMSec)
-    {
+    } else if (m_postDelayMSec) {
         m_postDelayMSec--;
-    }
-    else
-    {
+    } else {
         m_timer.stop();
 
-        if (m_fadeIn)
-        {
+        if (m_fadeIn) {
             emit fadeInFinished();
-        }
-        else
-        {
+        } else {
             emit fadeOutFinished();
         }
     }
 }
-

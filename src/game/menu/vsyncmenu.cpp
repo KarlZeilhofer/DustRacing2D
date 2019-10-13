@@ -33,14 +33,12 @@
 class VSyncItem : public MTFH::MenuItem
 {
 public:
-
     class SaveVSyncAction : public MTFH::MenuItemAction
     {
     public:
-
         //! Constructor.
         SaveVSyncAction(VSyncItem & parent)
-        : m_parent(parent)
+          : m_parent(parent)
         {
         }
 
@@ -54,21 +52,22 @@ public:
         }
 
     private:
-
         VSyncItem & m_parent;
     };
 
     //! Constructor.
     VSyncItem(ConfirmationMenuPtr confirmationMenu, int vsync, int width, int height, std::wstring text = L"")
-    : MenuItem(width, height, text)
-    , m_confirmationMenu(confirmationMenu)
-    , m_saveVSyncAction(new SaveVSyncAction(*this))
-    , m_vsync(vsync)
+      : MenuItem(width, height, text)
+      , m_confirmationMenu(confirmationMenu)
+      , m_saveVSyncAction(new SaveVSyncAction(*this))
+      , m_vsync(vsync)
     {
     }
 
     //! Destructor.
-    virtual ~VSyncItem() {}
+    virtual ~VSyncItem()
+    {
+    }
 
     //! \reimp
     virtual void setSelected(bool flag)
@@ -86,7 +85,6 @@ public:
     }
 
 private:
-
     ConfirmationMenuPtr m_confirmationMenu;
 
     MTFH::MenuItemActionPtr m_saveVSyncAction;
@@ -95,8 +93,8 @@ private:
 };
 
 VSyncMenu::VSyncMenu(ConfirmationMenuPtr confirmationMenu, std::string id, int width, int height)
-: SurfaceMenu("settingsBack", id, width, height)
-, m_confirmationMenu(confirmationMenu)
+  : SurfaceMenu("settingsBack", id, width, height)
+  , m_confirmationMenu(confirmationMenu)
 {
     const int itemHeight = height / 10;
 
@@ -115,12 +113,9 @@ void VSyncMenu::enter()
 {
     // Set the currently selected VSync setting
     const int vsync = Settings::instance().loadVSync();
-    for (unsigned int i = 0; i < itemCount(); i++)
-    {
-        if (auto vsyncItem = std::dynamic_pointer_cast<VSyncItem>(item(i)))
-        {
-            if (vsyncItem->vsync() == vsync)
-            {
+    for (unsigned int i = 0; i < itemCount(); i++) {
+        if (auto vsyncItem = std::dynamic_pointer_cast<VSyncItem>(item(i))) {
+            if (vsyncItem->vsync() == vsync) {
                 vsyncItem->setCurrent();
                 break;
             }

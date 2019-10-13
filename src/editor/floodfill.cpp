@@ -25,7 +25,7 @@ void setTileType(TrackTile & tile, QAction * action)
     tile.setTileType(action->data().toString());
     tile.setPixmap(action->icon().pixmap(TrackTile::TILE_W, TrackTile::TILE_H));
 }
-}
+} // namespace FloodFill
 
 void FloodFill::floodFill(TrackTile & tile, QAction * action, const QString & typeToFill, MapBase & map)
 {
@@ -33,28 +33,24 @@ void FloodFill::floodFill(TrackTile & tile, QAction * action, const QString & ty
 
     // Coordinates of neighbor tiles can be calculated by adding these
     // adjustments to tile coordinates.
-    static const QPoint neighborAdjustments[DIRECTION_COUNT] =
-    {
-        QPoint( 1,  0),  // right
-        QPoint( 0, -1),  // up
-        QPoint(-1,  0),  // left
-        QPoint( 0,  1)   // down
+    static const QPoint neighborAdjustments[DIRECTION_COUNT] = {
+        QPoint(1, 0), // right
+        QPoint(0, -1), // up
+        QPoint(-1, 0), // left
+        QPoint(0, 1) // down
     };
 
     setTileType(tile, action);
 
     QPoint location = tile.matrixLocation();
 
-    for (int i = 0; i < DIRECTION_COUNT; ++i)
-    {
+    for (int i = 0; i < DIRECTION_COUNT; ++i) {
         int x = location.x() + neighborAdjustments[i].x();
         int y = location.y() + neighborAdjustments[i].y();
 
-        if (x >= 0 && y >= 0)
-        {
+        if (x >= 0 && y >= 0) {
             auto tile = std::dynamic_pointer_cast<TrackTile>(map.getTile(x, y));
-            if (tile && tile->tileType() == typeToFill)
-            {
+            if (tile && tile->tileType() == typeToFill) {
                 FloodFill::floodFill(*(tile.get()), action, typeToFill, map);
             }
         }

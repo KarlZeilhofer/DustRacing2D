@@ -15,8 +15,8 @@
 
 #include "particlefactory.hpp"
 
-#include "renderer.hpp"
 #include "layers.hpp"
+#include "renderer.hpp"
 
 #include <MCAssetManager>
 #include <MCGLColor>
@@ -46,15 +46,14 @@ ParticleFactory & ParticleFactory::instance()
 }
 
 void ParticleFactory::preCreateSurfaceParticles(
-    int count, std::string typeId, ParticleFactory::ParticleType typeEnum, MCSurface & surface, bool alphaBlend, bool hasShadow)
+  int count, std::string typeId, ParticleFactory::ParticleType typeEnum, MCSurface & surface, bool alphaBlend, bool hasShadow)
 {
     m_particleRenderers[typeEnum] = MCParticleRendererPtr(new MCSurfaceParticleRenderer);
 
-    for (int i = 0; i < count; i++)
-    {
+    for (int i = 0; i < count; i++) {
         MCSurfaceParticle * particle = new MCSurfaceParticle(typeId, surface);
         particle->setFreeList(m_freeLists[typeEnum]);
-        particle->setCustomDeathCondition([] (MCParticle & self) {
+        particle->setCustomDeathCondition([](MCParticle & self) {
             return self.location().k() <= 0;
         });
         particle->setAlphaBlend(alphaBlend);
@@ -86,10 +85,9 @@ void ParticleFactory::preCreateParticles()
 }
 
 void ParticleFactory::doParticle(
-    ParticleType type, MCVector3dFR location, MCVector3dFR initialVelocity, int angle)
+  ParticleType type, MCVector3dFR location, MCVector3dFR initialVelocity, int angle)
 {
-    switch (type)
-    {
+    switch (type) {
     case DamageSmoke:
         doDamageSmoke(location, initialVelocity);
         break;
@@ -135,8 +133,7 @@ MCSurfaceParticle * ParticleFactory::newSurfaceParticle(ParticleType typeEnum) c
 {
     MCSurfaceParticle * p = nullptr;
     MCParticle::ParticleFreeList & freeList = m_freeLists[typeEnum];
-    if (freeList.size())
-    {
+    if (freeList.size()) {
         p = dynamic_cast<MCSurfaceParticle *>(freeList.back());
         assert(p);
         freeList.pop_back();
@@ -147,8 +144,7 @@ MCSurfaceParticle * ParticleFactory::newSurfaceParticle(ParticleType typeEnum) c
 
 void ParticleFactory::doDamageSmoke(MCVector3dFR location, MCVector3dFR velocity) const
 {
-    if (MCSurfaceParticle * smoke = ParticleFactory::newSurfaceParticle(Smoke))
-    {
+    if (MCSurfaceParticle * smoke = ParticleFactory::newSurfaceParticle(Smoke)) {
         smoke->init(location + MCVector3dF(0, 0, 10), 12, 3000);
         smoke->setColor(MCGLColor(0.1f, 0.1f, 0.1f, 0.25f));
         smoke->setAnimationStyle(MCParticle::AnimationStyle::FadeOutAndExpand);
@@ -160,8 +156,7 @@ void ParticleFactory::doDamageSmoke(MCVector3dFR location, MCVector3dFR velocity
 
 void ParticleFactory::doSkidSmoke(MCVector3dFR location, MCVector3dFR velocity) const
 {
-    if (MCSurfaceParticle * smoke = ParticleFactory::newSurfaceParticle(Smoke))
-    {
+    if (MCSurfaceParticle * smoke = ParticleFactory::newSurfaceParticle(Smoke)) {
         smoke->init(location + MCVector3dF(0, 0, 5), 6, 3000);
         smoke->setColor(MCGLColor(1.0f, 1.0f, 1.0f, 0.1f));
         smoke->setAnimationStyle(MCParticle::AnimationStyle::FadeOutAndExpand);
@@ -173,8 +168,7 @@ void ParticleFactory::doSkidSmoke(MCVector3dFR location, MCVector3dFR velocity) 
 
 void ParticleFactory::doSmoke(MCVector3dFR location, MCVector3dFR velocity) const
 {
-    if (MCSurfaceParticle * smoke = ParticleFactory::newSurfaceParticle(Smoke))
-    {
+    if (MCSurfaceParticle * smoke = ParticleFactory::newSurfaceParticle(Smoke)) {
         smoke->init(location + MCVector3dF(0, 0, 10), 12, 3000);
         smoke->setColor(MCGLColor(0.75f, 0.75f, 0.75f, 0.15f));
         smoke->setAnimationStyle(MCParticle::AnimationStyle::FadeOutAndExpand);
@@ -186,8 +180,7 @@ void ParticleFactory::doSmoke(MCVector3dFR location, MCVector3dFR velocity) cons
 
 void ParticleFactory::doOffTrackSmoke(MCVector3dFR location) const
 {
-    if (MCSurfaceParticle * smoke = ParticleFactory::newSurfaceParticle(OffTrackSmoke))
-    {
+    if (MCSurfaceParticle * smoke = ParticleFactory::newSurfaceParticle(OffTrackSmoke)) {
         smoke->init(location + MCVector3dF(0, 0, 10), 15, 3000);
         smoke->setColor(MCGLColor(0.6f, 0.4f, 0.0f, 0.25f));
         smoke->setAnimationStyle(MCParticle::AnimationStyle::FadeOut);
@@ -199,8 +192,7 @@ void ParticleFactory::doOffTrackSmoke(MCVector3dFR location) const
 
 void ParticleFactory::doOnTrackSkidMark(MCVector3dFR location, int angle) const
 {
-    if (MCSurfaceParticle * skidMark = newSurfaceParticle(OnTrackSkidMark))
-    {
+    if (MCSurfaceParticle * skidMark = newSurfaceParticle(OnTrackSkidMark)) {
         skidMark->init(location + MCVector3dF(0, 0, 1), 8, 50000);
         skidMark->setColor(MCGLColor(0.1f, 0.1f, 0.1f, 0.25f));
         skidMark->setAnimationStyle(MCParticle::AnimationStyle::FadeOut);
@@ -213,8 +205,7 @@ void ParticleFactory::doOnTrackSkidMark(MCVector3dFR location, int angle) const
 
 void ParticleFactory::doOffTrackSkidMark(MCVector3dFR location, int angle) const
 {
-    if (MCSurfaceParticle * skidMark = newSurfaceParticle(OffTrackSkidMark))
-    {
+    if (MCSurfaceParticle * skidMark = newSurfaceParticle(OffTrackSkidMark)) {
         skidMark->init(location + MCVector3dF(0, 0, 1), 8, 50000);
         skidMark->setColor(MCGLColor(0.2f, 0.1f, 0.0f, 0.25f));
         skidMark->setAnimationStyle(MCParticle::AnimationStyle::FadeOut);
@@ -227,8 +218,7 @@ void ParticleFactory::doOffTrackSkidMark(MCVector3dFR location, int angle) const
 
 void ParticleFactory::doMud(MCVector3dFR location, MCVector3dFR velocity) const
 {
-    if (MCSurfaceParticle * mud = newSurfaceParticle(Mud))
-    {
+    if (MCSurfaceParticle * mud = newSurfaceParticle(Mud)) {
         mud->init(location, 12, 3000);
         mud->rotate(MCRandom::getValue() * 360);
         mud->setColor(MCGLColor(1.0f, 1.0f, 1.0f, 0.5f));
@@ -241,8 +231,7 @@ void ParticleFactory::doMud(MCVector3dFR location, MCVector3dFR velocity) const
 
 void ParticleFactory::doSparkle(MCVector3dFR location, MCVector3dFR velocity) const
 {
-    if (MCSurfaceParticle * sparkle = ParticleFactory::newSurfaceParticle(Sparkle))
-    {
+    if (MCSurfaceParticle * sparkle = ParticleFactory::newSurfaceParticle(Sparkle)) {
         sparkle->init(location, 2 + MCRandom::getValue() * 2, 1500);
         sparkle->setColor(MCGLColor(1.0f, 1.0f, 1.0f, 0.33f));
         sparkle->setAnimationStyle(MCParticle::AnimationStyle::Shrink);
@@ -254,8 +243,7 @@ void ParticleFactory::doSparkle(MCVector3dFR location, MCVector3dFR velocity) co
 
 void ParticleFactory::doLeaf(MCVector3dFR location, MCVector3dFR velocity) const
 {
-    if (MCSurfaceParticle * leaf = newSurfaceParticle(Leaf))
-    {
+    if (MCSurfaceParticle * leaf = newSurfaceParticle(Leaf)) {
         leaf->init(location, 5, 3000);
         leaf->setAnimationStyle(MCParticle::AnimationStyle::Shrink);
         leaf->rotate(MCRandom::getValue() * 360);

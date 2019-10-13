@@ -24,12 +24,12 @@
 #include <MCWorld>
 
 Tire::Tire(Car & car, float friction, float offTrackFriction)
-    : MCObject(MCAssetManager::surfaceManager().surface("frontTire"), "Tire")
-    , m_isOffTrack(false)
-    , m_friction(friction)
-    , m_offTrackFriction(offTrackFriction)
-    , m_spinCoeff(1.0f)
-    , m_car(car)
+  : MCObject(MCAssetManager::surfaceManager().surface("frontTire"), "Tire")
+  , m_isOffTrack(false)
+  , m_friction(friction)
+  , m_offTrackFriction(offTrackFriction)
+  , m_spinCoeff(1.0f)
+  , m_car(car)
 {
     setBypassCollisions(true);
 }
@@ -46,8 +46,7 @@ void Tire::setSpinCoeff(float spinCoeff)
 
 void Tire::onStepTime(int)
 {
-    if (physicsComponent().velocity().lengthFast() > 0)
-    {
+    if (physicsComponent().velocity().lengthFast() > 0) {
         const float tireNormalAngle = angle() + 90;
         const MCVector2dF tireAxisUnityVector( // length 1
             MCTrigonom::cos(tireNormalAngle), MCTrigonom::sin(tireNormalAngle));

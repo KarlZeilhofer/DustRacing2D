@@ -23,15 +23,15 @@
 int MCParticle::m_numActiveParticles = 0;
 
 MCParticle::MCParticle(const std::string & typeId)
-: MCObject(typeId)
-, m_lifeTime(0)
-, m_initLifeTime(0)
-, m_animationStyle(MCParticle::AnimationStyle::None)
-, m_isActive(false)
-, m_dieWhenOffScreen(true)
-, m_dieOnOutOfBoundariesEvent(true)
-, m_freeList(nullptr)
-, m_customDeathCondition(nullptr)
+  : MCObject(typeId)
+  , m_lifeTime(0)
+  , m_initLifeTime(0)
+  , m_animationStyle(MCParticle::AnimationStyle::None)
+  , m_isActive(false)
+  , m_dieWhenOffScreen(true)
+  , m_dieOnOutOfBoundariesEvent(true)
+  , m_freeList(nullptr)
+  , m_customDeathCondition(nullptr)
 {
     setShape(MCShapePtr(new MCCircleShape(nullptr, 0.0)));
     setBypassCollisions(true);
@@ -45,11 +45,11 @@ MCParticle::~MCParticle()
 
 void MCParticle::init(MCVector3dFR newLocation, float newRadius, unsigned int newLifeTime)
 {
-    m_lifeTime       = newLifeTime;
-    m_initLifeTime   = newLifeTime;
-    m_isActive       = true;
-    m_radius         = newRadius;
-    m_scale          = 1.0f;
+    m_lifeTime = newLifeTime;
+    m_initLifeTime = newLifeTime;
+    m_isActive = true;
+    m_radius = newRadius;
+    m_scale = 1.0f;
 
     setIsPhysicsObject(true);
 
@@ -65,16 +65,11 @@ void MCParticle::setFreeList(ParticleFreeList & freeList)
 
 float MCParticle::radius() const
 {
-    if (animationStyle() == MCParticle::AnimationStyle::Shrink)
-    {
+    if (animationStyle() == MCParticle::AnimationStyle::Shrink) {
         return m_scale * m_radius;
-    }
-    else if (animationStyle() == MCParticle::AnimationStyle::FadeOutAndExpand)
-    {
+    } else if (animationStyle() == MCParticle::AnimationStyle::FadeOutAndExpand) {
         return (2.0f - m_scale) * m_radius;
-    }
-    else
-    {
+    } else {
         return m_radius;
     }
 }
@@ -121,19 +116,15 @@ bool MCParticle::dieOnOutOfBoundariesEvent() const
 
 void MCParticle::onStepTime(int step)
 {
-    if (m_lifeTime >= step)
-    {
+    if (m_lifeTime >= step) {
         m_lifeTime -= step;
 
         m_scale = float(m_lifeTime) / m_initLifeTime;
 
-        if (m_customDeathCondition && m_customDeathCondition(*this))
-        {
+        if (m_customDeathCondition && m_customDeathCondition(*this)) {
             m_lifeTime = 0;
         }
-    }
-    else
-    {
+    } else {
         m_lifeTime = 0;
 
         timeOut();
@@ -142,8 +133,7 @@ void MCParticle::onStepTime(int step)
 
 void MCParticle::outOfBoundariesEvent(MCOutOfBoundariesEvent &)
 {
-    if (m_dieOnOutOfBoundariesEvent)
-    {
+    if (m_dieOnOutOfBoundariesEvent) {
         die();
     }
 }
@@ -165,16 +155,14 @@ bool MCParticle::isActive() const
 
 void MCParticle::die()
 {
-    if (m_isActive)
-    {
+    if (m_isActive) {
         m_isActive = false;
 
         MCParticle::m_numActiveParticles--;
 
         removeFromWorld();
 
-        if (m_freeList)
-        {
+        if (m_freeList) {
             m_freeList->push_back(this);
         }
     }

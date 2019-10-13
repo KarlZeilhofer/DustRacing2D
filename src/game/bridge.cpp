@@ -31,16 +31,16 @@
 #include <MCVector2d>
 
 namespace {
-static const char * BRIDGE_ID      = "bridge";
+static const char * BRIDGE_ID = "bridge";
 static const char * BRIDGE_RAIL_ID = "bridgeRail";
-static const int    RAIL_Z         = 16;
-static const float  OBJECT_Z_DELTA = RAIL_Z;
-static const float  OBJECT_Z_ZERO  = 0.0f;
-static const int    WIDTH          = 256;
-}
+static const int RAIL_Z = 16;
+static const float OBJECT_Z_DELTA = RAIL_Z;
+static const float OBJECT_Z_ZERO = 0.0f;
+static const int WIDTH = 256;
+} // namespace
 
 Bridge::Bridge()
-    : MCObject(BRIDGE_ID)
+  : MCObject(BRIDGE_ID)
 {
     auto && shape = MCShapePtr(new MCRectShape(nullptr, WIDTH, WIDTH));
     setShape(shape);
@@ -60,7 +60,7 @@ Bridge::Bridge()
     addChildObject(rail0, MCVector3dF(0, -railYDisplacement, RAIL_Z));
 
     auto && rail1 = MCObjectPtr(new MCObject(railSurface, BRIDGE_RAIL_ID));
-    addChildObject(rail1, MCVector3dF(0,  railYDisplacement, RAIL_Z));
+    addChildObject(rail1, MCVector3dF(0, railYDisplacement, RAIL_Z));
 
     rail0->setCollisionLayer(static_cast<int>(Layers::Collision::BridgeRails));
     rail0->physicsComponent().setMass(0, true);
@@ -76,7 +76,7 @@ Bridge::Bridge()
     addChildObject(trigger0, MCVector3dF(-triggerXDisplacement, 0, 0));
 
     auto && trigger1 = MCObjectPtr(new BridgeTrigger(*this));
-    addChildObject(trigger1, MCVector3dF( triggerXDisplacement, 0, 0));
+    addChildObject(trigger1, MCVector3dF(triggerXDisplacement, 0, 0));
 
     MCMeshObjectData data("bridge");
     data.setMeshId("bridge");
@@ -104,22 +104,17 @@ void Bridge::raiseObject(MCObject & object, bool raise)
 
 void Bridge::collisionEvent(MCCollisionEvent & event)
 {
-    if (!event.collidingObject().physicsComponent().isStationary())
-    {
+    if (!event.collidingObject().physicsComponent().isStationary()) {
         const auto object = &event.collidingObject();
-        if (m_edgeCount.count(object))
-        {
+        if (m_edgeCount.count(object)) {
             m_edgeCount[object]++;
 
-            if (m_edgeCount[object] >= 2)
-            {
+            if (m_edgeCount[object] >= 2) {
                 juzzlin::L().debug() << "Object " << object->index() << " is on bridge";
                 object->setCollisionLayer(static_cast<int>(Layers::Collision::BridgeRails));
                 raiseObject(*object, true);
             }
-        }
-        else
-        {
+        } else {
             m_edgeCount[object] = 1;
         }
     }
@@ -128,13 +123,11 @@ void Bridge::collisionEvent(MCCollisionEvent & event)
 void Bridge::separationEvent(MCSeparationEvent & event)
 {
     const auto object = &event.separatedObject();
-    if (m_edgeCount.count(object))
-    {
+    if (m_edgeCount.count(object)) {
         juzzlin::L().debug() << "Object " << object->index() << " is exiting bridge";
         m_edgeCount[object]--;
 
-        if (m_edgeCount[object] <= 0)
-        {
+        if (m_edgeCount[object] <= 0) {
             doExitObject(*object);
         }
     }
@@ -142,12 +135,9 @@ void Bridge::separationEvent(MCSeparationEvent & event)
 
 void Bridge::enterObject(MCObject & object)
 {
-    if (m_edgeCount.count(&object))
-    {
+    if (m_edgeCount.count(&object)) {
         m_edgeCount[&object]++;
-    }
-    else
-    {
+    } else {
         m_edgeCount[&object] = 1;
     }
 
@@ -156,13 +146,11 @@ void Bridge::enterObject(MCObject & object)
 
 void Bridge::exitObject(MCObject & object)
 {
-    if (m_edgeCount.count(&object))
-    {
+    if (m_edgeCount.count(&object)) {
         juzzlin::L().debug() << "Object " << object.index() << " is exiting trigger";
         m_edgeCount[&object]--;
 
-        if (m_edgeCount[&object] <= 0)
-        {
+        if (m_edgeCount[&object] <= 0) {
             doExitObject(object);
         }
     }

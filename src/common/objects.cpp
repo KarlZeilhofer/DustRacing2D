@@ -24,18 +24,15 @@ Objects::Objects()
 void Objects::add(ObjectBasePtr object)
 {
     auto i = std::find(m_objects.begin(), m_objects.end(), object);
-    if (i == m_objects.end())
-    {
+    if (i == m_objects.end()) {
         m_objects.push_back(object);
     }
 }
 
 void Objects::remove(ObjectBase & object)
 {
-    for (auto i = m_objects.begin(); i != m_objects.end(); i++)
-    {
-        if ((*i).get() == &object)
-        {
+    for (auto i = m_objects.begin(); i != m_objects.end(); i++) {
+        if ((*i).get() == &object) {
             m_objects.erase(i);
             return;
         }
@@ -76,4 +73,3 @@ Objects::ObjectVector::const_iterator Objects::cend() const
 {
     return m_objects.cend();
 }
-

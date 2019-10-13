@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Dust Racing 2D. If not, see <http://www.gnu.org/licenses/>.
 
-#include <QDir>
 #include <QDebug>
+#include <QDir>
 #include <QLocale>
 #include <QMessageBox>
 #include <QSettings>
@@ -29,8 +29,8 @@
 
 #include <iostream>
 #include <memory>
-#include <vector>
 #include <string>
+#include <vector>
 
 static const char * INIT_ERROR = "Initializing the game failed!";
 
@@ -61,8 +61,7 @@ int main(int argc, char ** argv)
 
     std::unique_ptr<Game> game;
 
-    try
-    {
+    try {
         initLogger();
 
         // Create the main game object. The game loop starts immediately after
@@ -72,11 +71,8 @@ int main(int argc, char ** argv)
         game.reset(new Game(argc, argv));
 
         return game->run();
-    }
-    catch (std::exception & e)
-    {
-        if (!dynamic_cast<UserException *>(&e))
-        {
+    } catch (std::exception & e) {
+        if (!dynamic_cast<UserException *>(&e)) {
             L().fatal() << e.what();
             L().fatal() << INIT_ERROR;
         }
@@ -86,4 +82,3 @@ int main(int argc, char ** argv)
         return EXIT_FAILURE;
     }
 }
-

@@ -26,53 +26,53 @@
 #include "mcoutofboundariesevent.hh"
 #include "mcphysicscomponent.hh"
 #include "mcrectshape.hh"
-#include "mcshapeview.hh"
 #include "mcseparationevent.hh"
+#include "mcshapeview.hh"
 #include "mcsurface.hh"
+#include "mcsurfaceview.hh"
 #include "mctimerevent.hh"
 #include "mctrigonom.hh"
-#include "mcsurfaceview.hh"
 #include "mcworld.hh"
 #include "mcworldrenderer.hh"
 
 #include <cassert>
 
 namespace {
-const int physicsObjectBit    = 1;
-const int triggerObjectBit    = 2;
-const int renderableBit       = 4;
+const int physicsObjectBit = 1;
+const int triggerObjectBit = 2;
+const int renderableBit = 4;
 const int bypassCollisionsBit = 8;
-const int removingBit         = 32;
-const int isParticleBit       = 128;
-}
+const int removingBit = 32;
+const int isParticleBit = 128;
+} // namespace
 
 MCTypeRegistry MCObject::m_typeRegistry;
 MCObject::TimerEventObjectsList MCObject::m_timerEventObjects;
 
 MCObject::MCObject(const std::string & typeName)
-    : m_typeId(MCObject::m_typeRegistry.registerType(typeName))
-    , m_typeName(typeName)
-    , m_status(physicsObjectBit | renderableBit)
-    , m_parent(this)
-    , m_physicsComponent(nullptr)
+  : m_typeId(MCObject::m_typeRegistry.registerType(typeName))
+  , m_typeName(typeName)
+  , m_status(physicsObjectBit | renderableBit)
+  , m_parent(this)
+  , m_physicsComponent(nullptr)
 {
     setPhysicsComponent(*(new MCPhysicsComponent));
 }
 
 MCObject::MCObject(MCShapePtr shape, const std::string & typeName)
-    : MCObject(typeName)
+  : MCObject(typeName)
 {
     setShape(shape);
 }
 
 MCObject::MCObject(MCSurface & surface, const std::string & typeName)
-    : MCObject(typeName)
+  : MCObject(typeName)
 {
     // Create an MCRectShape using surface with an MCSurfaceView
     MCShapePtr rectShape(new MCRectShape(
-        MCShapeViewPtr(new MCSurfaceView(surface.handle(), &surface)),
-        surface.width(),
-        surface.height()));
+      MCShapeViewPtr(new MCSurfaceView(surface.handle(), &surface)),
+      surface.width(),
+      surface.height()));
 
     setShape(rectShape);
 }
@@ -88,25 +88,22 @@ const std::string & MCObject::typeName() const
 }
 
 void MCObject::addChildObject(
-    MCObjectPtr object, const MCVector3dF & relativeLocation, float relativeAngle)
+  MCObjectPtr object, const MCVector3dF & relativeLocation, float relativeAngle)
 {
     assert(object.get() != this);
     assert(object->m_parent != this);
     m_children.push_back(object);
     object->setParent(*this);
     object->m_relativeLocation = relativeLocation;
-    object->m_relativeAngle    = relativeAngle;
+    object->m_relativeAngle = relativeAngle;
 }
 
 void MCObject::removeChildObject(MCObject & child)
 {
-    if (child.m_parent == this)
-    {
+    if (child.m_parent == this) {
         child.m_parent = &child;
-        for (auto iter = m_children.begin(); iter != m_children.end(); iter++)
-        {
-            if ((*iter).get() == &child)
-            {
+        for (auto iter = m_children.begin(); iter != m_children.end(); iter++) {
+            if ((*iter).get() == &child) {
                 m_children.erase(iter);
                 break;
             }
@@ -116,13 +113,10 @@ void MCObject::removeChildObject(MCObject & child)
 
 void MCObject::removeChildObject(MCObjectPtr child)
 {
-    if (child->m_parent == this)
-    {
+    if (child->m_parent == this) {
         child->m_parent = child.get();
-        for (auto iter = m_children.begin(); iter != m_children.end(); iter++)
-        {
-            if ((*iter) == child)
-            {
+        for (auto iter = m_children.begin(); iter != m_children.end(); iter++) {
+            if ((*iter) == child) {
                 m_children.erase(iter);
                 break;
             }
@@ -152,13 +146,10 @@ void MCObject::onStepTime(int)
 void MCObject::checkBoundaries()
 {
     // Use shape bbox if shape is defined.
-    if (m_shape)
-    {
+    if (m_shape) {
         checkXBoundariesAndSendEvent(m_shape->bbox().x1(), m_shape->bbox().x2());
         checkYBoundariesAndSendEvent(m_shape->bbox().y1(), m_shape->bbox().y2());
-    }
-    else
-    {
+    } else {
         // By default use the center point as the test point.
         checkXBoundariesAndSendEvent(m_location.i() - m_center.i(), m_location.i() - m_center.i());
         checkYBoundariesAndSendEvent(m_location.j() - m_center.j(), m_location.j() - m_center.j());
@@ -170,13 +161,10 @@ void MCObject::checkBoundaries()
 void MCObject::checkXBoundariesAndSendEvent(float minX, float maxX)
 {
     const MCWorld & world = MCWorld::instance();
-    if (minX < world.minX())
-    {
+    if (minX < world.minX()) {
         MCOutOfBoundariesEvent e(MCOutOfBoundariesEvent::West, *this);
         outOfBoundariesEvent(e);
-    }
-    else if (maxX > world.maxX())
-    {
+    } else if (maxX > world.maxX()) {
         MCOutOfBoundariesEvent e(MCOutOfBoundariesEvent::East, *this);
         outOfBoundariesEvent(e);
     }
@@ -185,13 +173,10 @@ void MCObject::checkXBoundariesAndSendEvent(float minX, float maxX)
 void MCObject::checkYBoundariesAndSendEvent(float minY, float maxY)
 {
     const MCWorld & world = MCWorld::instance();
-    if (minY < world.minY())
-    {
+    if (minY < world.minY()) {
         MCOutOfBoundariesEvent e(MCOutOfBoundariesEvent::South, *this);
         outOfBoundariesEvent(e);
-    }
-    else if (maxY > world.maxY())
-    {
+    } else if (maxY > world.maxY()) {
         MCOutOfBoundariesEvent e(MCOutOfBoundariesEvent::North, *this);
         outOfBoundariesEvent(e);
     }
@@ -200,19 +185,16 @@ void MCObject::checkYBoundariesAndSendEvent(float minY, float maxY)
 void MCObject::checkZBoundariesAndSendEvent()
 {
     const MCWorld & world = MCWorld::instance();
-    if (m_location.k() < world.minZ())
-    {
+    if (m_location.k() < world.minZ()) {
         m_physicsComponent->resetZ();
         translate(
-            MCVector3dF(m_location.i(), m_location.j(), world.minZ()));
+          MCVector3dF(m_location.i(), m_location.j(), world.minZ()));
         MCOutOfBoundariesEvent e(MCOutOfBoundariesEvent::Bottom, *this);
         outOfBoundariesEvent(e);
-    }
-    else if (m_location.k() > world.maxZ())
-    {
+    } else if (m_location.k() > world.maxZ()) {
         m_physicsComponent->resetZ();
         translate(
-            MCVector3dF(m_location.i(), m_location.j(), world.maxZ()));
+          MCVector3dF(m_location.i(), m_location.j(), world.maxZ()));
         MCOutOfBoundariesEvent e(MCOutOfBoundariesEvent::Top, *this);
         outOfBoundariesEvent(e);
     }
@@ -230,18 +212,13 @@ size_t MCObject::typeId(const std::string & typeName)
 
 bool MCObject::event(MCEvent & event)
 {
-    if (event.instanceTypeId() == MCCollisionEvent::typeId())
-    {
+    if (event.instanceTypeId() == MCCollisionEvent::typeId()) {
         collisionEvent(static_cast<MCCollisionEvent &>(event));
         return true;
-    }
-    else if (event.instanceTypeId() == MCSeparationEvent::typeId())
-    {
+    } else if (event.instanceTypeId() == MCSeparationEvent::typeId()) {
         separationEvent(static_cast<MCSeparationEvent &>(event));
         return true;
-    }
-    else if (event.instanceTypeId() == MCOutOfBoundariesEvent::typeId())
-    {
+    } else if (event.instanceTypeId() == MCOutOfBoundariesEvent::typeId()) {
         outOfBoundariesEvent(static_cast<MCOutOfBoundariesEvent &>(event));
         return true;
     }
@@ -271,8 +248,7 @@ void MCObject::sendEvent(MCObject & object, MCEvent & event)
 
 void MCObject::subscribeTimerEvent(MCObject & object)
 {
-    if (object.m_timerEventObjectsIndex == -1)
-    {
+    if (object.m_timerEventObjectsIndex == -1) {
         m_timerEventObjects.push_back(&object);
         object.m_timerEventObjectsIndex = static_cast<int>(m_timerEventObjects.size()) - 1;
     }
@@ -280,12 +256,11 @@ void MCObject::subscribeTimerEvent(MCObject & object)
 
 void MCObject::unsubscribeTimerEvent(MCObject & object)
 {
-    if (object.m_timerEventObjectsIndex > -1)
-    {
+    if (object.m_timerEventObjectsIndex > -1) {
         m_timerEventObjects.back()->m_timerEventObjectsIndex =
-            object.m_timerEventObjectsIndex;
+          object.m_timerEventObjectsIndex;
         m_timerEventObjects.at(object.m_timerEventObjectsIndex) =
-            m_timerEventObjects.back();
+          m_timerEventObjects.back();
         m_timerEventObjects.pop_back();
         object.m_timerEventObjectsIndex = -1;
     }
@@ -293,8 +268,7 @@ void MCObject::unsubscribeTimerEvent(MCObject & object)
 
 void MCObject::sendTimerEvent(MCTimerEvent & event)
 {
-    for (MCObject * obj : m_timerEventObjects)
-    {
+    for (MCObject * obj : m_timerEventObjects) {
         MCObject::sendEvent(*obj, event);
     }
 }
@@ -303,8 +277,7 @@ void MCObject::addToWorld()
 {
     MCWorld::instance().addObject(*this);
 
-    for (auto child : m_children)
-    {
+    for (auto child : m_children) {
         MCWorld::instance().addObject(*child);
     }
 }
@@ -313,8 +286,7 @@ void MCObject::addToWorld(float x, float y, float z)
 {
     MCWorld::instance().addObject(*this);
 
-    for (auto child : m_children)
-    {
+    for (auto child : m_children) {
         MCWorld::instance().addObject(*child);
     }
 
@@ -323,12 +295,10 @@ void MCObject::addToWorld(float x, float y, float z)
 
 void MCObject::removeFromWorld()
 {
-    if (MCWorld::hasInstance())
-    {
+    if (MCWorld::hasInstance()) {
         MCWorld::instance().removeObject(*this);
 
-        for (auto child : m_children)
-        {
+        for (auto child : m_children) {
             MCWorld::instance().removeObjectNow(*child);
         }
     }
@@ -336,12 +306,10 @@ void MCObject::removeFromWorld()
 
 void MCObject::removeFromWorldNow()
 {
-    if (MCWorld::hasInstance())
-    {
+    if (MCWorld::hasInstance()) {
         MCWorld::instance().removeObjectNow(*this);
 
-        for (auto child : m_children)
-        {
+        for (auto child : m_children) {
             MCWorld::instance().removeObjectNow(*child);
         }
     }
@@ -349,28 +317,23 @@ void MCObject::removeFromWorldNow()
 
 void MCObject::render(MCCamera * p)
 {
-    if (m_shape)
-    {
+    if (m_shape) {
         m_shape->render(p);
     }
 }
 
 void MCObject::renderShadow(MCCamera * p)
 {
-    if (m_shape)
-    {
+    if (m_shape) {
         m_shape->renderShadow(p);
     }
 }
 
 void MCObject::setStatus(int bit, bool flag)
 {
-    if (flag)
-    {
+    if (flag) {
         m_status |= bit;
-    }
-    else
-    {
+    } else {
         m_status &= ~bit;
     }
 }
@@ -447,24 +410,18 @@ void MCObject::translateRelative(const MCVector3dF & newLocation)
 
 void MCObject::translate(const MCVector3dF & newLocation)
 {
-    if (!m_shape)
-    {
+    if (!m_shape) {
         m_location = newLocation;
 
         updateChildTransforms();
-    }
-    else
-    {
+    } else {
         const bool wasInWorld = !removing() && MCWorld::instance().objectGrid().remove(*this);
 
         // Calculate velocity if this object is a child object and is thus moved
         // by the parent. This way we'll automatically get linear velocity +
         // possible orbital velocity.
         // TODO: do we need to take the time step into account here?
-        if (m_parent != this &&
-            m_parent->physicsComponent().isIntegrating() &&
-            !m_parent->physicsComponent().isStationary())
-        {
+        if (m_parent != this && m_parent->physicsComponent().isIntegrating() && !m_parent->physicsComponent().isStationary()) {
             m_physicsComponent->setVelocity(newLocation - m_location);
         }
 
@@ -474,8 +431,7 @@ void MCObject::translate(const MCVector3dF & newLocation)
 
         updateChildTransforms();
 
-        if (wasInWorld)
-        {
+        if (wasInWorld) {
             MCWorld::instance().objectGrid().insert(*this);
         }
     }
@@ -514,8 +470,7 @@ void MCObject::rotate(float newAngle, bool updateChildTransforms_)
     doRotate(newAngle);
     m_angle = newAngle;
 
-    if (updateChildTransforms_)
-    {
+    if (updateChildTransforms_) {
         updateChildTransforms();
     }
 }
@@ -533,21 +488,16 @@ void MCObject::doRotate(float newAngle)
 
 void MCObject::rotateShape(float angle)
 {
-    if (m_shape && std::abs(m_shape->angle() - angle) > std::numeric_limits<float>::epsilon())
-    {
-        if (m_shape->type() == MCShape::Type::Circle && m_centerIsZero)
-        {
+    if (m_shape && std::abs(m_shape->angle() - angle) > std::numeric_limits<float>::epsilon()) {
+        if (m_shape->type() == MCShape::Type::Circle && m_centerIsZero) {
             m_shape->rotate(angle);
-        }
-        else
-        {
+        } else {
             const bool wasInWorld = MCWorld::instance().objectGrid().remove(*this);
 
             m_shape->rotate(angle);
             m_shape->translate(m_location - MCVector3dF(m_center));
 
-            if (wasInWorld)
-            {
+            if (wasInWorld) {
                 MCWorld::instance().objectGrid().insert(*this);
             }
         }
@@ -574,8 +524,7 @@ void MCObject::setShape(MCShapePtr shape)
 {
     m_shape = shape;
 
-    if (m_shape)
-    {
+    if (m_shape) {
         m_shape->setParent(*this);
         rotateShape(m_angle);
     }
@@ -638,10 +587,8 @@ const MCObject::ContactHash & MCObject::contacts() const
 
 void MCObject::deleteContacts()
 {
-    for (auto i = m_contacts.begin(); i != m_contacts.end(); i++)
-    {
-        for (size_t j = 0; j < i->second.size(); j++)
-        {
+    for (auto i = m_contacts.begin(); i != m_contacts.end(); i++) {
+        for (size_t j = 0; j < i->second.size(); j++) {
             i->second[j]->free();
         }
     }
@@ -651,10 +598,8 @@ void MCObject::deleteContacts()
 void MCObject::deleteContacts(MCObject & object)
 {
     auto i(m_contacts.find(&object));
-    if (i != m_contacts.end())
-    {
-        for (size_t j = 0; j < i->second.size(); j++)
-        {
+    if (i != m_contacts.end()) {
+        for (size_t j = 0; j < i->second.size(); j++) {
             i->second[j]->free();
         }
         i->second.clear();
@@ -683,13 +628,10 @@ int MCObject::initialAngle() const
 
 void MCObject::updateChildTransforms()
 {
-    for (auto child : m_children)
-    {
+    for (auto child : m_children) {
         const float newAngle = m_angle + child->m_relativeAngle;
         child->rotate(newAngle);
-        child->translate(m_location - MCVector3dF(m_center) +
-            MCVector3dF(MCMathUtil::rotatedVector(child->m_relativeLocation, m_angle),
-                child->m_relativeLocation.k()));
+        child->translate(m_location - MCVector3dF(m_center) + MCVector3dF(MCMathUtil::rotatedVector(child->m_relativeLocation, m_angle), child->m_relativeLocation.k()));
     }
 }
 
@@ -699,8 +641,7 @@ float MCObject::calculateLinearBalance(const MCVector3dF & force, const MCVector
     if (shape()) {
         const float r = shape()->radius();
         if (r > 0) {
-            linearBalance = 1.0f - MCMathUtil::distanceFromVector(
-                MCVector2dF(pos - location()), MCVector2dF(force)) / r;
+            linearBalance = 1.0f - MCMathUtil::distanceFromVector(MCVector2dF(pos - location()), MCVector2dF(force)) / r;
             linearBalance = linearBalance < 0 ? 0 : linearBalance;
             linearBalance = linearBalance > 1 ? 1 : linearBalance;
         }

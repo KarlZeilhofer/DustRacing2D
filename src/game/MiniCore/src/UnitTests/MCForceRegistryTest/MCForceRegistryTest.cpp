@@ -18,20 +18,20 @@
 //
 
 #include "MCForceRegistryTest.hpp"
+#include "../../Core/mcobject.hh"
+#include "../../Core/mcworld.hh"
 #include "../../Physics/mcforcegenerator.hh"
 #include "../../Physics/mcforceregistry.hh"
-#include "../../Core/mcworld.hh"
-#include "../../Core/mcobject.hh"
 
 #include <memory>
 
 class TestForceGenerator : public MCForceGenerator
 {
 public:
-
     TestForceGenerator()
-    : m_updated(false)
-    {}
+      : m_updated(false)
+    {
+    }
 
     ~TestForceGenerator()
     {
@@ -84,9 +84,8 @@ void MCForceRegistryTest::testAddUpdateRemoveMulti()
         MCForceRegistry dut;
         MCWorld world;
 
-        std::vector<std::unique_ptr<MCObject> > objects;
-        for (unsigned int i = 0; i < NUM_OBJECTS; i++)
-        {
+        std::vector<std::unique_ptr<MCObject>> objects;
+        for (unsigned int i = 0; i < NUM_OBJECTS; i++) {
             MCObject * object = new MCObject("TestObject");
             objects.push_back(std::unique_ptr<MCObject>(object));
             world.addObject(*object);
@@ -95,15 +94,13 @@ void MCForceRegistryTest::testAddUpdateRemoveMulti()
             forces.push_back(force);
         }
 
-        for (unsigned int i = 0; i < NUM_OBJECTS; i++)
-        {
+        for (unsigned int i = 0; i < NUM_OBJECTS; i++) {
             QVERIFY(static_cast<TestForceGenerator *>(forces[i].get())->m_updated == false);
         }
 
         dut.update();
 
-        for (unsigned int i = 0; i < NUM_OBJECTS; i++)
-        {
+        for (unsigned int i = 0; i < NUM_OBJECTS; i++) {
             QVERIFY(static_cast<TestForceGenerator *>(forces[i].get())->m_updated == true);
         }
     }

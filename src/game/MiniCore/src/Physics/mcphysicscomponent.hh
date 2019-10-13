@@ -29,7 +29,6 @@
 class MCPhysicsComponent : public MCObjectComponent
 {
 public:
-
     //! Constructor.
     MCPhysicsComponent();
 

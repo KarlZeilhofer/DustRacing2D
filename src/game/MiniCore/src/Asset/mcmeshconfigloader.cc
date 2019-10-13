@@ -22,8 +22,8 @@
 #include <QDomElement>
 #include <QFile>
 
-#include "mcmeshconfigloader.hh"
 #include "mclogger.hh"
+#include "mcmeshconfigloader.hh"
 
 #include <cassert>
 
@@ -31,13 +31,11 @@ bool MCMeshConfigLoader::load(const std::string & filePath)
 {
     QDomDocument doc;
     QFile file(filePath.c_str());
-    if (!file.open(QIODevice::ReadOnly))
-    {
+    if (!file.open(QIODevice::ReadOnly)) {
         return false;
     }
 
-    if (!doc.setContent(&file))
-    {
+    if (!doc.setContent(&file)) {
         file.close();
         return false;
     }
@@ -45,16 +43,13 @@ bool MCMeshConfigLoader::load(const std::string & filePath)
     file.close();
 
     const auto && root = doc.documentElement();
-    if (root.nodeName() == "meshes")
-    {
+    if (root.nodeName() == "meshes") {
         const std::string baseModelPath = root.attribute("baseModelPath", "./").toStdString();
         auto && node = root.firstChild();
-        while(!node.isNull() && node.nodeName() == "mesh")
-        {
+        while (!node.isNull() && node.nodeName() == "mesh") {
             MeshDataPtr newData(new MCMeshMetaData);
             const auto && element = node.toElement();
-            if (!element.isNull())
-            {
+            if (!element.isNull()) {
                 parseAttributes(element, newData, baseModelPath);
                 parseChildNodes(node, newData);
             }
@@ -78,8 +73,7 @@ void MCMeshConfigLoader::parseAttributes(const QDomElement & element, MeshDataPt
 
     newData->texture2 = element.attribute("texture2", "").toStdString();
 
-    if (!model.empty())
-    {
+    if (!model.empty()) {
         newData->modelPath = baseModelPath + QDir::separator().toLatin1() + model;
     }
 }
@@ -87,32 +81,24 @@ void MCMeshConfigLoader::parseAttributes(const QDomElement & element, MeshDataPt
 void MCMeshConfigLoader::parseChildNodes(const QDomNode & node, MeshDataPtr newData)
 {
     auto && childNode = node.firstChild();
-    while (!childNode.isNull())
-    {
-        if (childNode.nodeName() == "color")
-        {
+    while (!childNode.isNull()) {
+        if (childNode.nodeName() == "color") {
             const auto && element = childNode.toElement();
-            if (!element.isNull())
-            {
+            if (!element.isNull()) {
                 newData->color.setR(element.attribute("r", "1").toFloat());
                 newData->color.setG(element.attribute("g", "1").toFloat());
                 newData->color.setB(element.attribute("b", "1").toFloat());
                 newData->color.setA(element.attribute("a", "1").toFloat());
             }
-        }
-        else if (childNode.nodeName() == "scale")
-        {
+        } else if (childNode.nodeName() == "scale") {
             const auto && element = childNode.toElement();
-            if (!element.isNull())
-            {
+            if (!element.isNull()) {
                 newData->scale.first.setI(element.attribute("x", "1").toFloat());
                 newData->scale.first.setJ(element.attribute("y", "1").toFloat());
                 newData->scale.first.setK(element.attribute("z", "1").toFloat());
                 newData->scale.second = true;
             }
-        }
-        else
-        {
+        } else {
             throw std::runtime_error("Unknown element '" + childNode.nodeName().toStdString() + "'");
         }
 

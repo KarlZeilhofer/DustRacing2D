@@ -55,8 +55,8 @@
 #include <MCGLDiffuseLight>
 #include <MCGLScene>
 #include <MCGLShaderProgram>
-#include <MCObjectFactory>
 #include <MCObject>
+#include <MCObjectFactory>
 #include <MCPhysicsComponent>
 #include <MCShape>
 #include <MCSurface>
@@ -66,8 +66,8 @@
 #include <MCWorld>
 #include <MCWorldRenderer>
 
-#include <QObject>
 #include <QApplication>
+#include <QObject>
 
 #include <algorithm>
 #include <cassert>
@@ -76,25 +76,25 @@
 using std::dynamic_pointer_cast;
 
 // Default visible scene size.
-int Scene::m_width  = 1024;
+int Scene::m_width = 1024;
 int Scene::m_height = 768;
 
 static const float METERS_PER_UNIT = 4.2f/48; // a car has typically 48 scene units and is in real life about 4.2m long. 
 
 Scene::Scene(Game & game, StateMachine & stateMachine, Renderer & renderer, MCWorld & world)
-: m_game(game)
-, m_stateMachine(stateMachine)
-, m_renderer(renderer)
-, m_messageOverlay(new MessageOverlay)
-, m_race(game, NUM_CARS)
-, m_activeTrack(nullptr)
-, m_world(world)
-, m_startlights(new Startlights)
-, m_startlightsOverlay(new StartlightsOverlay(*m_startlights))
-, m_checkeredFlag(new CheckeredFlag)
-, m_intro(new Intro)
-, m_particleFactory(new ParticleFactory)
-, m_fadeAnimation(new FadeAnimation)
+  : m_game(game)
+  , m_stateMachine(stateMachine)
+  , m_renderer(renderer)
+  , m_messageOverlay(new MessageOverlay)
+  , m_race(game, NUM_CARS)
+  , m_activeTrack(nullptr)
+  , m_world(world)
+  , m_startlights(new Startlights)
+  , m_startlightsOverlay(new StartlightsOverlay(*m_startlights))
+  , m_checkeredFlag(new CheckeredFlag)
+  , m_intro(new Intro)
+  , m_particleFactory(new ParticleFactory)
+  , m_fadeAnimation(new FadeAnimation)
 {
     initializeComponents();
 
@@ -119,9 +119,9 @@ void Scene::connectComponents()
     connect(m_fadeAnimation.get(), &FadeAnimation::fadeOutFinished, &m_stateMachine, &StateMachine::endFadeOut);
 
     connect(&m_race, &Race::finished, &m_stateMachine, &StateMachine::finishRace);
-    connect(&m_race, &Race::messageRequested, m_messageOverlay.get(), static_cast<void(MessageOverlay::*)(QString)>(&MessageOverlay::addMessage));
+    connect(&m_race, &Race::messageRequested, m_messageOverlay.get(), static_cast<void (MessageOverlay::*)(QString)>(&MessageOverlay::addMessage));
 
-    connect(m_startlights.get(), &Startlights::messageRequested, m_messageOverlay.get(), static_cast<void(MessageOverlay::*)(QString)>(&MessageOverlay::addMessage));
+    connect(m_startlights.get(), &Startlights::messageRequested, m_messageOverlay.get(), static_cast<void (MessageOverlay::*)(QString)>(&MessageOverlay::addMessage));
     connect(this, &Scene::listenerLocationChanged, &m_game.audioWorker(), &AudioWorker::setListenerLocation);
 
     m_game.audioWorker().connectAudioSource(m_race);
@@ -129,8 +129,7 @@ void Scene::connectComponents()
 
 void Scene::initializeComponents()
 {
-    for (int i = 0; i < 2; i++)
-    {
+    for (int i = 0; i < 2; i++) {
         m_cameraOffset[i] = 0.0f;
         m_timingOverlay[i].setRace(m_race);
     }
@@ -142,10 +141,8 @@ void Scene::initializeComponents()
 
     m_world.setMetersPerUnit(METERS_PER_UNIT);
 
-    MCAssetManager::textureFontManager().font(m_game.fontName()).setShaderProgram(
-        m_renderer.program("text"));
-    MCAssetManager::textureFontManager().font(m_game.fontName()).setShadowShaderProgram(
-        m_renderer.program("textShadow"));
+    MCAssetManager::textureFontManager().font(m_game.fontName()).setShaderProgram(m_renderer.program("text"));
+    MCAssetManager::textureFontManager().font(m_game.fontName()).setShadowShaderProgram(m_renderer.program("textShadow"));
 
     const MCGLAmbientLight ambientLight(1.0f, 0.9f, 0.95f, 0.75f);
     const MCGLDiffuseLight diffuseLight(MCVector3dF(1.0f, -1.0f, -1.0f), 1.0f, 0.9f, 0.5f, 0.75f);
@@ -185,13 +182,10 @@ void Scene::createCars()
     m_ai.clear();
 
     // Create and add cars.
-    for (int i = 0; i < NUM_CARS; i++)
-    {
+    for (int i = 0; i < NUM_CARS; i++) {
         CarPtr car(CarFactory::buildCar(i, NUM_CARS, m_game));
-        if (car)
-        {
-            if (!car->isHuman())
-            {
+        if (car) {
+            if (!car->isHuman()) {
                 m_ai.push_back(AIPtr(new AI(*car)));
             }
 
@@ -205,8 +199,7 @@ void Scene::createCars()
         }
     }
 
-    if (m_game.hasTwoHumanPlayers())
-    {
+    if (m_game.hasTwoHumanPlayers()) {
         m_timingOverlay[1].setCarToFollow(*m_cars.at(1));
         m_crashOverlay[1].setCarToFollow(*m_cars.at(1));
     }
@@ -220,8 +213,7 @@ void Scene::setupMinimaps()
     const auto minimapSize = static_cast<int>(m_width * 0.2f);
     const auto minimapY = !m_game.hasTwoHumanPlayers() ? minimapSize : minimapSize / 2 + 10;
 
-    for (size_t i = 0; i < 2; i++)
-    {
+    for (size_t i = 0; i < 2; i++) {
         m_minimap[i].initialize(*m_cars[i], m_activeTrack->trackData().map(), minimapSize / 2 + 10, minimapY, minimapSize);
     }
 }
@@ -238,7 +230,7 @@ int Scene::height()
 
 void Scene::setSize(int width, int height)
 {
-    Scene::m_width  = width;
+    Scene::m_width = width;
     Scene::m_height = height;
 }
 
@@ -248,7 +240,7 @@ void Scene::createMenus()
 
     m_mainMenu = MTFH::MenuPtr(new MainMenu(*m_menuManager, *this, width(), height()));
     connect(
-        std::static_pointer_cast<MainMenu>(m_mainMenu).get(), &MainMenu::exitGameRequested, &m_game, &Game::exitGame);
+      std::static_pointer_cast<MainMenu>(m_mainMenu).get(), &MainMenu::exitGameRequested, &m_game, &Game::exitGame);
 
     m_menuManager->addMenu(m_mainMenu);
     m_menuManager->enterMenu(m_mainMenu);
@@ -261,15 +253,9 @@ void Scene::createMenus()
  */
 void Scene::updateFrame(InputHandler & handler, int step)
 {
-    if (m_stateMachine.state() == StateMachine::State::GameTransitionIn  ||
-        m_stateMachine.state() == StateMachine::State::GameTransitionOut ||
-        m_stateMachine.state() == StateMachine::State::DoStartlights     ||
-        m_stateMachine.state() == StateMachine::State::Play)
-    {
-        if (m_activeTrack)
-        {
-            if (m_race.started())
-            {
+    if (m_stateMachine.state() == StateMachine::State::GameTransitionIn || m_stateMachine.state() == StateMachine::State::GameTransitionOut || m_stateMachine.state() == StateMachine::State::DoStartlights || m_stateMachine.state() == StateMachine::State::Play) {
+        if (m_activeTrack) {
+            if (m_race.started()) {
                 processUserInput(handler);
                 updateAi();
             }
@@ -277,26 +263,19 @@ void Scene::updateFrame(InputHandler & handler, int step)
             updateWorld(step);
             updateRace();
 
-            if (m_game.hasTwoHumanPlayers())
-            {
-                for (size_t i = 0; i < 2; i++)
-                {
+            if (m_game.hasTwoHumanPlayers()) {
+                for (size_t i = 0; i < 2; i++) {
                     updateCameraLocation(m_camera[i], m_cameraOffset[i], *m_cars.at(i));
                 }
-            }
-            else
-            {
+            } else {
                 updateCameraLocation(m_camera[0], m_cameraOffset[0], *m_cars.at(0));
             }
         }
-    }
-    else if (m_stateMachine.state() == StateMachine::State::Menu)
-    {
+    } else if (m_stateMachine.state() == StateMachine::State::Menu) {
         m_menuManager->stepTime(step);
     }
 
-    if (m_fadeAnimation->isFading())
-    {
+    if (m_fadeAnimation->isFading()) {
         MCGLScene & glScene = MCWorld::instance().renderer().glScene();
         glScene.setFadeValue(m_renderer.fadeValue());
     }
@@ -304,8 +283,7 @@ void Scene::updateFrame(InputHandler & handler, int step)
 
 void Scene::updateOverlays()
 {
-    if (m_game.hasTwoHumanPlayers())
-    {
+    if (m_game.hasTwoHumanPlayers()) {
         m_timingOverlay[1].update();
         m_crashOverlay[1].update();
     }
@@ -352,44 +330,30 @@ void Scene::updateCameraLocation(MCCamera & camera, float & offset, MCObject & o
 
 void Scene::processUserInput(InputHandler & handler)
 {
-    for (size_t i = 0; i < (m_game.hasTwoHumanPlayers() ? 2 : 1); i++)
-    {
+    for (size_t i = 0; i < (m_game.hasTwoHumanPlayers() ? 2 : 1); i++) {
         // Handle accelerating / braking
-        if (handler.getActionState(i, InputHandler::Action::Down))
-        {
-            if (!m_race.timing().raceCompleted(i))
-            {
+        if (handler.getActionState(i, InputHandler::Action::Down)) {
+            if (!m_race.timing().raceCompleted(i)) {
                 m_cars.at(i)->setBrakeEnabled(true);
             }
-        }
-        else
-        {
+        } else {
             m_cars.at(i)->setBrakeEnabled(false);
         }
 
-        if (handler.getActionState(i, InputHandler::Action::Up))
-        {
-            if (!m_race.timing().raceCompleted(i))
-            {
+        if (handler.getActionState(i, InputHandler::Action::Up)) {
+            if (!m_race.timing().raceCompleted(i)) {
                 m_cars.at(i)->setAcceleratorEnabled(true);
             }
-        }
-        else
-        {
+        } else {
             m_cars.at(i)->setAcceleratorEnabled(false);
         }
 
         // Handle turning
-        if (handler.getActionState(i, InputHandler::Action::Left))
-        {
+        if (handler.getActionState(i, InputHandler::Action::Left)) {
             m_cars.at(i)->steer(Car::Steer::Left);
-        }
-        else if (handler.getActionState(i, InputHandler::Action::Right))
-        {
+        } else if (handler.getActionState(i, InputHandler::Action::Right)) {
             m_cars.at(i)->steer(Car::Steer::Right);
-        }
-        else
-        {
+        } else {
             m_cars.at(i)->steer(Car::Steer::Neutral);
         }
     }
@@ -397,8 +361,7 @@ void Scene::processUserInput(InputHandler & handler)
 
 void Scene::updateAi()
 {
-    for (AIPtr ai : m_ai)
-    {
+    for (AIPtr ai : m_ai) {
         const bool isRaceCompleted = m_race.timing().raceCompleted(ai->car().index());
         ai->update(isRaceCompleted);
     }
@@ -407,36 +370,28 @@ void Scene::updateAi()
 void Scene::setupCameras(Track & activeTrack)
 {
     m_world.renderer().removeParticleVisibilityCameras();
-    if (m_game.hasTwoHumanPlayers())
-    {
-        for (int i = 0; i < 2; i++)
-        {
-            if (m_game.splitType() == Game::SplitType::Vertical)
-            {
+    if (m_game.hasTwoHumanPlayers()) {
+        for (int i = 0; i < 2; i++) {
+            if (m_game.splitType() == Game::SplitType::Vertical) {
                 m_camera[i].init(
-                    Scene::width() / 2, Scene::height(), 0, 0, activeTrack.width(), activeTrack.height());
+                  Scene::width() / 2, Scene::height(), 0, 0, activeTrack.width(), activeTrack.height());
                 m_world.renderer().addParticleVisibilityCamera(m_camera[i]);
-            }
-            else
-            {
+            } else {
                 m_camera[i].init(
-                    Scene::width(), Scene::height() / 2, 0, 0, activeTrack.width(), activeTrack.height());
+                  Scene::width(), Scene::height() / 2, 0, 0, activeTrack.width(), activeTrack.height());
                 m_world.renderer().addParticleVisibilityCamera(m_camera[i]);
             }
         }
-    }
-    else
-    {
+    } else {
         m_camera[0].init(
-            Scene::width(), Scene::height(), 0, 0, activeTrack.width(), activeTrack.height());
+          Scene::width(), Scene::height(), 0, 0, activeTrack.width(), activeTrack.height());
         m_world.renderer().addParticleVisibilityCamera(m_camera[0]);
     }
 }
 
 void Scene::setupAI(Track & activeTrack)
 {
-    for (AIPtr ai : m_ai)
-    {
+    for (AIPtr ai : m_ai) {
         ai->setTrack(activeTrack);
     }
 }
@@ -486,8 +441,7 @@ void Scene::setWorldDimensions()
 void Scene::addCarsToWorld()
 {
     // Add objects to the world
-    for (CarPtr car : m_cars)
-    {
+    for (CarPtr car : m_cars) {
         car->addToWorld();
     }
 }
@@ -503,8 +457,7 @@ void Scene::createNormalObjects()
 {
     assert(m_activeTrack);
 
-    for (unsigned int i = 0; i < m_activeTrack->trackData().objects().count(); i++)
-    {
+    for (unsigned int i = 0; i < m_activeTrack->trackData().objects().count(); i++) {
         auto trackObject = dynamic_pointer_cast<TrackObject>(m_activeTrack->trackData().objects().object(i));
         assert(trackObject);
 
@@ -513,10 +466,8 @@ void Scene::createNormalObjects()
 
         // Set the base Z of mesh objects at ground level instead of at the object center
         float baseZ = 0;
-        if (object.shape() && object.shape()->view() && object.shape()->view()->object())
-        {
-            if (dynamic_cast<MCMesh*>(object.shape()->view()->object()))
-            {
+        if (object.shape() && object.shape()->view() && object.shape()->view()->object()) {
+            if (dynamic_cast<MCMesh *>(object.shape()->view()->object())) {
                 baseZ = -object.shape()->view()->object()->minZ();
             }
         }
@@ -524,8 +475,7 @@ void Scene::createNormalObjects()
         object.translate(object.initialLocation() + MCVector3dF(0, 0, baseZ));
         object.rotate(object.initialAngle());
 
-        if (auto pit = dynamic_cast<Pit *>(&object))
-        {
+        if (auto pit = dynamic_cast<Pit *>(&object)) {
             pit->reset();
             connect(pit, &Pit::pitStop, &m_race, &Race::pitStop);
         }
@@ -541,13 +491,10 @@ void Scene::createBridgeObjects()
     static const int w = TrackTile::TILE_W;
     static const int h = TrackTile::TILE_H;
 
-    for (unsigned int j = 0; j <= rMap.rows(); j++)
-    {
-        for (unsigned int i = 0; i <= rMap.cols(); i++)
-        {
+    for (unsigned int j = 0; j <= rMap.rows(); j++) {
+        for (unsigned int i = 0; i <= rMap.cols(); i++) {
             auto tile = dynamic_pointer_cast<TrackTile>(rMap.getTile(i, j));
-            if (tile && tile->tileTypeEnum() == TrackTile::TT_BRIDGE)
-            {
+            if (tile && tile->tileTypeEnum() == TrackTile::TT_BRIDGE) {
                 MCObjectPtr bridge(new Bridge);
 
                 bridge->translate(MCVector3dF(i * w + w / 2, j * h + h / 2, 0));
@@ -561,27 +508,19 @@ void Scene::createBridgeObjects()
 
 void Scene::resizeOverlays()
 {
-    if (m_game.hasTwoHumanPlayers())
-    {
-        if (m_game.splitType() == Game::SplitType::Vertical)
-        {
-            for (int i = 0; i < 2; i++)
-            {
+    if (m_game.hasTwoHumanPlayers()) {
+        if (m_game.splitType() == Game::SplitType::Vertical) {
+            for (int i = 0; i < 2; i++) {
                 m_timingOverlay[i].setDimensions(width() / 2, height());
                 m_crashOverlay[i].setDimensions(width() / 2, height());
             }
-        }
-        else
-        {
-            for (int i = 0; i < 2; i++)
-            {
+        } else {
+            for (int i = 0; i < 2; i++) {
                 m_timingOverlay[i].setDimensions(width(), height() / 2);
                 m_crashOverlay[i].setDimensions(width(), height() / 2);
             }
         }
-    }
-    else
-    {
+    } else {
         m_timingOverlay[0].setDimensions(width(), height());
         m_crashOverlay[0].setDimensions(width(), height());
     }
@@ -606,13 +545,10 @@ MTFH::MenuPtr Scene::trackSelectionMenu() const
 
 void Scene::getSplitPositions(MCGLScene::SplitType & p0, MCGLScene::SplitType & p1)
 {
-    if (m_game.splitType() == Game::SplitType::Vertical)
-    {
+    if (m_game.splitType() == Game::SplitType::Vertical) {
         p1 = MCGLScene::ShowOnLeft;
         p0 = MCGLScene::ShowOnRight;
-    }
-    else
-    {
+    } else {
         p1 = MCGLScene::ShowOnTop;
         p0 = MCGLScene::ShowOnBottom;
     }
@@ -620,17 +556,14 @@ void Scene::getSplitPositions(MCGLScene::SplitType & p0, MCGLScene::SplitType & 
 
 void Scene::renderTrack()
 {
-    switch (m_stateMachine.state())
-    {
+    switch (m_stateMachine.state()) {
     case StateMachine::State::GameTransitionIn:
     case StateMachine::State::GameTransitionOut:
     case StateMachine::State::DoStartlights:
-    case StateMachine::State::Play:
-    {
+    case StateMachine::State::Play: {
         MCGLScene & glScene = MCWorld::instance().renderer().glScene();
 
-        if (m_game.hasTwoHumanPlayers())
-        {
+        if (m_game.hasTwoHumanPlayers()) {
             MCGLScene::SplitType p1, p0;
             getSplitPositions(p1, p0);
 
@@ -641,9 +574,7 @@ void Scene::renderTrack()
             m_activeTrack->render(&m_camera[0]);
 
             glScene.setSplitType(MCGLScene::ShowFullScreen);
-        }
-        else
-        {
+        } else {
             m_activeTrack->render(&m_camera[0]);
         }
 
@@ -651,15 +582,14 @@ void Scene::renderTrack()
     }
     default:
         break;
-    };
+    }
 }
 
 void Scene::renderMenu()
 {
     MCGLScene & glScene = MCWorld::instance().renderer().glScene();
 
-    switch (m_stateMachine.state())
-    {
+    switch (m_stateMachine.state()) {
     case StateMachine::State::DoIntro:
 
         glScene.setSplitType(MCGLScene::ShowFullScreen);
@@ -680,24 +610,21 @@ void Scene::renderMenu()
 
     default:
         break;
-    };
+    }
 }
 
 void Scene::renderCommonHUD()
 {
-    switch (m_stateMachine.state())
-    {
+    switch (m_stateMachine.state()) {
     case StateMachine::State::GameTransitionIn:
     case StateMachine::State::GameTransitionOut:
     case StateMachine::State::DoStartlights:
-    case StateMachine::State::Play:
-    {
+    case StateMachine::State::Play: {
         // Setup for common scene
         MCGLScene & glScene = MCWorld::instance().renderer().glScene();
         glScene.setSplitType(MCGLScene::ShowFullScreen);
 
-        if (m_race.checkeredFlagEnabled() && !m_game.hasTwoHumanPlayers())
-        {
+        if (m_race.checkeredFlagEnabled() && !m_game.hasTwoHumanPlayers()) {
             m_checkeredFlag->render();
         }
 
@@ -707,22 +634,19 @@ void Scene::renderCommonHUD()
     }
     default:
         break;
-    };
+    }
 }
 
 void Scene::renderHUD()
 {
-    switch (m_stateMachine.state())
-    {
+    switch (m_stateMachine.state()) {
     case StateMachine::State::GameTransitionIn:
     case StateMachine::State::GameTransitionOut:
     case StateMachine::State::DoStartlights:
-    case StateMachine::State::Play:
-    {
+    case StateMachine::State::Play: {
         MCGLScene & glScene = MCWorld::instance().renderer().glScene();
 
-        if (m_game.hasTwoHumanPlayers())
-        {
+        if (m_game.hasTwoHumanPlayers()) {
             MCGLScene::SplitType p1, p0;
             getSplitPositions(p1, p0);
 
@@ -737,9 +661,7 @@ void Scene::renderHUD()
             m_crashOverlay[0].render();
 
             glScene.setSplitType(MCGLScene::ShowFullScreen);
-        }
-        else
-        {
+        } else {
             m_timingOverlay[0].render();
             m_minimap[0].render(m_cars, m_race);
             m_crashOverlay[0].render();
@@ -749,27 +671,23 @@ void Scene::renderHUD()
     }
     default:
         break;
-    };
+    }
 }
 
 void Scene::renderWorld(MCRenderGroup renderGroup, bool prepareRendering)
 {
-    switch (m_stateMachine.state())
-    {
+    switch (m_stateMachine.state()) {
     case StateMachine::State::GameTransitionIn:
     case StateMachine::State::GameTransitionOut:
     case StateMachine::State::DoStartlights:
-    case StateMachine::State::Play:
-    {
+    case StateMachine::State::Play: {
         MCGLScene & glScene = MCWorld::instance().renderer().glScene();
 
-        if (m_game.hasTwoHumanPlayers())
-        {
+        if (m_game.hasTwoHumanPlayers()) {
             MCGLScene::SplitType p1, p0;
             getSplitPositions(p1, p0);
 
-            if (prepareRendering)
-            {
+            if (prepareRendering) {
                 m_world.prepareRendering(&m_camera[1]);
                 m_world.prepareRendering(&m_camera[0]);
             }
@@ -781,11 +699,8 @@ void Scene::renderWorld(MCRenderGroup renderGroup, bool prepareRendering)
             m_world.render(&m_camera[0], renderGroup);
 
             glScene.setSplitType(MCGLScene::ShowFullScreen);
-        }
-        else
-        {
-            if (prepareRendering)
-            {
+        } else {
+            if (prepareRendering) {
                 m_world.prepareRendering(&m_camera[0]);
             }
 
@@ -796,7 +711,7 @@ void Scene::renderWorld(MCRenderGroup renderGroup, bool prepareRendering)
     }
     default:
         break;
-    };
+    }
 }
 
 Scene::~Scene() = default;

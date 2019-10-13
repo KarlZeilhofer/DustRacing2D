@@ -15,18 +15,18 @@
 
 #include "messageoverlay.hpp"
 #include "game.hpp"
-#include <MCCamera>
 #include <MCAssetManager>
+#include <MCCamera>
 
-static const int GLYPH_WIDTH  = 20;
+static const int GLYPH_WIDTH = 20;
 static const int GLYPH_HEIGHT = 20;
 
 MessageOverlay::MessageOverlay(Alignment align, int messageMaxTime)
-: m_fontManager(MCAssetManager::textureFontManager())
-, m_font(m_fontManager.font(Game::instance().fontName()))
-, m_text(L"")
-, m_messageMaxTime(messageMaxTime)
-, m_align(align)
+  : m_fontManager(MCAssetManager::textureFontManager())
+  , m_font(m_fontManager.font(Game::instance().fontName()))
+  , m_text(L"")
+  , m_messageMaxTime(messageMaxTime)
+  , m_align(align)
 {
     m_text.setShadowOffset(2, -2);
     m_text.setGlyphSize(GLYPH_WIDTH, GLYPH_HEIGHT);
@@ -42,33 +42,27 @@ bool MessageOverlay::update()
     // Loop trough active messages, increment their time and
     // remove messages when needed.
     auto i(m_listMessages.begin());
-    while (i != m_listMessages.end())
-    {
+    while (i != m_listMessages.end()) {
         MessageOverlay::Message & m = *i;
 
         // Inc time
         m.timeShown++;
 
         // Animate y
-        if (m.isYInitialized)
-        {
+        if (m.isYInitialized) {
             m.y = m.y + (m.targetY - m.y) / 4;
         }
 
         // Time to vanish?
-        if (m.timeShown >= m.maxTime / 2)
-        {
-            m.targetY    = -20;
+        if (m.timeShown >= m.maxTime / 2) {
+            m.targetY = -20;
             m.isRemoving = true;
         }
 
-        if (m.timeShown >= m.maxTime)
-        {
+        if (m.timeShown >= m.maxTime) {
             // Yes: remove from the list
             i = m_listMessages.erase(i);
-        }
-        else
-        {
+        } else {
             i++;
         }
     }
@@ -81,13 +75,13 @@ void MessageOverlay::addMessage(const std::wstring & msg)
     // Create a new message
     MessageOverlay::Message myMsg;
 
-    myMsg.timeShown      = 0;
-    myMsg.maxTime        = m_messageMaxTime * 2; // Half of the time is used when removing
-    myMsg.text           = msg;
-    myMsg.y              = -1;
-    myMsg.targetY        = -1;
+    myMsg.timeShown = 0;
+    myMsg.maxTime = m_messageMaxTime * 2; // Half of the time is used when removing
+    myMsg.text = msg;
+    myMsg.y = -1;
+    myMsg.targetY = -1;
     myMsg.isYInitialized = false;
-    myMsg.isRemoving     = false;
+    myMsg.isRemoving = false;
 
     // Add to the list of active messages
     m_listMessages.push_front(myMsg);
@@ -111,16 +105,13 @@ void MessageOverlay::renderMessages()
     // Y delta
     int dY;
 
-    if (m_align == MessageOverlay::Alignment::Bottom)
-    {
+    if (m_align == MessageOverlay::Alignment::Bottom) {
         // Y-coordinate for the fist message
-        y  = GLYPH_HEIGHT;
+        y = GLYPH_HEIGHT;
         dY = GLYPH_HEIGHT;
-    }
-    else
-    {
+    } else {
         // Y-coordinate for the fist message
-        y  = height() - 2 * GLYPH_HEIGHT;
+        y = height() - 2 * GLYPH_HEIGHT;
         dY = -GLYPH_HEIGHT;
     }
 
@@ -129,20 +120,15 @@ void MessageOverlay::renderMessages()
 
     // Loop through active messages and init their targetY
     auto i(m_listMessages.begin());
-    while (i != m_listMessages.end())
-    {
+    while (i != m_listMessages.end()) {
         MessageOverlay::Message & m = *i;
 
-        if (!m.isYInitialized)
-        {
+        if (!m.isYInitialized) {
             m.y = y;
             m.targetY = y;
             m.isYInitialized = true;
-        }
-        else
-        {
-            if (!m.isRemoving)
-            {
+        } else {
+            if (!m.isRemoving) {
                 m.targetY = y;
             }
         }
@@ -155,8 +141,7 @@ void MessageOverlay::renderMessages()
 
     // Loop trough active messages and render them stacked
     auto j(m_listMessages.begin());
-    while (j != m_listMessages.end())
-    {
+    while (j != m_listMessages.end()) {
         const MessageOverlay::Message & m = *j;
 
         // Create a Text object from the std QString

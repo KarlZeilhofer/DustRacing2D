@@ -18,8 +18,8 @@
 //
 
 #include "mctexturefontconfigloader.hh"
-#include "mctexturefontdata.hh"
 #include "mclogger.hh"
+#include "mctexturefontdata.hh"
 
 #include <QDomDocument>
 #include <QDomElement>
@@ -39,13 +39,11 @@ bool MCTextureFontConfigLoader::loadFonts()
 {
     QDomDocument doc;
     QFile file(m_filePath.c_str());
-    if (!file.open(QIODevice::ReadOnly))
-    {
+    if (!file.open(QIODevice::ReadOnly)) {
         return false;
     }
 
-    if (!doc.setContent(&file))
-    {
+    if (!doc.setContent(&file)) {
         file.close();
         return false;
     }
@@ -53,30 +51,24 @@ bool MCTextureFontConfigLoader::loadFonts()
     file.close();
 
     QDomElement root = doc.documentElement();
-    if (root.nodeName() == "fonts")
-    {
+    if (root.nodeName() == "fonts") {
         MCTextureFontData * newData = nullptr;
         QDomNode node = root.firstChild();
-        while(!node.isNull() && node.nodeName() == "font")
-        {
+        while (!node.isNull() && node.nodeName() == "font") {
             newData = new MCTextureFontData;
             QDomElement tag = node.toElement();
-            if(!tag.isNull())
-            {
-                newData->name    = tag.attribute("name", "").toStdString();
+            if (!tag.isNull()) {
+                newData->name = tag.attribute("name", "").toStdString();
                 newData->surface = tag.attribute("surface", "").toStdString();
 
                 MCLogger().info() << "Loading font '" << newData->name.c_str() << "'..";
 
                 // Read child nodes of font node.
                 QDomNode childNode = node.firstChild();
-                while(!childNode.isNull())
-                {
-                    if (childNode.nodeName() == "glyph")
-                    {
+                while (!childNode.isNull()) {
+                    if (childNode.nodeName() == "glyph") {
                         QDomElement tag = childNode.toElement();
-                        if(!tag.isNull())
-                        {
+                        if (!tag.isNull()) {
                             MCTextureFontData::Glyph glyph;
                             glyph.x0 = tag.attribute("x0", "0").toInt();
                             glyph.y0 = tag.attribute("y0", "0").toInt();
@@ -115,8 +107,7 @@ MCTextureFontData & MCTextureFontConfigLoader::font(unsigned int index) const
 
 MCTextureFontConfigLoader::~MCTextureFontConfigLoader()
 {
-    for (MCTextureFontData * font : m_fonts)
-    {
+    for (MCTextureFontData * font : m_fonts) {
         delete font;
     }
 }

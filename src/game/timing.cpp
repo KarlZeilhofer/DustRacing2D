@@ -22,13 +22,13 @@
 
 #include <cassert>
 
-Timing::Timing(size_t cars, QObject *parent)
-: QObject(parent)
-, m_times(cars, Timing::Times())
-, m_time(0)
-, m_started(false)
-, m_lapRecord(-1)
-, m_raceRecord(-1)
+Timing::Timing(size_t cars, QObject * parent)
+  : QObject(parent)
+  , m_times(cars, Timing::Times())
+  , m_time(0)
+  , m_started(false)
+  , m_lapRecord(-1)
+  , m_raceRecord(-1)
 {
 }
 
@@ -45,21 +45,18 @@ void Timing::setLapCompleted(size_t index, bool isHuman)
     juzzlin::L().debug() << "Current personal best time: " << times.recordLapTime;
 
     // Check if a new personal record achieved.
-    if (times.lastLapTime < times.recordLapTime || times.recordLapTime == -1)
-    {
+    if (times.lastLapTime < times.recordLapTime || times.recordLapTime == -1) {
         times.recordLapTime = times.lastLapTime;
         juzzlin::L().debug() << "New personal best time: " << times.recordLapTime;
     }
 
     // Check if a new lap record achieved.
     // Accept new lap records only by human players.
-    if (isHuman)
-    {
+    if (isHuman) {
         juzzlin::L().debug() << "Human lap completed: " << times.lastLapTime;
         juzzlin::L().debug() << "Current lap record: " << m_lapRecord;
 
-        if (times.lastLapTime < m_lapRecord || m_lapRecord == -1)
-        {
+        if (times.lastLapTime < m_lapRecord || m_lapRecord == -1) {
             m_lapRecord = times.lastLapTime;
             juzzlin::L().debug() << "New lap record: " << m_lapRecord;
 
@@ -76,10 +73,8 @@ void Timing::setRaceCompleted(size_t index, bool state, bool isHuman)
     times.raceCompleted = state;
     times.raceTime = m_time;
 
-    if (isHuman)
-    {
-        if (times.raceTime < m_raceRecord || m_raceRecord == -1)
-        {
+    if (isHuman) {
+        if (times.raceTime < m_raceRecord || m_raceRecord == -1) {
             m_raceRecord = times.raceTime;
 
             emit raceRecordAchieved(m_raceRecord);
@@ -114,11 +109,9 @@ int Timing::leadersLap() const
 {
     int maxLap = 0;
 
-    for (size_t index = 0; index < m_times.size(); index++)
-    {
+    for (size_t index = 0; index < m_times.size(); index++) {
         const int lap = m_times.at(index).lap;
-        if (lap > maxLap)
-        {
+        if (lap > maxLap) {
             maxLap = lap;
         }
     }
@@ -128,8 +121,7 @@ int Timing::leadersLap() const
 
 int Timing::currentLapTime(size_t index) const
 {
-    if (!m_started)
-    {
+    if (!m_started) {
         return 0;
     }
 
@@ -139,8 +131,7 @@ int Timing::currentLapTime(size_t index) const
 
 int Timing::recordLapTime(size_t index) const
 {
-    if (!m_started)
-    {
+    if (!m_started) {
         return -1;
     }
 
@@ -149,8 +140,7 @@ int Timing::recordLapTime(size_t index) const
 
 int Timing::raceTime() const
 {
-    if (!m_started)
-    {
+    if (!m_started) {
         return 0;
     }
 
@@ -159,20 +149,16 @@ int Timing::raceTime() const
 
 int Timing::raceTime(size_t index) const
 {
-    if (!m_times.at(index).raceCompleted)
-    {
+    if (!m_times.at(index).raceCompleted) {
         return raceTime();
-    }
-    else
-    {
+    } else {
         return m_times.at(index).raceTime;
     }
 }
 
 int Timing::recordRaceTime(size_t index) const
 {
-    if (!m_started)
-    {
+    if (!m_started) {
         return -1;
     }
 
@@ -201,8 +187,7 @@ void Timing::setRaceRecord(int msecs)
 
 int Timing::lastLapTime(size_t index) const
 {
-    if (!m_started)
-    {
+    if (!m_started) {
         return -1;
     }
 
@@ -225,33 +210,29 @@ void Timing::reset()
     m_time = 0;
     m_started = false;
 
-    for (Timing::Times & time : m_times)
-    {
+    for (Timing::Times & time : m_times) {
         time = Timing::Times();
     }
 }
 
 void Timing::tick()
 {
-    if (m_started)
-    {
+    if (m_started) {
         m_time += 1000 / 60;
     }
 }
 
 std::wstring Timing::msecsToString(int msec)
 {
-    if (msec < 0)
-    {
+    if (msec < 0) {
         return L"--:--.--";
     }
 
     const int hr = msec % 3600000;
-    const int mm = hr   / 60000;
-    const int mr = hr   % 60000;
-    const int ss = mr   / 1000;
-    const int ms = mr   % 1000;
+    const int mm = hr / 60000;
+    const int mr = hr % 60000;
+    const int ss = mr / 1000;
+    const int ms = mr % 1000;
 
     return QString().sprintf("%02d:%02d.%02d", mm, ss, ms / 10).toStdWString();
 }
-

@@ -19,15 +19,15 @@
 
 #include "mcrectshape.hh"
 #include "mccamera.hh"
-#include "mcobject.hh"
 #include "mcmathutil.hh"
+#include "mcobject.hh"
 
 #include <cmath>
 
 MCRectShape::MCRectShape(MCShapeViewPtr view, float width, float height)
-: MCShape(view)
-, m_width(width)
-, m_height(height)
+  : MCShape(view)
+  , m_width(width)
+  , m_height(height)
 {
     resize(width, height);
 }
@@ -41,20 +41,13 @@ MCEdgeF MCRectShape::edgeForSegment(const MCSegmentF & p) const
     const MCSegmentF s2s3(m_obbox.vertex(2), m_obbox.vertex(3));
     const MCSegmentF s3s0(m_obbox.vertex(3), m_obbox.vertex(0));
 
-    if (MCMathUtil::crosses(p, s0s1))
-    {
+    if (MCMathUtil::crosses(p, s0s1)) {
         return MCEdgeF(m_obbox.vertex(1) - m_obbox.vertex(0), m_obbox.vertex(0));
-    }
-    else if (MCMathUtil::crosses(p, s1s2))
-    {
+    } else if (MCMathUtil::crosses(p, s1s2)) {
         return MCEdgeF(m_obbox.vertex(2) - m_obbox.vertex(1), m_obbox.vertex(1));
-    }
-    else if (MCMathUtil::crosses(p, s2s3))
-    {
+    } else if (MCMathUtil::crosses(p, s2s3)) {
         return MCEdgeF(m_obbox.vertex(3) - m_obbox.vertex(2), m_obbox.vertex(2));
-    }
-    else if (MCMathUtil::crosses(p, s3s0))
-    {
+    } else if (MCMathUtil::crosses(p, s3s0)) {
         return MCEdgeF(m_obbox.vertex(0) - m_obbox.vertex(3), m_obbox.vertex(3));
     }
 
@@ -75,8 +68,7 @@ MCEdgeF MCRectShape::edgeForSegment(const MCSegmentF & p) const
 
     // **** Find the corresponding edge  ****
 
-    if (x % a > 0 && b % x > 0)
-    {
+    if (x % a > 0 && b % x > 0) {
         return MCEdgeF(v1 - v0, v0);
     }
 
@@ -84,8 +76,7 @@ MCEdgeF MCRectShape::edgeForSegment(const MCSegmentF & p) const
 
     a = b;
     b = v2 - l;
-    if (x % a > 0 && b % x > 0)
-    {
+    if (x % a > 0 && b % x > 0) {
         return MCEdgeF(v2 - v1, v1);
     }
 
@@ -93,8 +84,7 @@ MCEdgeF MCRectShape::edgeForSegment(const MCSegmentF & p) const
 
     a = b;
     b = v3 - l;
-    if (x % a > 0 && b % x > 0)
-    {
+    if (x % a > 0 && b % x > 0) {
         return MCEdgeF(v3 - v2, v2);
     }
 

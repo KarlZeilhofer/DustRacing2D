@@ -13,11 +13,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Dust Racing 2D. If not, see <http://www.gnu.org/licenses/>.
 
-#include <QFile>
 #include <QDir>
-#include <QTextStream>
 #include <QDomDocument>
 #include <QDomElement>
+#include <QFile>
+#include <QTextStream>
 
 #include "mainwindow.hpp"
 #include "object.hpp"
@@ -43,8 +43,9 @@ void readTile(TrackData & newData, const QDomElement & element)
     // Init a new tile. QGraphicsScene will take
     // the ownership eventually.
     auto tile = dynamic_cast<TrackTile *>(newData.map().getTile(
-        element.attribute(TrackDataBase::DataKeywords::Tile::i, "0").toUInt(),
-        element.attribute(TrackDataBase::DataKeywords::Tile::j, "0").toUInt()).get());
+                                                         element.attribute(TrackDataBase::DataKeywords::Tile::i, "0").toUInt(),
+                                                         element.attribute(TrackDataBase::DataKeywords::Tile::j, "0").toUInt())
+                                            .get());
     assert(tile);
 
     tile->setRotation(element.attribute(TrackDataBase::DataKeywords::Tile::orientation, "0").toInt());
@@ -54,7 +55,7 @@ void readTile(TrackData & newData, const QDomElement & element)
     tile->setTileType(type);
 
     tile->setComputerHint(
-        static_cast<TrackTileBase::ComputerHint>(element.attribute(TrackDataBase::DataKeywords::Tile::computerHint, "0").toInt()));
+      static_cast<TrackTileBase::ComputerHint>(element.attribute(TrackDataBase::DataKeywords::Tile::computerHint, "0").toInt()));
 
     tile->setExcludeFromMinimap(element.attribute(TrackDataBase::DataKeywords::Tile::excludeFromMinimap, "0").toUInt());
 }
@@ -66,8 +67,8 @@ void readObject(TrackData & newData, const QDomElement & element)
     Object & object = ObjectFactory::createObject(element.attribute(TrackDataBase::DataKeywords::Object::role, "clear"));
 
     object.setLocation(QPointF(
-        element.attribute(TrackDataBase::DataKeywords::Object::x, "0").toInt(),
-        element.attribute(TrackDataBase::DataKeywords::Object::y, "0").toInt()));
+      element.attribute(TrackDataBase::DataKeywords::Object::x, "0").toInt(),
+      element.attribute(TrackDataBase::DataKeywords::Object::y, "0").toInt()));
 
     object.setRotation(element.attribute(TrackDataBase::DataKeywords::Object::orientation, "0").toInt());
 
@@ -91,8 +92,7 @@ void readTargetNode(std::vector<TargetNodeBasePtr> & route, const QDomElement & 
     const int w = element.attribute(TrackDataBase::DataKeywords::Node::width, "0").toInt();
     const int h = element.attribute(TrackDataBase::DataKeywords::Node::height, "0").toInt();
 
-    if (w > 0 && h > 0)
-    {
+    if (w > 0 && h > 0) {
         tnode->setSize(QSizeF(w, h));
     }
 
@@ -101,10 +101,8 @@ void readTargetNode(std::vector<TargetNodeBasePtr> & route, const QDomElement & 
 
 void writeTiles(const TrackDataPtr trackData, QDomElement & root, QDomDocument & doc)
 {
-    for (unsigned int i = 0; i < trackData->map().cols(); i++)
-    {
-        for (unsigned int j = 0; j < trackData->map().rows(); j++)
-        {
+    for (unsigned int i = 0; i < trackData->map().cols(); i++) {
+        for (unsigned int j = 0; j < trackData->map().rows(); j++) {
             auto tile = std::dynamic_pointer_cast<TrackTile>(trackData->map().getTile(i, j));
             assert(tile);
 
@@ -118,8 +116,7 @@ void writeTiles(const TrackDataPtr trackData, QDomElement & root, QDomDocument &
                 tileElement.setAttribute(TrackDataBase::DataKeywords::Tile::excludeFromMinimap, true);
             }
 
-            if (tile->computerHint() != TrackTile::CH_NONE)
-            {
+            if (tile->computerHint() != TrackTile::CH_NONE) {
                 tileElement.setAttribute(TrackDataBase::DataKeywords::Tile::computerHint, tile->computerHint());
             }
 
@@ -130,8 +127,7 @@ void writeTiles(const TrackDataPtr trackData, QDomElement & root, QDomDocument &
 
 void writeObjects(TrackDataPtr trackData, QDomElement & root, QDomDocument & doc)
 {
-    for (auto objectPtr : trackData->objects())
-    {
+    for (auto objectPtr : trackData->objects()) {
         auto object = std::dynamic_pointer_cast<Object>(objectPtr);
         assert(object);
 
@@ -142,8 +138,7 @@ void writeObjects(TrackDataPtr trackData, QDomElement & root, QDomDocument & doc
         objectElement.setAttribute(TrackDataBase::DataKeywords::Object::y, static_cast<int>(object->location().y()));
         objectElement.setAttribute(TrackDataBase::DataKeywords::Object::orientation, static_cast<int>(object->rotation()));
 
-        if (object->forceStationary())
-        {
+        if (object->forceStationary()) {
             objectElement.setAttribute(TrackDataBase::DataKeywords::Object::forceStationary, static_cast<int>(object->forceStationary()));
         }
 
@@ -153,8 +148,7 @@ void writeObjects(TrackDataPtr trackData, QDomElement & root, QDomDocument & doc
 
 void writeTargetNodes(TrackDataPtr trackData, QDomElement & root, QDomDocument & doc)
 {
-    for (auto tnode : trackData->route())
-    {
+    for (auto tnode : trackData->route()) {
         QDomElement tnodeElement = doc.createElement(TrackDataBase::DataKeywords::Track::node);
         tnodeElement.setAttribute(TrackDataBase::DataKeywords::Node::index, tnode->index());
         tnodeElement.setAttribute(TrackDataBase::DataKeywords::Node::x, static_cast<int>(tnode->location().x()));
@@ -192,8 +186,7 @@ bool TrackIO::save(TrackDataPtr trackData, QString path)
 
     // Save to file
     QFile file(path);
-    if (file.open(QIODevice::WriteOnly | QIODevice::Text))
-    {
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QTextStream out(&file);
         out << doc.toString();
         file.close();
@@ -208,13 +201,11 @@ TrackDataPtr TrackIO::open(QString path)
     QDomDocument doc;
 
     QFile file(path);
-    if (!file.open(QIODevice::ReadOnly))
-    {
+    if (!file.open(QIODevice::ReadOnly)) {
         return nullptr;
     }
 
-    if (!doc.setContent(&file))
-    {
+    if (!doc.setContent(&file)) {
         file.close();
         return nullptr;
     }
@@ -224,13 +215,12 @@ TrackDataPtr TrackIO::open(QString path)
     const QDomElement root = doc.documentElement();
 
     const unsigned int cols =
-        root.attribute(TrackDataBase::DataKeywords::Header::cols, "0").toUInt();
+      root.attribute(TrackDataBase::DataKeywords::Header::cols, "0").toUInt();
     const unsigned int rows =
-        root.attribute(TrackDataBase::DataKeywords::Header::rows, "0").toUInt();
+      root.attribute(TrackDataBase::DataKeywords::Header::rows, "0").toUInt();
 
     TrackData * newData = nullptr;
-    if (cols && rows)
-    {
+    if (cols && rows) {
         const QString name = root.attribute(TrackDataBase::DataKeywords::Header::name, "undefined");
         const bool isUserTrack = root.attribute(TrackDataBase::DataKeywords::Header::user, "0").toInt();
         newData = new TrackData(name, isUserTrack, cols, rows);
@@ -243,24 +233,19 @@ TrackDataPtr TrackIO::open(QString path)
         std::vector<TargetNodeBasePtr> route;
 
         QDomNode node = root.firstChild();
-        while(!node.isNull())
-        {
+        while (!node.isNull()) {
             QDomElement element = node.toElement();
-            if(!element.isNull())
-            {
+            if (!element.isNull()) {
                 // Read a tile element
-                if (element.nodeName() == TrackDataBase::DataKeywords::Track::tile)
-                {
+                if (element.nodeName() == TrackDataBase::DataKeywords::Track::tile) {
                     readTile(*newData, element);
                 }
                 // Read an object element
-                else if (element.nodeName() == TrackDataBase::DataKeywords::Track::object)
-                {
+                else if (element.nodeName() == TrackDataBase::DataKeywords::Track::object) {
                     readObject(*newData, element);
                 }
                 // Read a target node element
-                else if (element.nodeName() == TrackDataBase::DataKeywords::Track::node)
-                {
+                else if (element.nodeName() == TrackDataBase::DataKeywords::Track::node) {
                     readTargetNode(route, element);
                 }
             }

@@ -24,7 +24,7 @@
 #include <MCSurface>
 
 Pit::Pit(MCSurface & surface)
-: MCObject(surface, "pit")
+  : MCObject(surface, "pit")
 {
     physicsComponent().setMass(1, true); // Stationary
     setIsPhysicsObject(false);
@@ -41,11 +41,9 @@ void Pit::collisionEvent(MCCollisionEvent & event)
 {
     // Cache type id integers.
     static const auto carType = MCObject::typeId("car");
-    if (event.collidingObject().typeId() == carType)
-    {
+    if (event.collidingObject().typeId() == carType) {
         Car & car = static_cast<Car &>(event.collidingObject());
-        if (car.isHuman())
-        {
+        if (car.isHuman()) {
             m_possiblyPittingCars.insert(&car);
         }
     }
@@ -55,11 +53,9 @@ void Pit::separationEvent(MCSeparationEvent & event)
 {
     // Cache type id integers.
     static const auto carType = MCObject::typeId("car");
-    if (event.separatedObject().typeId() == carType)
-    {
+    if (event.separatedObject().typeId() == carType) {
         Car & car = static_cast<Car &>(event.separatedObject());
-        if (car.isHuman())
-        {
+        if (car.isHuman()) {
             m_possiblyPittingCars.erase(&car);
         }
     }
@@ -68,16 +64,12 @@ void Pit::separationEvent(MCSeparationEvent & event)
 void Pit::onStepTime(int)
 {
     auto iter = m_possiblyPittingCars.begin();
-    while (iter != m_possiblyPittingCars.end())
-    {
-        if ((*iter)->speedInKmh() < 25)
-        {
+    while (iter != m_possiblyPittingCars.end()) {
+        if ((*iter)->speedInKmh() < 25) {
             emit pitStop(**iter);
 
             iter = m_possiblyPittingCars.erase(iter);
-        }
-        else
-        {
+        } else {
             iter++;
         }
     }

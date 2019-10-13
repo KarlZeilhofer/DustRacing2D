@@ -21,10 +21,11 @@
 #include <QPointF>
 
 MapBase::MapBase(unsigned int cols, unsigned int rows)
-    : m_cols(cols)
-    , m_rows(rows)
-    , m_map(rows, TrackTileRow(m_cols, nullptr))
-{}
+  : m_cols(cols)
+  , m_rows(rows)
+  , m_map(rows, TrackTileRow(m_cols, nullptr))
+{
+}
 
 unsigned int MapBase::cols() const
 {
@@ -38,16 +39,13 @@ unsigned int MapBase::rows() const
 
 void MapBase::resize(unsigned int newCols, unsigned int newRows)
 {
-    for (unsigned int row = 0; row < m_map.size(); row++)
-    {
-        if (newCols > m_map[row].size())
-        {
+    for (unsigned int row = 0; row < m_map.size(); row++) {
+        if (newCols > m_map[row].size()) {
             m_map[row].resize(newCols, nullptr);
         }
     }
 
-    if (newRows > m_rows)
-    {
+    if (newRows > m_rows) {
         m_map.resize(newRows, TrackTileRow(newCols, nullptr));
     }
 
@@ -77,8 +75,7 @@ unsigned int MapBase::insertColumn(unsigned int at, MapBase::InsertDirection ins
 {
     at = at + (insertDirection == MapBase::InsertDirection::Before ? 0 : 1);
 
-    for (auto & row : m_map)
-    {
+    for (auto & row : m_map) {
         row.insert(row.begin() + at, nullptr);
     }
 
@@ -91,8 +88,7 @@ std::vector<TrackTileBasePtr> MapBase::deleteColumn(unsigned int at)
 {
     std::vector<TrackTileBasePtr> deleted;
 
-    for (auto & row : m_map)
-    {
+    for (auto & row : m_map) {
         deleted.push_back(*(row.begin() + at));
         row.erase(row.begin() + at);
     }
