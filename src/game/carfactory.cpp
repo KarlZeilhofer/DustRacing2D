@@ -20,7 +20,11 @@
 CarPtr CarFactory::buildCar(int index, int numCars, Game & game)
 {
     const int   defaultPower = 200000; // This in Watts
-    const float defaultDrag  = 2.5f;
+	
+	const float airDensity = 1.25; // kg/m³
+	const float cw = 0.25f; // form dependent factor for stream lined drag
+	const float A = 1.8f; // m², cross section area of car
+    const float defaultDrag  = airDensity*cw*A/2.0f; // in N/(m/s)²
 
     static const int NUM_CARS = numCars;
     static std::map<int, std::string> carImageMap = {
@@ -52,7 +56,7 @@ CarPtr CarFactory::buildCar(int index, int numCars, Game & game)
     {
         desc.power                = defaultPower;
         desc.dragQuadratic        = defaultDrag;
-        desc.accelerationFriction = 0.55f * Game::instance().difficultyProfile().accelerationFrictionMultiplier(true);
+        desc.accelerationFriction = 0.60f * Game::instance().difficultyProfile().accelerationFrictionMultiplier(true);
 
         car.reset(new Car(desc, MCAssetManager::surfaceManager().surface(carImage), index, true));
     }
