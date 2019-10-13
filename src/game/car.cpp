@@ -206,7 +206,7 @@ void Car::accelerate(bool deccelerate)
         if (currentForce > maxForce)
         {
             currentForce = maxForce;
-            const float maxSpinVelocity = 4.5f; // FIXME: velocity is not in meters/s
+            const float maxSpinVelocity = 30/3.6; // spinnin to max. 30km/h
             if (m_gearbox->gear() != Gearbox::Gear::Reverse && velocity > 0 && velocity < maxSpinVelocity)
             {
                 if (isHuman()) // Don't enable tire spin for AI yet
