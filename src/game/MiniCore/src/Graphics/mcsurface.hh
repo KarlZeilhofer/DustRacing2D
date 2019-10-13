@@ -87,7 +87,7 @@ public:
       const MCGLTexCoord texCoords[4]);
 
     //! Destructor.
-    virtual ~MCSurface() {};
+    virtual ~MCSurface(){};
 
     //! Update texture coordinates.
     void updateTexCoords(const MCGLTexCoord texCoords[4]);

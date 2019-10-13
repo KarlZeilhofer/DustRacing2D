@@ -45,7 +45,7 @@ public:
     MCSurfaceParticle(const std::string & viewId, MCSurface & surface);
 
     //! Destructor.
-    virtual ~MCSurfaceParticle() {};
+    virtual ~MCSurfaceParticle(){};
 
     //! Set color
     void setColor(const MCGLColor & color);

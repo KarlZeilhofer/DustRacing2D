@@ -62,7 +62,7 @@ public:
     MCMesh(std::string handle, const FaceVector & faces, MCGLMaterialPtr material);
 
     //! Destructor.
-    virtual ~MCMesh() {};
+    virtual ~MCMesh(){};
 
     /*! Render by using the default size.
      * \param pos The position.

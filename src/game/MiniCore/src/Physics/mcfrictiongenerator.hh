@@ -55,13 +55,13 @@ private:
     DISABLE_ASSI(MCFrictionGenerator);
 
     float m_coeffLinTot; // coefficient for mass dependent friction force (Coloumb Friction), dimension: N/(kg)
-	// example usage: force = -velocityDirection * coeff * mass
+      // example usage: force = -velocityDirection * coeff * mass
 
     float m_coeffRotTot; // TODO PHYSICS: what's the dimension of this coefficient?
-	// due to it's usage
-	// physicsComponent.addAngularImpulse(-a * m_coeffRotTot); 
-	// where a is an angular velocity, m_coeffRotTot should be an Inertia
-	// In current implementation, it is set to zero anyway. 
+      // due to it's usage
+      // physicsComponent.addAngularImpulse(-a * m_coeffRotTot);
+      // where a is an angular velocity, m_coeffRotTot should be an Inertia
+      // In current implementation, it is set to zero anyway.
 };
 
 typedef std::shared_ptr<MCFrictionGenerator> MCFrictionGeneratorPtr;

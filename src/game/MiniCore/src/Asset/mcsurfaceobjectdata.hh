@@ -33,7 +33,7 @@ public:
     explicit MCSurfaceObjectData(const std::string & typeId);
 
     //! Destructor.
-    virtual ~MCSurfaceObjectData() {};
+    virtual ~MCSurfaceObjectData(){};
 
     //! Set the id of the already created MCSurface.
     void setSurfaceId(const std::string & id);

@@ -70,8 +70,7 @@ float DifficultyProfile::accelerationFrictionMultiplier(bool isHuman) const
 
 float DifficultyProfile::powerMultiplier(bool isHuman) const
 {
-	switch (m_difficulty)
-    {
+    switch (m_difficulty) {
     case Difficulty::Easy:
         return isHuman ? 0.5f : 0.5;
     case Difficulty::Medium:
@@ -80,7 +79,7 @@ float DifficultyProfile::powerMultiplier(bool isHuman) const
         return isHuman ? 2.5f : 2.5f;
     }
 
-	return 1.0f;
+    return 1.0f;
 }
 
 DifficultyProfile::~DifficultyProfile()

@@ -22,6 +22,6 @@
 namespace CarFactory {
 CarPtr buildCar(int index, int numCars, Game & game);
 float randomFactor(float from, float to);
-}
+} // namespace CarFactory
 
 #endif // CARFACTORY_HPP

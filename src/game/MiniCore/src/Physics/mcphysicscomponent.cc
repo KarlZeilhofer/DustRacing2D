@@ -21,28 +21,28 @@
 #include "mctrigonom.hh"
 
 MCPhysicsComponent::MCPhysicsComponent()
-    : m_maxSpeed(1000.0f)
-    , m_linearDamping(10) // in N/(m/s), TODO PHYSICS: what's the reason for damping?
-    , m_angularAcceleration(0)
-    , m_angularVelocity(0)
-    , m_angularDamping(10) // in Nm/(rad/s), TODO PHYSICS: what's the reason for damping?
-    , m_angularImpulse(0)
-    , m_torque(0)
-    , m_invMass(std::numeric_limits<float>::max())
-    , m_mass(0)
-    , m_invMomentOfInertia(std::numeric_limits<float>::max())
-    , m_momentOfInertia(0)
-    , m_restitution(0.5f) // TODO PHYSICS: describe this factor
-    , m_xyFriction(0.0f)
-    , m_isSleeping(false)
-    , m_isSleepingPrevented(false)
-    , m_isStationary(false)
-    , m_isIntegrating(false)
-    , m_linearSleepLimit(0.01f)
-    , m_angularSleepLimit(0.01f)
-    , m_sleepCount(0)
-    , m_collisionTag(0)
-    , m_neverCollideWithTag(-1)
+  : m_maxSpeed(1000.0f)
+  , m_linearDamping(10) // in N/(m/s), TODO PHYSICS: what's the reason for damping?
+  , m_angularAcceleration(0)
+  , m_angularVelocity(0)
+  , m_angularDamping(10) // in Nm/(rad/s), TODO PHYSICS: what's the reason for damping?
+  , m_angularImpulse(0)
+  , m_torque(0)
+  , m_invMass(std::numeric_limits<float>::max())
+  , m_mass(0)
+  , m_invMomentOfInertia(std::numeric_limits<float>::max())
+  , m_momentOfInertia(0)
+  , m_restitution(0.5f) // TODO PHYSICS: describe this factor
+  , m_xyFriction(0.0f)
+  , m_isSleeping(false)
+  , m_isSleepingPrevented(false)
+  , m_isStationary(false)
+  , m_isIntegrating(false)
+  , m_linearSleepLimit(0.01f)
+  , m_angularSleepLimit(0.01f)
+  , m_sleepCount(0)
+  , m_collisionTag(0)
+  , m_neverCollideWithTag(-1)
 {
 }
 
@@ -67,19 +67,19 @@ void MCPhysicsComponent::addAngularImpulse(float impulse, bool)
 {
     m_angularImpulse += impulse;
 
-	toggleSleep(false);
+    toggleSleep(false);
 }
 
-const MCVector3dF &MCPhysicsComponent::metricLocation()
+const MCVector3dF & MCPhysicsComponent::metricLocation()
 {
-	m_metricLocation = object().location() * MCWorld::metersPerUnit();
-	return m_metricLocation;
+    m_metricLocation = object().location() * MCWorld::metersPerUnit();
+    return m_metricLocation;
 }
 
-void MCPhysicsComponent::translate(const MCVector3dF &newLocation)
+void MCPhysicsComponent::translate(const MCVector3dF & newLocation)
 {
-	m_metricLocation = newLocation;
-	object().translate(newLocation/MCWorld::metersPerUnit());
+    m_metricLocation = newLocation;
+    object().translate(newLocation / MCWorld::metersPerUnit());
 }
 
 void MCPhysicsComponent::setVelocity(const MCVector3dF & newVelocity)
@@ -137,7 +137,7 @@ void MCPhysicsComponent::addForce(const MCVector3dF & force)
 
 void MCPhysicsComponent::addForce(const MCVector3dF & force, const MCVector3dF & pos)
 {
-    addTorque(-(force % (pos - metricLocation())).k()); 
+    addTorque(-(force % (pos - metricLocation())).k());
     m_forces += force;
 
     toggleSleep(false);
@@ -314,7 +314,7 @@ void MCPhysicsComponent::integrate(float deltaT)
             m_angularImpulse = 0.0f;
 
             object().rotate(object().angle() + angleDiff, false);
-            translate(metricLocation() + m_velocity*deltaT); 
+            translate(metricLocation() + m_velocity * deltaT);
 
             m_sleepCount = 0;
         }
@@ -332,8 +332,8 @@ void MCPhysicsComponent::integrateLinear(float deltaT)
     MCVector3dF totAcceleration(m_acceleration);
     totAcceleration += m_forces * m_invMass;
     m_velocity += totAcceleration * deltaT;
-	m_velocity += m_linearImpulse * m_invMass;
-	m_velocity -= m_velocity * (m_linearDamping * m_invMass) * deltaT;
+    m_velocity += m_linearImpulse * m_invMass;
+    m_velocity -= m_velocity * (m_linearDamping * m_invMass) * deltaT;
 }
 
 /**
@@ -343,11 +343,10 @@ void MCPhysicsComponent::integrateLinear(float deltaT)
  */
 float MCPhysicsComponent::integrateAngular(float deltaT)
 {
-    if (object().shape() && m_momentOfInertia > 0.0f)
-    {
+    if (object().shape() && m_momentOfInertia > 0.0f) {
         m_angularVelocity += m_torque * m_invMomentOfInertia * deltaT;
-		m_angularVelocity += m_angularImpulse * m_invMomentOfInertia;
-		m_angularVelocity -= m_angularVelocity * m_angularDamping * m_invMomentOfInertia * deltaT;
+        m_angularVelocity += m_angularImpulse * m_invMomentOfInertia;
+        m_angularVelocity -= m_angularVelocity * m_angularDamping * m_invMomentOfInertia * deltaT;
 
         m_torque = 0.0f;
 

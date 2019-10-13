@@ -36,7 +36,6 @@
 
 #include <MCVector2d>
 #include <MCWorld>
-#include <MCWorld>
 
 #include <cassert>
 #include <cmath>
@@ -47,43 +46,43 @@ using std::dynamic_pointer_cast;
 using std::static_pointer_cast;
 
 Car::Car(Description & desc, MCSurface & surface, unsigned int index, bool isHuman)
-: MCObject(surface, "car")
-, m_desc(desc)
-, m_onTrackFriction(new MCFrictionGenerator(desc.rollingFrictionOnTrack, 0.0)) // NOTE PHYSICS: no rotational friction, this is implemented by friction forces on the tires
-, m_leftSideOffTrack(false)
-, m_rightSideOffTrack(false)
-, m_skidding(false)
-, m_steer(Steer::Neutral)
-, m_index(index)
-, m_tireAngle(0)
-, m_initDamageCapacity(100)
-, m_damageCapacity(m_initDamageCapacity)
-, m_initTireWearOutCapacity(100)
-, m_tireWearOutCapacity(m_initTireWearOutCapacity)
-, m_frontTire(MCAssetManager::surfaceManager().surface("frontTire"))
-, m_brakeGlow(MCAssetManager::surfaceManager().surface("brakeGlow"))
-, m_speedInKmh(0)
-, m_absSpeed(0)
-, m_dx(0)
-, m_dy(0)
-, m_currentTargetNodeIndex(-1)
-, m_prevTargetNodeIndex(-1)
-, m_routeProgression(0)
-, m_position(0)
-, m_isHuman(isHuman)
-, m_particleEffectManager(*this)
-, m_numberPos(-5, 0, 0)
+  : MCObject(surface, "car")
+  , m_desc(desc)
+  , m_onTrackFriction(new MCFrictionGenerator(desc.rollingFrictionOnTrack, 0.0)) // NOTE PHYSICS: no rotational friction, this is implemented by friction forces on the tires
+  , m_leftSideOffTrack(false)
+  , m_rightSideOffTrack(false)
+  , m_skidding(false)
+  , m_steer(Steer::Neutral)
+  , m_index(index)
+  , m_tireAngle(0)
+  , m_initDamageCapacity(100)
+  , m_damageCapacity(m_initDamageCapacity)
+  , m_initTireWearOutCapacity(100)
+  , m_tireWearOutCapacity(m_initTireWearOutCapacity)
+  , m_frontTire(MCAssetManager::surfaceManager().surface("frontTire"))
+  , m_brakeGlow(MCAssetManager::surfaceManager().surface("brakeGlow"))
+  , m_speedInKmh(0)
+  , m_absSpeed(0)
+  , m_dx(0)
+  , m_dy(0)
+  , m_currentTargetNodeIndex(-1)
+  , m_prevTargetNodeIndex(-1)
+  , m_routeProgression(0)
+  , m_position(0)
+  , m_isHuman(isHuman)
+  , m_particleEffectManager(*this)
+  , m_numberPos(-5, 0, 0)
 
-// Tire positions in graphics units:
-, m_leftFrontTirePos(14, 9, 0)
-, m_rightFrontTirePos(14, -9, 0)
-, m_leftRearTirePos(-14, 9, 0)
-, m_rightRearTirePos(-14, -9, 0)
+  // Tire positions in graphics units:
+  , m_leftFrontTirePos(14, 9, 0)
+  , m_rightFrontTirePos(14, -9, 0)
+  , m_leftRearTirePos(-14, 9, 0)
+  , m_rightRearTirePos(-14, -9, 0)
 
-, m_leftBrakeGlowPos(-21, 8, 0)
-, m_rightBrakeGlowPos(-21, -8, 0)
-, m_hadHardCrash(false)
-, m_gearbox(new Gearbox)
+  , m_leftBrakeGlowPos(-21, 8, 0)
+  , m_rightBrakeGlowPos(-21, -8, 0)
+  , m_hadHardCrash(false)
+  , m_gearbox(new Gearbox)
 {
     // Override the default physics component to handle damage from impulses
     setPhysicsComponent(*(new CarPhysicsComponent(*this)));
@@ -134,19 +133,18 @@ Car::Car(Description & desc, MCSurface & surface, unsigned int index, bool isHum
 void Car::setProperties(Description & desc)
 {
     physicsComponent().setMass(desc.mass);
-	
-	// metric dimensions:
-	const float width_m = dynamic_pointer_cast<MCRectShape>(shape())->width() * MCWorld::metersPerUnit();
-    const float height_m = dynamic_pointer_cast<MCRectShape>(shape())->height() * MCWorld::metersPerUnit();
-	
-    m_length = std::max(width_m, height_m) / MCWorld::metersPerUnit(); // note: the object's length is here in scene units. 
 
-	
-	// TODO PHYSICS: clarify center of rotation for this inertia
-	// the inertia is calculated by the car's dimensions I = 1/12 * m*(width^2 + height^2), both in meters:	
-    physicsComponent().setMomentOfInertia(desc.mass * 1.0f/12 * (width_m*width_m + height_m*height_m)); 
-    
-	physicsComponent().setRestitution(desc.restitution);
+    // metric dimensions:
+    const float width_m = dynamic_pointer_cast<MCRectShape>(shape())->width() * MCWorld::metersPerUnit();
+    const float height_m = dynamic_pointer_cast<MCRectShape>(shape())->height() * MCWorld::metersPerUnit();
+
+    m_length = std::max(width_m, height_m) / MCWorld::metersPerUnit(); // note: the object's length is here in scene units.
+
+    // TODO PHYSICS: clarify center of rotation for this inertia
+    // the inertia is calculated by the car's dimensions I = 1/12 * m*(width^2 + height^2), both in meters:
+    physicsComponent().setMomentOfInertia(desc.mass * 1.0f / 12 * (width_m * width_m + height_m * height_m));
+
+    physicsComponent().setRestitution(desc.restitution);
     setShadowOffset(MCVector3dF(5, -5, 1));
 }
 
@@ -193,16 +191,13 @@ void Car::accelerate(bool deccelerate)
       physicsComponent().mass() * m_desc.accelerationFriction * std::fabs(MCWorld::instance().gravity().k());
     float currentForce = maxForce;
     const float velocity = physicsComponent().velocity().length(); // in m/s
-    if (velocity > 0.001f)
-    {
-		// Our gear box translate a constant power into a force, depending on the current speed. 
-        currentForce = m_desc.power / velocity; 
-        if (currentForce > maxForce)
-        {
+    if (velocity > 0.001f) {
+        // Our gear box translate a constant power into a force, depending on the current speed.
+        currentForce = m_desc.power / velocity;
+        if (currentForce > maxForce) {
             currentForce = maxForce;
-            const float maxSpinVelocity = 30/3.6; // spinnin to max. 30km/h
-            if (m_gearbox->gear() != Gearbox::Gear::Reverse && velocity > 0 && velocity < maxSpinVelocity)
-            {
+            const float maxSpinVelocity = 30 / 3.6; // spinnin to max. 30km/h
+            if (m_gearbox->gear() != Gearbox::Gear::Reverse && velocity > 0 && velocity < maxSpinVelocity) {
                 if (isHuman()) // Don't enable tire spin for AI yet
                 {
                     const float spinCoeff = 0.025f + 0.975f * std::pow(velocity / maxSpinVelocity, 2.0f);
@@ -261,42 +256,42 @@ float Car::absSpeed() const
 // FIXME Physics: why are front tires handled differently than rear tires?
 MCVector3dF Car::leftFrontTireLocation(Unit unit) const
 {
-	if(unit == Unit::Scene){
-		return m_leftFrontTire->location();
-	}else if(unit == Unit::Metric){
-		return m_leftFrontTire->location()*MCWorld::metersPerUnit();
-	}
-	assert(false);
+    if (unit == Unit::Scene) {
+        return m_leftFrontTire->location();
+    } else if (unit == Unit::Metric) {
+        return m_leftFrontTire->location() * MCWorld::metersPerUnit();
+    }
+    assert(false);
 }
 
 MCVector3dF Car::rightFrontTireLocation(Unit unit) const
 {
-	if(unit == Unit::Scene){
-		return m_rightFrontTire->location();
-	}else if(unit == Unit::Metric){
-		return m_rightFrontTire->location()*MCWorld::metersPerUnit();
-	}
-	assert(false);
+    if (unit == Unit::Scene) {
+        return m_rightFrontTire->location();
+    } else if (unit == Unit::Metric) {
+        return m_rightFrontTire->location() * MCWorld::metersPerUnit();
+    }
+    assert(false);
 }
 
 MCVector3dF Car::leftRearTireLocation(Unit unit) const
 {
-	if(unit == Unit::Scene){
-		return (MCMathUtil::rotatedVector(m_leftRearTirePos, angle()) + MCVector2dF(location()));
-	}else if(unit == Unit::Metric){
-		return (MCMathUtil::rotatedVector(m_leftRearTirePos, angle()) + MCVector2dF(location()))*MCWorld::metersPerUnit();
-	}
-	assert(false);
+    if (unit == Unit::Scene) {
+        return (MCMathUtil::rotatedVector(m_leftRearTirePos, angle()) + MCVector2dF(location()));
+    } else if (unit == Unit::Metric) {
+        return (MCMathUtil::rotatedVector(m_leftRearTirePos, angle()) + MCVector2dF(location())) * MCWorld::metersPerUnit();
+    }
+    assert(false);
 }
 
 MCVector3dF Car::rightRearTireLocation(Unit unit) const
 {
-	if(unit == Unit::Scene){
-		return (MCMathUtil::rotatedVector(m_rightRearTirePos, angle()) + MCVector2dF(location()));
-	}else if(unit == Unit::Metric){
-		return (MCMathUtil::rotatedVector(m_rightRearTirePos, angle()) + MCVector2dF(location()))*MCWorld::metersPerUnit();
-	}
-	assert(false);
+    if (unit == Unit::Scene) {
+        return (MCMathUtil::rotatedVector(m_rightRearTirePos, angle()) + MCVector2dF(location()));
+    } else if (unit == Unit::Metric) {
+        return (MCMathUtil::rotatedVector(m_rightRearTirePos, angle()) + MCVector2dF(location())) * MCWorld::metersPerUnit();
+    }
+    assert(false);
 }
 
 void Car::updateAnimations()
@@ -323,15 +318,13 @@ void Car::updateTireWear(int step)
     m_dy = MCTrigonom::sin(angle());
 
     // Cache speed in km/h.
-    m_absSpeed   = physicsComponent().speed();
+    m_absSpeed = physicsComponent().speed();
     m_speedInKmh = m_absSpeed * 3.6;
 
-	// TODO Physics 4: the tire wear should be proportinal to the product of 
-	// the tire force and the velocity difference. 
-    if (m_isHuman)
-    {
-        if (isBraking() || (isAccelerating() && m_steer != Steer::Neutral))
-        {
+    // TODO Physics 4: the tire wear should be proportinal to the product of
+    // the tire force and the velocity difference.
+    if (m_isHuman) {
+        if (isBraking() || (isAccelerating() && m_steer != Steer::Neutral)) {
             const float brakingTireWearFactor = 0.05f;
             wearOutTires(step, brakingTireWearFactor);
         }
@@ -567,12 +560,12 @@ Car::~Car()
 
 Car::Description::Description()
 {
-	accelerationFriction = 0.95f;
-	rollingFrictionOnTrack = 0.05f;
-	rotationFriction = 1.0f;
-	power = 5000.0f;
-	mass = 1500.0f;
-	restitution = 0.05f;
-	dragLinear = 1.0f; // N/(m/s)
-	dragQuadratic = 5.0f; // N/(m/s)²
+    accelerationFriction = 0.95f;
+    rollingFrictionOnTrack = 0.05f;
+    rotationFriction = 1.0f;
+    power = 5000.0f;
+    mass = 1500.0f;
+    restitution = 0.05f;
+    dragLinear = 1.0f; // N/(m/s)
+    dragQuadratic = 5.0f; // N/(m/s)²
 }

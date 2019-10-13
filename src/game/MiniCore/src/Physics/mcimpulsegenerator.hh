@@ -34,7 +34,7 @@ public:
     MCImpulseGenerator();
 
     //! Destructor.
-    ~MCImpulseGenerator() {};
+    ~MCImpulseGenerator(){};
 
     //! Generate impulses to the given objects according to current contacts.
     //! Delete contacts.
@@ -46,9 +46,9 @@ public:
 
 private:
     void generateImpulsesFromContact(
-        MCObject & pa, MCObject & pb, const MCContact & contact,
-        const MCVector3dF & normalVelocityDelta,
-        float restitution);
+      MCObject & pa, MCObject & pb, const MCContact & contact,
+      const MCVector3dF & normalVelocityDelta,
+      float restitution);
 
     void displace(MCObject & pa, MCObject & pb, const MCVector3dF & displacement);
 

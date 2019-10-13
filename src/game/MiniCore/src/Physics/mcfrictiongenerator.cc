@@ -28,9 +28,10 @@
 static const float ROTATION_DECAY = 0.01f;
 
 MCFrictionGenerator::MCFrictionGenerator(float coeffLin, float coeffRot)
-    : m_coeffLinTot(std::fabs(coeffLin * MCWorld::instance().gravity().k())) // Coeff for Coluomb Friction on translations on the surface
-    , m_coeffRotTot(std::fabs(coeffRot * MCWorld::instance().gravity().k() * ROTATION_DECAY)) // Coeff for Coluomb Friction on rotations on the surface
-{}
+  : m_coeffLinTot(std::fabs(coeffLin * MCWorld::instance().gravity().k())) // Coeff for Coluomb Friction on translations on the surface
+  , m_coeffRotTot(std::fabs(coeffRot * MCWorld::instance().gravity().k() * ROTATION_DECAY)) // Coeff for Coluomb Friction on rotations on the surface
+{
+}
 
 void MCFrictionGenerator::updateForce(MCObject & object)
 {
@@ -38,22 +39,19 @@ void MCFrictionGenerator::updateForce(MCObject & object)
     MCPhysicsComponent & physicsComponent = object.physicsComponent();
     const float length = physicsComponent.velocity().lengthFast();
     const MCVector2d<float> velocityDirection(physicsComponent.velocity().normalizedFast());
-    if (length >= 1.0f)
-    {
+    if (length >= 1.0f) {
         physicsComponent.addForce(-velocityDirection * m_coeffLinTot * physicsComponent.mass());
-    }
-    else
-    {
+    } else {
         physicsComponent.addForce(-velocityDirection * length * m_coeffLinTot * physicsComponent.mass());
     }
 
     // Simulated friction caused by angular torque.
     if (object.shape()) {
         const float a = physicsComponent.angularVelocity();
-		if(a > 0)
-			physicsComponent.addTorque(- m_coeffRotTot * physicsComponent.mass() * 1.0f); // TODO: replace constant of 1.0m for average radius
-		if(a < 0)
-			physicsComponent.addTorque(+ m_coeffRotTot * physicsComponent.mass() * 1.0f); // TODO: replace constant of 1.0m for average radius
+        if (a > 0)
+            physicsComponent.addTorque(-m_coeffRotTot * physicsComponent.mass() * 1.0f); // TODO: replace constant of 1.0m for average radius
+        if (a < 0)
+            physicsComponent.addTorque(+m_coeffRotTot * physicsComponent.mass() * 1.0f); // TODO: replace constant of 1.0m for average radius
     }
 }
 

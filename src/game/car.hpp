@@ -40,24 +40,25 @@ public:
         Left,
         Right
     };
-	
-	// enum, for getters and setters, default is metric
-	enum class Unit{
-		Undefined, 
-		Metric, 
-		Scene
-	};
+
+    // enum, for getters and setters, default is metric
+    enum class Unit
+    {
+        Undefined,
+        Metric,
+        Scene
+    };
 
     //! Defines the (default) car properties.
     struct Description
     {
-		Description();
-		
+        Description();
+
         float accelerationFriction; // friction coefficient for tires on street, about 1.1 for best of class tires
 
         float rollingFrictionOnTrack; // braking friction coefficient for rolling on street, typically below 0.1
 
-        float rotationFriction; 
+        float rotationFriction;
 
         float power; // engine's power in Watts
 

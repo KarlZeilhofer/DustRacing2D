@@ -61,7 +61,7 @@ public:
     MCMeshManager();
 
     //! Destructor
-    virtual ~MCMeshManager() {};
+    virtual ~MCMeshManager(){};
 
     /*! Loads mesh config from strBasePath using the given mapping file strFile.
      *  \param configFilePath Path to the XML-based input file.

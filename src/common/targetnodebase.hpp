@@ -36,7 +36,7 @@ public:
     TargetNodeBase & operator=(TargetNodeBase & other) = delete;
 
     //! Destructor.
-    virtual ~TargetNodeBase() {};
+    virtual ~TargetNodeBase(){};
 
     //! Get location in world / scene.
     virtual QPointF location() const;

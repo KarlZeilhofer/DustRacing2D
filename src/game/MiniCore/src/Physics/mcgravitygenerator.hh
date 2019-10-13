@@ -34,7 +34,7 @@ public:
     MCGravityGenerator(const MCVector3d<float> & g);
 
     //! Destructor
-    virtual ~MCGravityGenerator() {};
+    virtual ~MCGravityGenerator(){};
 
     //! \reimp
     virtual void updateForce(MCObject & object);

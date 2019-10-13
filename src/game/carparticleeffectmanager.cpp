@@ -77,8 +77,7 @@ void CarParticleEffectManager::doRightSkidMark(ParticleFactory::ParticleType typ
 
 void CarParticleEffectManager::doDamageSmoke()
 {
-    if (m_car.damageLevel() <= 0.3f && MCRandom::getValue() > m_car.damageLevel())
-    {
+    if (m_car.damageLevel() <= 0.3f && MCRandom::getValue() > m_car.damageLevel()) {
         MCVector3dF smokeLocation = (m_car.leftFrontTireLocation(Car::Unit::Scene) + m_car.rightFrontTireLocation(Car::Unit::Scene)) * 0.5f;
         ParticleFactory::instance().doParticle(ParticleFactory::DamageSmoke, smokeLocation);
     }
@@ -89,16 +88,16 @@ void CarParticleEffectManager::doOnTrackAnimations()
     if ((m_car.isBraking() && m_car.speedInKmh() > ON_TRACK_ANIMATION_SPEED_MIN && m_car.speedInKmh() < 200) || m_car.isSkidding()) {
         if (!m_car.leftSideOffTrack()) {
             doLeftSkidMark(ParticleFactory::OnTrackSkidMark);
-            ParticleFactory::instance().doParticle(ParticleFactory::SkidSmoke, 
-					m_car.leftRearTireLocation(Car::Unit::Scene),
-					m_car.physicsComponent().velocity() * 0.25f / MCWorld::metersPerUnit()); 
+            ParticleFactory::instance().doParticle(ParticleFactory::SkidSmoke,
+                                                   m_car.leftRearTireLocation(Car::Unit::Scene),
+                                                   m_car.physicsComponent().velocity() * 0.25f / MCWorld::metersPerUnit());
         }
 
         if (!m_car.rightSideOffTrack()) {
             doRightSkidMark(ParticleFactory::OnTrackSkidMark);
-            ParticleFactory::instance().doParticle(ParticleFactory::SkidSmoke, 
-				m_car.rightRearTireLocation(Car::Unit::Scene), 
-				m_car.physicsComponent().velocity() * 0.25f  / MCWorld::metersPerUnit());
+            ParticleFactory::instance().doParticle(ParticleFactory::SkidSmoke,
+                                                   m_car.rightRearTireLocation(Car::Unit::Scene),
+                                                   m_car.physicsComponent().velocity() * 0.25f / MCWorld::metersPerUnit());
         }
     }
 }
@@ -115,8 +114,8 @@ void CarParticleEffectManager::doOffTrackAnimations()
 
             if (++m_mudCounter >= 5) {
                 ParticleFactory::instance().doParticle(
-                    ParticleFactory::Mud, m_car.leftRearTireLocation(Car::Unit::Scene), 
-							m_car.physicsComponent().velocity() * 0.5f  / MCWorld::metersPerUnit()); 
+                  ParticleFactory::Mud, m_car.leftRearTireLocation(Car::Unit::Scene),
+                  m_car.physicsComponent().velocity() * 0.5f / MCWorld::metersPerUnit());
                 m_mudCounter = 0;
             }
         }
@@ -128,16 +127,14 @@ void CarParticleEffectManager::doOffTrackAnimations()
 
             if (++m_mudCounter >= 5) {
                 ParticleFactory::instance().doParticle(
-                    ParticleFactory::Mud, m_car.rightRearTireLocation(Car::Unit::Scene), 
-							m_car.physicsComponent().velocity() * 0.5f  / MCWorld::metersPerUnit());
+                  ParticleFactory::Mud, m_car.rightRearTireLocation(Car::Unit::Scene),
+                  m_car.physicsComponent().velocity() * 0.5f / MCWorld::metersPerUnit());
                 m_mudCounter = 0;
             }
         }
 
-        if (smoke)
-        {
-            if (++m_smokeCounter >= 2)
-            {
+        if (smoke) {
+            if (++m_smokeCounter >= 2) {
                 MCVector3dF smokeLocation = (m_car.leftRearTireLocation(Car::Unit::Scene) + m_car.rightRearTireLocation(Car::Unit::Scene)) * 0.5f;
                 ParticleFactory::instance().doParticle(ParticleFactory::OffTrackSmoke, smokeLocation);
             }

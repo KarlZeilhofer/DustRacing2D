@@ -55,17 +55,16 @@ void MCImpulseGenerator::displace(
 }
 
 void MCImpulseGenerator::generateImpulsesFromContact(
-    MCObject & pa, MCObject & pb, const MCContact & contact,
-    const MCVector3dF & normalVelocityDelta,
-    float restitution)
+  MCObject & pa, MCObject & pb, const MCContact & contact,
+  const MCVector3dF & normalVelocityDelta,
+  float restitution)
 {
-    if (!pa.physicsComponent().isStationary())
-    {
+    if (!pa.physicsComponent().isStationary()) {
 
         const MCVector3dF & contactPoint(contact.contactPoint());
 
         // Linear component
-		const float invMassA = pa.physicsComponent().invMass();
+        const float invMassA = pa.physicsComponent().invMass();
         const float invMassB = pb.physicsComponent().invMass();
         const float massScaling = invMassA / (invMassA + invMassB);
         const float effRestitution = 1.0f + restitution;
@@ -74,13 +73,13 @@ void MCImpulseGenerator::generateImpulsesFromContact(
         // Angular component
         const MCVector3dF armA = (contactPoint - pa.location()) * MCWorld::metersPerUnit(); // NOTE PHYSICS: conversion to physical units
         const MCVector3dF rotationalImpulse = normalVelocityDelta % armA;
-        
-		const float invInertiaA = pa.physicsComponent().invMomentOfInertia();
+
+        const float invInertiaA = pa.physicsComponent().invMomentOfInertia();
         const float invInertiaB = pb.physicsComponent().invMomentOfInertia();
         const float inertiaScaling = invInertiaA / (invInertiaA + invInertiaB);
-		
-		// TODO PHYSICS: clarify this calculation. It's not dimensions clean, since the rotationalImpulse is not a 
-		// true rotational impluse. 
+
+        // TODO PHYSICS: clarify this calculation. It's not dimensions clean, since the rotationalImpulse is not a
+        // true rotational impluse.
         pa.physicsComponent().addAngularImpulse(-rotationalImpulse.k() * effRestitution * massScaling, true);
     }
 }
@@ -126,11 +125,9 @@ void MCImpulseGenerator::generateImpulsesFromDeepestContacts(std::vector<MCObjec
                 const MCVector2dF velocityDelta(pb.physicsComponent().velocity() - pa.physicsComponent().velocity());
                 const float projection = contact->contactNormal().dot(velocityDelta);
 
-                if (projection > 0)
-                {
+                if (projection > 0) {
                     const MCVector3dF normalVelocityDelta(
-                        contact->contactNormal() *
-                        contact->contactNormal().dot(velocityDelta));
+                      contact->contactNormal() * contact->contactNormal().dot(velocityDelta));
 
                     generateImpulsesFromContact(pa, pb, *contact, normalVelocityDelta, restitution);
                     generateImpulsesFromContact(pb, pa, *contact, -normalVelocityDelta, restitution);

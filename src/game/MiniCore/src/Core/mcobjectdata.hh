@@ -48,7 +48,7 @@ public:
     explicit MCObjectData(const std::string & typeId);
 
     //! Destructor.
-    virtual ~MCObjectData() {};
+    virtual ~MCObjectData(){};
 
     //! Get type id.
     std::string typeId() const;
